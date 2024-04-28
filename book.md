@@ -12,7 +12,14 @@
     - [BFC](#bfc)
       - [margin重叠](#margin重叠)
     - [三栏布局](#三栏布局)
+    - [粘连布局](#粘连布局)
     - [清除浮动](#清除浮动)
+    - [盒模型](#盒模型)
+    - [响应式设计](#响应式设计)
+    - [元素水平垂直居中](#元素水平垂直居中)
+    - [line-height继承](#line-height继承)
+    - [rem em vw vh](#rem-em-vw-vh)
+    - [flex布局](#flex布局)
   - [js](#js)
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
 
@@ -159,6 +166,21 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.一个
 ```
 
 ![margin负值](book_files/9.jpg)
+
+
+k1和k2是两个div
+1. 上下布局
+   + k1 margin-top 负值，k1往上移动，k2跟随移动对应距离
+   + k2 margin-top 负值，k1不动，k2往上移动，层级比k1高，可覆盖点击不到K1的事件
+   + k1 margin-bottom 负值 k1不动 k2往上移动
+   + k2 margin-bottom 负值 k2不动，k2后如果有相邻的元素比如k3存在，则会向上移动
+2. 左右布局
+   + k1 margin-left 负值 k1往左移动，k2跟随移动对应距离
+   + k2 margin-left 负值 k1不动，k2 往左移动，层级比k1高
+   + k1 margin-right 负值 k1不动 k2往左移动
+   + k2 margin-right 负值 k2不动 k2后如果有相邻的元素比如k3存在，则会向左移动
+
+实际应用：`圣杯布局+粘连布局`
 
 ### BFC
 在页面中元素都有一个隐含的属性叫作`Block Formatting Context`，即块级格式化上下文，简称BFC。该属性能够设置打开或关闭，默认是关闭的。页面上的一个`隔离渲染区域`，**容器里面的子元素不会在布局上影响到外面的元素**
@@ -416,7 +438,318 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 ```
 
+### 粘连布局
+1. 为内容区域添加最小的高度
+	+ min-height
+	+ padding-bottom top元素
+	+ margin-top bottom元素(margin负值的应用)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+		*{
+			margin: 0;
+			padding: 0;         
+		}
+		html,body{
+			height: 100%;
+		}
+		#main{
+			min-height: 100%;  
+			background-color: orange;
+		}
+		.main{
+			padding-bottom: 100px;
+		}
+		#footer{
+			height: 100px;
+		    background: pink;
+			margin-top: -100px;
+		}
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div class="main">
+            main<br>
+            main<br>
+            main<br>
+            main<br>
+            main<br>
+            main<br>	
+        </div>
+    </div>
+    <div id="footer">
+        footer
+    </div>
+</body>
+</html>
+```
+
+2. flex布局：footer的flex设为0，这样footer获得其固有的高度;content的flex设为1
+
 ### 清除浮动
+1.	overflow:hidden
+2.	父级设置固定高度
+3.	clear:both;兼容性好，需要一个空div，语义化不好
+4.	万能清除法
+
+```css
+.类名:after {
+  content: "";
+  clear: both;
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  zoom:1;
+}
+```
+
+```html
+<style type="text/css">
+	.parent::after {  
+	    content: ""; /* 必须设置内容，即使它是空的 */  
+	    display: table; /* 创建一个匿名表格块级盒子 */  
+	    clear: both; /* 清除浮动 */  
+	}  
+	.parent{
+		border:3px slateblue solid 
+	}
+	.float-child {  
+	    float: left; /* 或者使用 float: right; */  
+	    width: 100px;  
+	    height: 100px;  
+	    background-color: lightblue;  
+	    margin-right: 10px; /* 如果是左浮动的话 */  
+	}
+</style>
+<div class="parent">  
+    <div class="float-child">我是浮动元素我是浮动元素我是浮动元素我是浮动元素我是浮动元素我是浮动元素我是浮动元素</div>  
+    <!-- 注意这里没有额外的清除标签 -->  
+</div>
+```
+![img](book_files/13.jpg)
+
+
+### 盒模型
+盒模型指的是HTML元素在渲染时所占据的空间，包括元素的内容（content）、内边距（padding）、边框（border）和外边距（margin）。
+
+```
+box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
+```
+
+
+### 响应式设计
+适配不同尺寸屏幕
+
++ 媒体查询 @media
++ 百分比
++ vw/vh
++ rem
+
+### 元素水平垂直居中
++ position 定位四个方向值一致，margin:auto
++ position + transform
++ position + margin负值(需知道宽高)
++ grid
++ flex
++ table
+
+```css
+.father {  
+	display: flex;  
+	justify-content: center; /* 水平居中 */  
+	align-items: center; /* 垂直居中 */  
+}  
+```
+```css
+	.father {
+		display: table-cell;
+		vertical-align: middle;
+		text-align: center; 
+	}
+	.son {
+		display: inline-block;
+	}
+```
+
+```html
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>水平垂直居中方案</title>
+    <style type="text/css">
+        .container {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            height: 200px;
+        }
+        .item {
+            background-color: #ccc;
+        }
+		 /*行内元素*/
+        .container-1{
+            text-align: center;
+            line-height: 200px;
+            height: 200px;
+        }
+
+        .container-2 {
+            position: relative;
+        }
+		 /*需要知道宽高*/
+        .container-2 .item {
+            width: 300px;
+            height: 100px;
+            position: absolute;
+            left: 50%;
+            margin-left: -150px;
+            top: 50%;
+            margin-top: -50px;
+        }
+
+        .container-3 {
+            position: relative;
+        }
+		/*不需要知道宽高，但是不兼容低版本浏览器*/
+        .container-3 .item {
+            width: 200px;
+            height: 80px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%)
+        }
+
+        .container-4 {
+            position: relative;
+        }
+		 /*比较优秀的处理方案*/
+        .container-4 .item {
+            width: 100px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+        }
+ 		.container-5 {
+           position: relative;
+          justify-content: center;
+          align-items: center;
+          display:flex;
+          
+        }
+        .container-5 .item {
+            width: 100px;
+            height: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container container-1">
+        <span>一段文字</span>
+    </div>
+
+    <div class="container container-2">
+        <div class="item">
+            this is item
+        </div>
+    </div>
+
+    <div class="container container-3">
+        <div class="item">
+            this is item
+        </div>
+    </div>
+
+    <div class="container container-4">
+        <div class="item">
+            this is item
+        </div>
+</div>
+<div class="container container-5">
+        <div class="item">
+            this is item
+        </div>
+    </div>
+
+</body>
+</html>
+
+```
+
+### line-height继承
+1.	写具体数值，如30px，则继承父级该值
+2.	写比例如1/2/3.5等,则继承该比例（**自己的**font-size*父级中的比例）
+3.	写百分比,如200%,则继承计算出来的结果(**父级**的font-size*200%)
+
+### rem em vw vh
+1.	rem: 相对大小，但相对的只是HTML根元素
+2.	em:  继承父级元素的字体大小
+3.	vw:window.innerWidth = 100vw
+4.	vh:window.innerHeight = 100vh
+5.	vmax:取vh/vw中大值
+6.	vmin: 取vh/vw中小
+
+
+### flex布局
++ flex-direction: 设置主轴的方向
++ **justify-content**: `设置主轴上的子元素排列方式`
++ flex-wrap: 设置子元素是否换行
++ align-content: 设置侧轴的子元素的排列方式（多行）
++ **align-items**:`设置侧轴上的子元素排列方式（单行）`
++ align-self:`允许单个项目有与其他项目不一样的对齐方式`，可覆盖align-items属性。
++ flex-flow:复合属性，相当于同时设置了flex-direction 和 flex-wrap
++ order：定义项目的排列顺序。数值越小，排列越靠前，默认为0。
+
+```css
+.box {
+ justify-content: flex-start | flex-end | center | space-between | space-around;
+}
+```
++ space-between：两端对齐，项目之间的间隔都相等。
++ space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+
+![1](book_files/14.jpg)
+
+```css
+.box { align-items: flex-start | flex-end | center | baseline | stretch; }
+```
+
+![2](book_files/15.jpg)
+
++ stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
+
+```css
+.box {
+  align-content: flex-start | flex-end | center | space-between | space-around | stretch;
+}
+```
+![3](book_files/16.jpg)
+
++ align-content属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
+
+```css
+.item {
+  align-self: auto | flex-start | flex-end | center | baseline | stretch;
+}
+```
+![4](book_files/17.jpg)
+
++ align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 
 ## js
 
