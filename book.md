@@ -18,8 +18,19 @@
     - [响应式设计](#响应式设计)
     - [元素水平垂直居中](#元素水平垂直居中)
     - [line-height继承](#line-height继承)
-    - [rem em vw vh](#rem-em-vw-vh)
+    - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
+      - [移动端1px实现](#移动端1px实现)
+      - [移动端2X3X图](#移动端2x3x图)
+    - [css预处理语言](#css预处理语言)
     - [flex布局](#flex布局)
+    - [元素竖向的百分比设定是相对于容器的高度吗？](#元素竖向的百分比设定是相对于容器的高度吗)
+    - [css选择器](#css选择器)
+      - [css选择器读取顺序](#css选择器读取顺序)
+      - [可继承](#可继承)
+    - [css元素隐藏](#css元素隐藏)
+    - [css画三角形](#css画三角形)
+    - [css视差滚动实现方案](#css视差滚动实现方案)
+    - [css性能优化](#css性能优化)
   - [js](#js)
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
 
@@ -696,13 +707,348 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 2.	写比例如1/2/3.5等,则继承该比例（**自己的**font-size*父级中的比例）
 3.	写百分比,如200%,则继承计算出来的结果(**父级**的font-size*200%)
 
-### rem em vw vh
+### rem em vw vh dpr
 1.	rem: 相对大小，但相对的只是HTML根元素
 2.	em:  继承父级元素的字体大小
 3.	vw:window.innerWidth = 100vw
 4.	vh:window.innerHeight = 100vh
 5.	vmax:取vh/vw中大值
 6.	vmin: 取vh/vw中小
+7.	dpr（设备像素比）：是指`设备物理像素的个数`除以`设备独立像素`的大小。物理像素是手机屏幕上一个一个的发光的点，大小是固定的；独立像素也叫做逻辑像素，css设置的像素大小就是逻辑像素。
+
+`window.devicePixelRatio`可获取，无缩放的情况下，1个css像素 === 一个设备独立像素
+
+![dpr](book_files/20.jpg)
+
+#### 移动端1px实现
++  border-image:需要图片
++  background-image：因为每个边框都是线性渐变颜色实现，因此无法实现圆角。
++  box-shadow:不好控制
++  媒体查询：兼容性
++  :after transform (其实无非是把1px缩放为0.5px，**0.5px并不是所有都支持**(iOS8以上支持)。)
+
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>1px Border with Transform and After</title>  
+<style>  
+  .border-1px {  
+    position: relative;  
+    background-color: white;  
+  }  
+  .border-1px::after {  
+    content: "";  
+    position: absolute;  
+    left: 0;  
+    top: 0;  
+    width: 200%;  
+    height: 200%;  
+    border: 1px solid #000;  
+    transform: scale(0.5);  
+    transform-origin: 0 0;  
+    box-sizing: border-box;  
+    pointer-events: none; /* 防止影响点击事件 */  
+  }  
+</style>  
+</head>  
+<body>  
+<div class="border-1px" style="width: 200px; height: 100px;">  
+  使用transform和伪元素的1px边框  
+</div>  
+</body>  
+</html>
+```
+
++  viewport + rem
+
+```html
+<meta name="viewport" id="WebViewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+```
+```js
+var viewport = document.querySelector("meta[name=viewport]")
+if (window.devicePixelRatio == 1) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no')
+} 
+if (window.devicePixelRatio == 2) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no')
+} 
+if (window.devicePixelRatio == 3) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=0.333333333, maximum-scale=0.333333333, minimum-scale=0.333333333, user-scalable=no')
+} 
+var docEl = document.documentElement;
+var fontsize = 10 * (docEl.clientWidth / 320) + 'px';
+docEl.style.fontSize = fontsize;
+```
++ svg，postcss-write-svg(小插件，只适合画直线)
+
+#### 移动端2X3X图
++ srcset
+
+```html
+<img srcset="my-image@1x.png 1x, my-image@2x.png 2x, my-image@3x.png 3x"  
+     src="my-image@1x.png"  
+     alt="My Image"  
+     style="width:100%;height:auto;">
+```
++ 媒体查询 兼容性差，目前之余IOS8+才支持，在IOS7及其以下、安卓系统都是显示0px。
+
+```css
+.my-element {  
+  /* 默认背景图像，用于1倍像素密度的设备 */  
+  background-image: url('my-image@1x.png');  
+}  
+  /* 针对2倍像素密度的设备 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+  .my-element {  
+    background-image: url('my-image@2x.png');  
+  }  
+}  
+  
+	/* 针对3倍像素密度的设备 */  
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {  
+  .my-element {  
+    background-image: url('my-image@3x.png');  
+  }  
+}
+```
+
++ js处理
+
+```js
+function setAppropriateImageSrc() {  
+  var image = document.getElementById('my-image');  
+  var dpr = window.devicePixelRatio || 1;  
+  var src;  
+  
+  if (dpr >= 3) {  
+    src = 'my-image@3x.png';  
+  } else if (dpr >= 2) {  
+    src = 'my-image@2x.png';  
+  } else {  
+    src = 'my-image@1x.png';  
+  }  
+  
+  image.src = src;  
+}  
+  
+window.onload = setAppropriateImageSrc;  
+// 如果需要监听窗口大小变化，可以添加以下事件监听器  
+window.onresize = setAppropriateImageSrc;
+```
+
+### css预处理语言
+扩充css语言，增加了变量，混合，函数，嵌套，代码模块化等功能，方便复用和开发
+
++ 嵌套 scss less stylus
+
+```css
+.a {
+	&.b {
+		color: red;
+	}
+}
+```
++ 变量处理
+
+```less
+// less要求变量@开头
+@red : #c00;
+strong {
+	color: @red;
+}
+```
+```scss
+/* sass变量$开头 */
+$red: #c00;
+strong {
+	color: $red;
+}
+```
+```css
+/* stylus变量可以$也可以不加符号，不要用@ */
+$mainColor = #0982c1  
+$siteWidth = 1024px  
+borderStyle = dotted  
+  
+body  
+  color $mainColor  
+  border 1px borderStyle $mainColor  
+  max-width $siteWidth
+```
+
++ 作用域概念:和js类似，但是最好不要去定义重复名称变量，除非真的需要
+
+> sass测试也一样，有的人说显示unscoped 会是white，实际测试不是
+```less
+@color: black;
+.scoped {
+ @bg: blue;
+ @color: white;
+ color: @color;
+ background-color:@bg;
+}
+.unscoped {
+ color:@color;
+}
+```
+```css
+.scoped {
+  color: #ffffff;
+  background-color: #0000ff;
+}
+.unscoped {
+  color: #000000;
+}
+```
+
++ 混入(mixins)是预处理器最精髓之一，抽离提取。
+
+在less中，混合的用法是指将定义好的classA引入classB中，同时还可以传参和带有默认参数
+```less
+.alert {
+ font-weight: 700;
+}
+// 函数一样
+.highlight(@color: red) {
+ font-size: 1.2em;
+ color: @color;
+}
+.heads-up {
+ .alert;
+ .highlight(red);
+}
+```
+```css
+.alert {
+  font-weight: 700;
+}
+.heads-up {
+  font-weight: 700;
+  font-size: 1.2em;
+  color: #ff0000;
+}
+
+```
+
+sass需要关键词@mixin和引入时@include
+```scss
+@mixin large-text {
+ font: {
+ family: Arial;
+ size: 20px;
+ weight: bold;
+ }
+ color: #ff0000;
+}
+.page-title {
+ @include large-text;
+ padding: 4px;
+ margin-top: 10px;
+}
+```
+```scss
+// 定义一个带参数的mixin  
+@mixin large-text($family, $size, $weight) {  
+  font-family: $family;  
+  font-size: $size;  
+  font-weight: $weight;  
+  color: #ff0000;  
+}  
+  
+// 使用mixin，并传递参数  
+.page-title {  
+  @include large-text(Arial, 40px, bold);  
+  padding: 4px;  
+  margin-top: 10px;  
+}
+```
+```css
+.page-title {
+  font-family: Arial;
+  font-size: 40px;
+  font-weight: bold;
+  color: #ff0000;
+  padding: 4px;
+  margin-top: 10px; }
+```
+stylus可以不加关键字,参数和函数写法一致，用等号
+```css
+error(borderWidth= 2px) {
+ border: borderWidth solid #F00;
+ color: #F00;
+}
+.generic-error {
+ padding: 20px;
+ margin: 4px;
+ error(); /* error mixins */
+}
+.login-error {
+ left: 12px;
+ position: absolute;
+ top: 20px;
+ error(5px); /* error mixins $borderWidth 5px */
+}
+```
+
++ 其他逻辑判断
+
+```scss
+@for $i from 1 through 3 {  
+  .item-#{$i} { width: 100px * $i; }  
+}
+$type: monster;  
+body {  
+  @if $type == monster {  
+    background: green;  
+  } @else if $type == demon {  
+    background: red;  
+  } @else {  
+    background: blue;  
+  }  
+}
+```
+```css
+.item-1 {
+  width: 100px; }
+.item-2 {
+  width: 200px; }
+.item-3 {
+  width: 300px; }
+body {
+  background: green; }
+```
+stylus语法
+```css
+for i in 1..3  
+  .item-{i}  
+    width: 100px * i
+type = 'monster'  
+body  
+  if type == 'monster'  
+    background: green  
+  else if type == 'demon'  
+    background: red  
+  else  
+    background: blue
+```
+```css
+.item-1 {  
+  width: 100px;  
+}  
+.item-2 {  
+  width: 200px;  
+}  
+.item-3 {  
+  width: 300px;  
+}
+body {  
+  background: green;  
+}
+```
+
 
 
 ### flex布局
@@ -750,6 +1096,73 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ![4](book_files/17.jpg)
 
 + align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
+
+
+
+### 元素竖向的百分比设定是相对于容器的高度吗？
+当按百分比设定一个元素的宽度时，它是相对于父容器的宽度计算的，但是，对于一些表示竖向距离的属性，例如 `padding-top , padding-bottom , margin-top , margin-bottom` 等，当按百分比设定它们时，依据的也是父容器的`宽度`，而不是高度。
+
+### css选择器
+id选择器 标签选择器 类选择器 后代选择器 子选择器(div>p) 相邻选择器(a+div) 群组选择器(div,p 选择所有div和p) 伪类选择器 伪元素选择器 属性选择器 层级选择器(p~ul 选择前面有p元素的所有ul)
+
+#### css选择器读取顺序
+CSS选择器的解析是从右向左解析的。若从左向右的匹配，发现不符合规则，需要进行回溯，会损失很多性能。
+
+若从右向左匹配，先找到所有的最右节点，对于每一个节点，向上寻找其父节点直到找到根元素或满足条件的匹配规则，则结束这个分支的遍历。
+
+两种匹配规则的性能差别很大，是因为从右向左的匹配在第一步就筛选掉了大量的不符合条件的最右节点（叶子节点），而从左向右的匹配规则的性能都浪费在了失败的查找上面。
+
+#### 可继承
++ 可继承的属性：font-size, font-family, color
++ 不可继承的样式：border, padding, margin, width, height
++ 注意a标签不继承父级的`color`，h1-h6不继承font-size(是按照一定的em比例呈现的)
+
+### css元素隐藏
++ display:none
++ visibility:didden
++ opacity:0
++ 宽高设为0
++ 定位出可视区
++ clip-path
+
+![对比](book_files/18.jpg)
+
+### css画三角形
+可以看到,设置不同颜色的各个边框，就会发现边框是梯形，极限情况下，width height为0，其他边框颜色留一个边框就可以得到三角形
+
+![三角形](book_files/19.jpg)
+
+
+### css视差滚动实现方案
++ perspective  transform: translateZ() scale();
++ background-attachment
+
+### css性能优化
+1. 内联首屏`关键css`，可下载完html立刻渲染，不需要外链下载再渲染，但是不能缓存且代码不能过多(阻塞)
+2. 异步加载css
+```js
+//方案1
+const myCSS = document.createElement( "link" );
+myCSS.rel = "stylesheet";
+myCSS.href = "mystyles.css";
+// header
+document.head.insertBefore( myCSS, document.head.childNodes[ document.head.
+childNodes.length - 1 ].nextSibling );
+```
+```html
+<!-- 方案2： media设置noexist，再onload改为all，这样一开始不加载，等页面加载完毕后再去解析css -->
+<link rel="stylesheet" href="mystyles.css" media="noexist" onload="this.med
+ia='all'">
+```
+```html
+<!-- 方案3：先rel配置可选，后加载完删除可选alternate -->
+<link rel="alternate stylesheet" href="mystyles.css" onload="this.rel='styl
+esheet'">
+```
+3. 资源压缩 webpack gulp
+4. 选择器(从右往左执行，不要写太多层级div #x 直接写 #x更快)，尽量不用通配符和属性选择器
+5. 减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能
+6. 少使用@import
 
 ## js
 
