@@ -8,8 +8,13 @@
     - [p标签里面不能嵌套ul、div等块级元素原因](#p标签里面不能嵌套uldiv等块级元素原因)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
+    - [margin负值](#margin负值)
+    - [BFC](#bfc)
+      - [margin重叠](#margin重叠)
+    - [三栏布局](#三栏布局)
+    - [清除浮动](#清除浮动)
   - [js](#js)
-    - [window.getComputedStyle(element)](#windowgetcomputedstyleelement)
+    - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
 
 
 ## html
@@ -87,6 +92,73 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.一个
 
 
 ### margin负值
+1.	margin-top和margin-left为负值时，元素向上或者向左移动
+2.	margin-bottom为负值时，下方元素上移，自身不受影响
+3.	margin-right为负值时，右侧元素左移，自身不受影响(margin-right负值也可以理解为自身在越来越小，当不占width又是float时可以浮动上去，三栏布局可应用到)
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>margin 负值</title>
+    <style type="text/css">
+        body {
+            margin: 20px;
+        }
+
+        .float-left {
+            float: left;
+        }
+        .clearfix:after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+
+        .container {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .container .item {
+            width: 100px;
+            height: 100px;
+        }
+        .container .border-blue {
+            border: 1px solid blue;
+            margin-right:-10px;
+        }
+        .container .border-red {
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    
+    <p>用于测试 margin top bottom 的负数情况</p>
+    <div class="container">
+        <div class="item border-blue">
+            this is item 1
+        </div>
+        <div class="item border-red">
+            this is item 2
+        </div>
+    </div>
+
+    <p>用于测试 margin left right 的负数情况</p>
+    <div class="container clearfix">
+        <div class="item border-blue float-left">
+            this is item 3
+        </div>
+        <div class="item border-red float-left">
+            this is item 4
+        </div>
+    </div>
+
+</body>
+</html>
+```
+
+![margin负值](book_files/9.jpg)
 
 ### BFC
 在页面中元素都有一个隐含的属性叫作`Block Formatting Context`，即块级格式化上下文，简称BFC。该属性能够设置打开或关闭，默认是关闭的。页面上的一个`隔离渲染区域`，**容器里面的子元素不会在布局上影响到外面的元素**
@@ -226,6 +298,123 @@ margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 
 
 ### 三栏布局
++ flex grid
++ absolute + margin
++ 圣杯布局：center left right在同一层级全部浮动，父级设左右padding，左侧：left:-100% + right对应宽度，右边margin-right对应宽度 
++ 双飞翼布局：多一个div包裹，中间div用margin不是padding，左侧不需要再借助定位改变位置，右侧不需要通过margin-right直接使用margin-left即可
+
+```html
+<style>
+*{
+    margin:0;
+    padding:0
+}
+#container {
+  padding-left: 200px; 
+  padding-right: 150px;
+}
+#container .column {
+  float: left;
+}
+
+#center {
+  width: 100%;
+  background:greenyellow
+}
+
+#left {
+  width: 200px; 
+  margin-left: -100%;
+  position: relative;
+  right: 200px;
+  background: skyblue;
+}
+#right {
+  width: 150px; 
+  margin-right: -150px; 
+  background: mediumvioletred;
+}
+
+#footer {
+  clear: both;
+}
+
+</style>
+<div id="header">header</div>
+<div id="container">
+  <div id="center" class="column">1</div>
+  <div id="left" class="column">2</div>
+  <div id="right" class="column">3</div>
+</div>
+<div id="footer">footer</div>
+```
+
+![1](book_files/10.jpg)
+
+div内容为2的位置因为浮动本应该在1之后，然后设置margin-left：-100%；相当于向左移动了整个#container位置，还需要在通过定位移动200px
+
+![2](book_files/11.jpg)
+
+div内容为3的位置，设置了margin-right负值，本来应该影响右侧内容，但是它的右侧没内容，假设有，右侧内容会慢慢左移，当margin-right负值等于div3的大小，就相当于完全遮盖住，**外界感觉div3相当于没了宽度，没了宽度的div3自然可以移动上去。**
+
+![3](book_files/12.jpg)
+
+双飞翼布局
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>双飞翼布局</title>
+    <style type="text/css">
+        body {
+            min-width: 550px;
+        }
+        .col {
+            float: left;
+        }
+
+        #main {
+            width: 100%;
+            height: 200px;
+            background-color: #ccc;
+        }
+        #main-wrap {
+            margin: 0 190px 0 190px;
+        }
+
+        #left {
+            width: 190px;
+            height: 200px;
+            background-color: #0000FF;
+            margin-left: -100%;
+        }
+        #right {
+            width: 190px;
+            height: 200px;
+            background-color: #FF0000;
+            margin-left: -190px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main" class="col">
+        <div id="main-wrap">
+            this is main
+        </div>
+    </div>
+    <div id="left" class="col">
+        this is left
+    </div>
+    <div id="right" class="col">
+        this is right
+    </div>
+</body>
+</html>
+
+```
 
 ### 清除浮动
 
