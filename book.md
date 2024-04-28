@@ -30,9 +30,17 @@
     - [css元素隐藏](#css元素隐藏)
     - [css画三角形](#css画三角形)
     - [css视差滚动实现方案](#css视差滚动实现方案)
+    - [3D立体感绕x轴旋转](#3d立体感绕x轴旋转)
+      - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
     - [css性能优化](#css性能优化)
   - [js](#js)
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
+    - [js中哪些会被判断为false](#js中哪些会被判断为false)
+    - [js 类型转换机制](#js-类型转换机制)
+    - [Promise](#promise)
+    - [== 和 ===](#-和-)
+      - [==的注意之处](#的注意之处)
+      - [\[\]==!\[\] {}==!{}的结果](#-的结果)
 
 
 ## html
@@ -1137,6 +1145,135 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 + perspective  transform: translateZ() scale();
 + background-attachment
 
+![perspective](book_files/22.jpg)
+
+translateZ 值调节元素在 Z 轴的位置（近大远小），同时配合 scale 值让元素的大小看起来和原来无异。那么就实现了滚动过程中，不同元素看起来的运动速度不同。
+
+```css
+.container {
+  width: 100vw;
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  perspective: 1px;
+}
+.img-1 {
+  transform: translateZ(-1px) scale(2); //变慢两倍
+}
+.img-2 {
+  transform: translateZ(-2px) scale(3); //变慢三倍
+}
+.text-1 {
+  transform: translateZ(0.5px) scale(0.5); //变快两倍
+}
+
+```
+
+
+### 3D立体感绕x轴旋转
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"> 
+<title></title> 
+<style>
+#div1
+{
+	position: relative;
+	height: 150px;
+	width: 150px;
+	margin: 50px;
+	padding:10px;
+	border: 1px solid black;
+	perspective:150;
+	-webkit-perspective:150; /* Safari and Chrome */
+}
+
+#div2
+{
+	padding:50px;
+	position: absolute;
+	border: 1px solid black;
+	background-color: red;
+	transform: rotateX(50deg);
+	
+}
+</style>
+</head>
+
+<body>
+
+<div id="div1">
+  <div id="div2">HELLO</div>
+</div>
+ 
+</body>
+</html>
+```
+
+![案例](book_files/21.jpg)
+
+#### transform-style立体交叉遮盖
+transform-style 属性指定嵌套元素是怎样在三维空间中呈现。
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"> 
+<title></title>
+<style>
+#div5
+{
+	position: relative;
+	height: 200px;
+	width: 200px;
+	margin: 100px;
+	padding:10px;
+	border: 1px solid black;
+}
+
+#div6
+{
+	padding:50px;
+	position: absolute;
+	border: 1px solid black;
+	background-color: red;
+	transform: rotateY(60deg);
+	transform-style: preserve-3d;
+	-webkit-transform: rotateY(60deg); 
+	-webkit-transform-style: preserve-3d;
+}
+
+#div7
+{
+	padding:40px;
+	position: absolute;
+	border: 1px solid black;
+	background-color: yellow;
+	transform: rotateY(-60deg);
+	-webkit-transform: rotateY(-60deg); 
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="div5">
+  <div id="div6">HELLO
+  	<div id="div7">YELLOW</div>
+  </div>
+</div>
+
+</body>
+</html>
+```
+
+![图](book_files/23.jpg)
+
+
 ### css性能优化
 1. 内联首屏`关键css`，可下载完html立刻渲染，不需要外链下载再渲染，但是不能缓存且代码不能过多(阻塞)
 2. 异步加载css
@@ -1188,4 +1325,139 @@ console.log(style.paddingLeft) // 10px
 let k1=document.getElementsByClassName("k1")[0]
 console.log(window.getComputedStyle(k1, ':before').getPropertyValue("content")) //rocks!
 //	console.log(window.getComputedStyle(k1, ':before').content)也可以这样写
+```
+
+### js中哪些会被判断为false
+以下这些都会： 0 null undefined NaN ""
+```js
+if (0) {  
+  console.log("This will not be logged because 0 is falsy.");  
+}  
+  
+if (null) {  
+  console.log("This will not be logged because null is falsy.");  
+}  
+  
+if (undefined) {  
+  console.log("This will not be logged because undefined is falsy.");  
+}  
+  
+if (NaN) {  
+  console.log("This will not be logged because NaN is falsy.");  
+}  
+  
+if ("") {  
+  console.log("This will not be logged because an empty string is falsy.");  
+}
+```
+
+### js 类型转换机制
++ 显式转换： Number() parseInt() Boolean() String()...
++ 隐式转换: 根据运行的代码自动做了某些转换
+
+```js
+console.warn(Number('1a'))//NaN
+console.warn(Number(true))//1
+const obj ={
+	toString:()=>{
+		return 112
+	}
+}
+console.log(Number(obj))// 112
+console.log(parseInt('22a1'))//22
+//console.log(Number(Symbol(1)))// Cannot convert a Symbol value to a number
+console.log(Number(null))//0
+console.log(Number([3,4]))//NaN
+console.log(Number([3]))//3
+const arr=[1,2,3]
+arr.toString=function(){
+	return 1111
+}
+console.log(Number(arr))//1111
+```
+
+```js
++new Date()// 转换成时间戳
+null+1 //1
+undefined+1//NaN
+```
+
+### Promise
++ 三种状态 pending resolved rejected
++ then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
++ catch函数正常返回resolved，里面有报错返回rejected[同上]
+
+```js
+Promise.resolve().then(() => {
+    console.log(1) //1
+    }).catch(() => {
+        console.log(2)
+    }).catch(() => {
+        console.log(2)
+}).catch(() => {
+        console.log(2)
+    }).then((val) => {
+    console.warn(val)//undefined
+        console.log(3)//3
+})
+```
+
+```js
+Promise.resolve().then(() => { // 返回 rejected 状态的 promise
+    console.log(1)
+    throw new Error('erro1')
+}).catch((e) => { // 返回 resolved 状态的 promise
+  console.log(e)  //Error: erro1
+    console.log(2) // 2
+}).catch(() => { 
+    console.log(2)
+}).catch(() => { 
+    console.log(2)
+}).then(() => {
+    console.log(3)//3
+})
+```
+
+### == 和 ===
+全等不会存在隐式转换问题
+
+#### ==的注意之处
+两等操作符存在隐式转换的情形。
+
+```js
+let obj = {valueOf:function(){return 1}}
+let result1 = (obj == 1); // true
+console.log(result1)//true
+
+console.log(NaN == NaN) //false
+
+let obj1 = {toString:function(){return 1}}
+console.log(obj1 == 1)//true
+
+// 运算操作时，valueOf的优先级高于toString
+let obj2 = {toString:function(){return 1},valueOf:function(){return 2}}
+console.log(obj2 == 1)//false
+```
+
+两等操作符总结：
+1. 两个都为简单类型，字符串和布尔值都会转换成**数值**，再比较
+2. 简单类型与引用类型比较，**对象转化成其原始类型的值**，再比较
+3. 两个都为引用类型，**则比较它们是否指向同一个对象**
+4. null 和 undefined 相等
+5. 存在 NaN 则返回 false
+
+
+#### []==![] {}==!{}的结果
+```js
+console.warn([] == ![])//true
+console.warn({} == !{})//false
+
+// Number([]) //=> 0
+// [].valueOf() -> []
+// [].toString() -> ''
+//  Number('') -> 0
+// Number({})// => NaN
+// ({}).valueOf() -> {}
+// ({}).toString() -> '[object Object]'
+// Number('[object Object]') -> NaN
 ```
