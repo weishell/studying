@@ -58,6 +58,10 @@
       - [函数的特殊性](#函数的特殊性)
     - [js如何实现继承](#js如何实现继承)
       - [继承的方案](#继承的方案)
+    - [闭包](#闭包)
+      - [不要滥用闭包](#不要滥用闭包)
+      - [防抖和节流](#防抖和节流)
+      - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
 
 
 ## html
@@ -1880,3 +1884,122 @@ console.log(person6);
 ```
 
 ![整体思路](book_files/35.jpg)
+
+### 闭包
+函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。
+
+![闭包](book_files/36.jpg)
+
+场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存]
+```js
+// 闭包隐藏数据，只提供 API
+	function createCache() {
+	    const data = {} // 闭包中的数据，被隐藏，不被外界访问
+	    return {
+	        set: function (key, val) {
+	            data[key] = val
+	        },
+	        get (key) {
+	            return data[key]
+	        }
+	    }
+	}
+	
+	const c = createCache()
+	c.set('a', 100)
+	c.set('a', 160)
+	console.log( c.get('a') )
+```
+```js
+const updateCursor = (function () {
+  // 如果这个换成全局变量，其实也可以，找的时候都可能有些麻烦。
+  let selectTableCol = false
+  return function (updateLeftStaple: boolean) {
+   // xxx处理
+   // selectTableCol= xxxx
+  }
+})()
+```
+
+#### 不要滥用闭包
+1. 构造函数的方法尽可能定义在函数原型上
+```js
+// 定义在内部每次都要占内存且消耗时间，这种闭包不是需要的
+function MyObject(name, message) {
+ this.name = name.toString();
+ this.message = message.toString();
+ this.getName = function() {
+ return this.name;
+ };
+ this.getMessage = function() {
+ return this.message;
+ };
+}
+```
+2. 避免循环引用的问题
+```js
+function func() {
+	var test = document.getElementById('test');
+	test.onclick = function () {
+		console.log('hello world');
+	}
+	test = null;//没有这一步，则会形成不必要的闭包
+	//再给test赋值onclick的时候点击事件已经存在dom上了，test只是一个暂存dom元素的变量
+	//这仅仅断开了局部变量 test 和 DOM 元素之间的引用，但并没有改变 DOM 元素本身或它的任何属性，包括 onclick 事件处理器。，如果是要解绑点击事件，需要把dom上的onclick设置为null
+	// document.getElementById('test').onclick = null;
+}
+```
+```js
+function func() {
+    var test = document.getElementById('test');
+	// 使click的handler无法再满足闭包条件
+    test.onclick = funcTest;
+}
+function funcTest(){
+    console.log('hello world');
+}
+```
+> 当闭包不需要时，需要手动置为null，释放内存
+
+#### 防抖和节流
+防抖（debounce）和节流（throttle）是两种常用的浏览器事件处理方法，它们的主要目的都是为了减少事件触发频率，优化性能。
+
++ 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。【搜索框自动补全、表单验证、按钮点击等】
++ 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。【页面滚动、鼠标移动、懒加载】
+
+#### 闭包为什么会延长变量的生命周期
+1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
+2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
+3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就创建一个函数对象 foo（oxa00），里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
+4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
+5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后解析函数，里面放入name:undefined,age:undefined
+
+![图](book_files/37.jpg)
+
+6. 然后执行一行一行执行foo里面的代码，同时把AO里面的name赋值'foo'，age赋值18；
+
+![图](book_files/38.jpg)
+
+7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
+8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
+
+```js
+var message = 'hello'
+function foo(){
+  var name = 'foo';
+  var age = 18;
+
+  function bar(){
+    console.log(name);
+    console.log(age);
+  }
+
+  return bar
+}
+
+var fn = foo();
+fn()
+```
+
+![图](book_files/39.jpg)
+![图](book_files/40.jpg)
