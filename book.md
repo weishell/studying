@@ -50,8 +50,14 @@
     - [字符串常用的方法](#字符串常用的方法)
       - [match matchAll](#match-matchall)
       - [substring slice字符串处理区别](#substring-slice字符串处理区别)
+    - [数组常用的方法](#数组常用的方法)
+      - [影响到原数组的方法](#影响到原数组的方法)
     - [event loop](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
+    - [Class和实例的关系以及原型链](#class和实例的关系以及原型链)
+      - [函数的特殊性](#函数的特殊性)
+    - [js如何实现继承](#js如何实现继承)
+      - [继承的方案](#继承的方案)
 
 
 ## html
@@ -1673,6 +1679,37 @@ console.log(...str.matchAll(/(hel)(lo)/g))
 + slice支持负值，就是字符串末尾开始计算，而substring遇到负值自动归为0
 
 
+### 数组常用的方法
++ 增 push unshift splice concat(只有它不影响原数组)
++ 删 pop shift splice slice(只有它不影响原数组)
++ 改 splice
++ 查 find(返回第一个匹配的选项) indexOf includes
++ 排序 sort reverse(会修改原数组)
++ 转换方法 join
++ 迭代方法 some every map forEach reduce filter 
++ 其他 fill flat(函数扁平化) copyWithin arr.keys() arr.values() arr.entries()
+
+```js
+let arr = [4,1,3,5,7,9]
+let a=arr.find(e=>{
+	return(e>5)
+})
+console.log(a)//7
+```
+
+#### 影响到原数组的方法
++ vue2中重写了 push pop unshift shift splice sort reverse
++ fill copyWithin
+```js
+let arr = [1, 2, 3, 4, 5];  
+arr.fill('a', 1, 3); // arr 现在是 [1, 'a', 'a', 4, 5]
+```
+```js
+let arr = [1,3,5,7,9]
+arr.copyWithin(-2,0,2)
+console.log(arr)//[1, 3, 5, 1, 3]
+```
+
 ### event loop
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
@@ -1734,3 +1771,112 @@ setTimeout(() => {
 ```
 
 ![微任务执行](book_files/28.jpg)
+
+
+### Class和实例的关系以及原型链
+1.	每个class都有显示原型prototype【class还有constructor和__proto__】
+2.	每个实例都有隐式原型__proto__【实例无prototype，有constructor】
+3.	实例的__proto__指向对应class的prototype
+
+原型（prototype）主要指的是一个对象，它用于存储`共享属性和方法`。js每个函数都有一个prototype属性，这个属性是一个指针，指向一个对象，这个对象就是原型对象。可提高代码的复用性和效率。
+
+原型链（prototype Chain）则是js实现继承的机制之一。每个对象都有一个`内部链接`指向另一个对象。这个链接被称为`对象的原型`。当试图访问一个对象的属性时，如果对象本身没有这个属性，那么js就会在这个对象的原型上寻找这个属性，这个原型对象自身也可能有原型，这样一层一层向上查找，就形成了一个链条，这就是原型链。
+
+原型链不仅用于`实现继承`，还用于解决对象`属性查找`的问题。
+
+![图1](book_files/33.jpg)
+![图2](book_files/32.jpg)
+![图3](book_files/34.jpg)
+
+特殊之处：Function的构造函数是自己；Function的prototype和__proto__都指向`Function.prototype`，Function作为对象时，它的__proto__指向它构造函数的prototype。Object的构造函数也是Function,同时`一切对象又是Object创建`。
+
+> 一切函数对象（包括Object），都是继承Function对象 
+
+#### 函数的特殊性
++ Person作为一个函数对象，它的隐式原型指向`Function.prototype`
++ Person的prototype作为一个普通对象，它的隐式原型指向`Object.prototype`
++ Function的`隐式原型和显示原型`则相等
++ Object作为一个函数对象，它的隐式原型指向Function.prototype
+  
+```js
+function Person(){}
+const person = new Person()
+console.log(Person.__proto__ === Function.prototype) // true
+console.log(Person.prototype.__proto__ === Object.prototype)// true
+console.log(Function.__proto__ === Function.prototype)// true
+console.log(Function.prototype.__proto__ === Object.prototype)// true
+console.log(Object.__proto__ === Function.prototype)// true
+console.log(Object.prototype.__proto__ === null)// true
+```
+
+### js如何实现继承
+它允许创建一个新的类（或对象），该类（或对象）可以继承另一个类（或对象）的属性和方法。
+
+#### 继承的方案
++ 原型链继承：复用prototype方法，缺点：1.对象类型的属性会被其他实例修改2.打印无法直接看到继承的属性3.原型创建时无法传参
+```js
+// 无法定制化传参
+Cat.prototype = new Animal();
+Cat.prototype.constructor = Cat;
+```
+
++ 盗用构造函数继承：子类可传参，不会共用对象，但是父类prototype方法无法继承
+```js
+function Child(){
+	Parent.apply(this, [test]); 
+}
+```
++ 组合继承：结合原型链+构造函数，两者优点有，缺点：调用两次父类，浪费性能，且继承的属性子类已经通过盗用构造函数存在了，父类对象又存在了一份无用的
+
+
++ 原型式继承【用于字面量对象】,缺点：修改对象属性会改变其他对象的相关属性
+```js
+var obj = {
+  name: "why",
+  age: 18,
+  arr:[]
+}
+var info = Object.create(obj)//浅拷贝
+info.name =xxx 
+info.arr.push(1)
+```
+
++ 寄生式继承【用于字面量对象】，核心：`使用原型式继承获得一个目标对象的浅复制，然后增强这个浅复制的能力。`缺点同上
+```js
+function createAnother(original){
+    var clone = Object.create(original);//通过调用函数创建一个新对象
+	// 增加了某些功能
+    clone.sayHi = function () {//以某种方式来增强这个对象
+        console.log("Hi");
+    };
+    return clone; //返回这个对象
+}
+```
+
++ 寄生组合式继承：比较完美的方案
+```js
+function clone (parent, child) {
+ // Object.create
+ child.prototype = Object.create(parent.prototype);
+ child.prototype.constructor = child;
+}
+function Parent6() {
+ this.name = 'parent6';
+ this.play = [1, 2, 3];
+}
+Parent6.prototype.getName = function () {
+ return this.name;
+}
+function Child6() {
+ Parent6.call(this);
+ this.friends = 'child5';
+}
+clone(Parent6, Child6);
+Child6.prototype.getFriends = function () {
+ return this.friends;
+}
+let person6 = new Child6();
+console.log(person6);
+```
+
+![整体思路](book_files/35.jpg)
