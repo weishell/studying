@@ -41,6 +41,17 @@
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
+    - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
+    - [数据类型](#数据类型)
+      - [undefined和null的区别](#undefined和null的区别)
+      - [判断数据类型的方法](#判断数据类型的方法)
+    - [数据结构](#数据结构)
+      - [数组和链表的应用场景](#数组和链表的应用场景)
+    - [字符串常用的方法](#字符串常用的方法)
+      - [match matchAll](#match-matchall)
+      - [substring slice字符串处理区别](#substring-slice字符串处理区别)
+    - [event loop](#event-loop)
+      - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
 
 
 ## html
@@ -1461,3 +1472,265 @@ console.warn({} == !{})//false
 // ({}).toString() -> '[object Object]'
 // Number('[object Object]') -> NaN
 ```
+
+### 深拷贝和浅拷贝
+
+![深拷贝浅拷贝](book_files/24.jpg)
+
+浅拷贝只复制对象的顶层属性和值，而深拷贝则会层层递归。
+
++ JavaScript中的`Object.assign()` `Object.create` 方法和数组和对象的`扩展运算符`（...）都执行的是浅拷贝。数组的concat和slice也属于浅拷贝
++ JSON.parse(JSON.stringify(obj))深拷贝,但是会忽略掉value是undefined,Symbol,function,也不能处理对象循环引用的问题,set类型数据和map类型会被处理为{}
+
+```js
+const fxArr = ["One", "Two", "Three"]
+const fxArrs = fxArr.slice(0)
+fxArrs[1] = "love";
+console.log(fxArr) // ["One", "Two", "Three"]
+console.log(fxArrs) // ["One", "love", "Three"]
+```
+```js
+const fxArr = ["One", "Two", "Three"]
+const fxArrs = fxArr.concat()
+fxArrs[1] = "love";
+console.log(fxArr) // ["One", "Two", "Three"]
+console.log(fxArrs) // ["One", "love", "Three"]
+```
+
+### 数据类型
++ 基本类型： number string boolean undefined `null symbol` bigInt
++ 引用类型： object function array
+
+Symbol 代表创建后独一无二且不可变的数据类型，它主要是为了解决可能出现的全局变量冲突的问题。
+
+基本类型存储在栈中，引用类型存储在堆中
+![栈](book_files/25.jpg)
+![堆](book_files/26.jpg)
+
+```js
+let intNum = 55 // 10进制 55
+let num1 = 070 // 8进制 56 (0开头)
+let hexNum1 = 0xA //16进制 10(0x开头)
+```
+
+#### undefined和null的区别
++ undefined是声明后未赋值，而null通常表示一个空的对象引用(空指针)
++ 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的低位字节中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
++ 在两等情况下，二者相等，三等情况下则不相等
+
+#### 判断数据类型的方法
++ typeof可判断基础类型，函数类型和其他引用类型都返回object，注意null的特殊性
++ instanceOf可以用来测试构造函数的prototype属性是否出现在对象的`原型链`中的`任何位置`，它可以对引用类型准确判断，但是不能判断基础类型
++ Object.prototype.toString [object xxx]
++ 构造函数:存在风险，可以判断包括简单类型、引用类型的构造函数
+
+```js
+(2).constructor
+//ƒ Number() { [native code] }
+```
+
+```js
+function F1(){}
+function F2(){}
+F1.prototype = new F2()
+// F1.prototype.constructor = F1
+const f1 =new F1()
+
+console.log(f1.constructor) //不注释的话为F1,注释的话为F2
+console.log(f1 instanceof F1)//true
+console.log(f1 instanceof F2)//true
+```
+
+### 数据结构
+数据结构是计算机存储和组织数据的方式，它研究的是数据的`逻辑结构和物理结构`以及它们之间的相互关系
+
+数据结构有多种分类，包括`数组、栈、链表、队列、树、图、字典、堆和散列表（哈希表）`等。
+
+#### 数组和链表的应用场景
+
+在前端开发中，链表和数组都是常用的数据结构，但它们有各自的特点和适用场景
+
+1. 数组（Array）
+
+特点：
+
++ 连续内存空间：数组的元素在内存中是`连续存储`的，这意味着访问数组中的任何元素都非常快（平均时间复杂度为`O(1)`）。
++ 固定大小：一旦数组被创建，其大小`通常是固定的`。虽然JavaScript中的数组是动态的，可以添加和删除元素，但内部实现可能会涉及到元素的移动和内存分配。
++ 随机访问：由于数组在内存中是连续存储的，所以可以通过索引直接访问任何元素。
+
+适用场景：
++ 当需要`快速访问和修改特定位置`的元素时。
++ 当需要`保持元素的插入顺序`时。
++ 当处理大量静态数据或进行批量操作时。
+
+2. 链表（Linked List）
+
+特点：
+
++ 非连续内存空间：链表中的元素可以`分散`在内存中的任何位置，每个元素（节点）都包含数据和指向下一个元素的指针。
++ 动态大小：链表的大小可以`动态`地增长和缩小，因为节点可以根据需要添加或删除。
++ 顺序访问：访问链表中的元素通常需要从头节点开始，逐个遍历节点，直到找到所需的元素。这导致访问特定位置的元素的时间复杂度较高（平均时间复杂度为`O(n)`）。
+
+适用场景：
++ 当需要在`任意位置插入或删除元素时`，链表的效率更高，因为不需要移动其他元素。
++ 当处理`大量动态数据`时，链表可以更有效地管理内存。
++ 当需要实现特定功能的数据结构（如栈、队列等）时，链表可以作为基础结构。
+
+3. 对比
+   + 空间复杂度：数组在内存使用上通常更紧凑，因为它们使用连续的内存空间。而链表由于每个节点都需要存储`指针`，可能会占用更多的空间。
+   + 时间复杂度：访问数组中的特定元素通常更快，因为可以通过`索引`直接访问。而访问链表中的元素需要从头节点开始遍历，时间复杂度较高。但在`插入和删除操`作方面，链表通常比数组更高效。
+   + 灵活性：链表在`动态调整大小和插入/删除元素`方面更加灵活，而数组则更适合处理`静态数据或进行批量操作`。
+
+4. 总结
+   
+在选择使用数组还是链表时，需要根据具体的应用场景和需求来权衡。在大多数情况下，数组是前端开发中更常用的数据结构，因为它们提供了直观的访问方式和丰富的API。但在某些特定场景下，如需要频繁地插入或删除元素，或者实现特定的数据结构时，链表可能会是一个更好的选择。
+
+### 字符串常用的方法
++ 增：concat(拼接，不影响原字符串)
++ 删：slice substr substring(都不影响原字符串)
++ 改：trim repeat padStart(填充) toLowerCase
++ 查：indexOf includes chartAt startWith
++ 转换方法： split(转为数组),可以是正则或者字符串
++ 正则方法：match search(可以是正则或者字符串,返回第一个匹配的内容下标) replace
+
+```js
+let colorText = "red,blue,green,yellow";
+let colors1 = colorText.split(",");       // ["red", "blue", "green", "yellow"]
+let colors2 = colorText.split(",", 2);    // ["red", "blue"]
+let colors3 = colorText.split(/[e]+/);  // ['r', 'd,blu', ',gr', 'n,y', 'llow']
+console.log(colors1)
+console.log(colors2)
+console.log(colors3)
+```
+
+```js
+var str="Visit Runoob!"; 
+var n=str.search("Runoob");
+//6
+
+let text = "cat,bat,sat,fat";
+let pos = text.search(/at,f/);
+console.log(pos); // 9
+```
+
+```js
+var str="Visit Microsoft! Visit Microsoft!";
+var n=str.replace("Microsoft","Runoob");
+//"Visit Runoob! Visit Microsoft!"
+var str2="Mr Blue has a blue house and a blue car";
+var n2=str.replace(/blue/g,"red");
+//"Mr Blue has a red house and a red car"
+```
+
+```js
+//replace第二个参数还可以是函数
+function htmlEscape(text) {
+  return text.replace(/[<>"&]/g, function(match, pos, originalText) {
+    switch(match) {
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case "&":
+        return "&amp;";
+      case "\"":
+        return "&quot;";
+    }       
+  });
+}
+         
+console.log(htmlEscape("<p class=\"greeting\">Hello world!</p>")); 
+// "&lt;p class=&quot;greeting&quot;&gt;Hello world!&lt;/p&gt;"
+```
+
+#### match matchAll
+
+match() 查找找到一个或多个正则表达式的匹配。
+```js
+var str="The rain in SPAIN stays mainly in the plain"; 
+var n=str.match(/ain/g);
+//ain,ain,ain
+```
+
+String.prototype.matchAll() 方法返回一个迭代器，它产生所有正则表达式匹配的结果，`包括捕获组`。
+```js
+const str = 'hello javascript hello css'
+console.log(...str.matchAll(/(hel)(lo)/g))
+//[ 'hello', 'hel', 'lo' ]  
+//[ 'hello', 'hel', 'lo' ]
+//浏览器打印会出现index和input等信息 ['hello', 'hel', 'lo', index: 0, input: 'hello javascript hello css', groups: undefined]
+```
+正则表达式 /(hel)(lo)/g 会查找字符串 str 中所有 hel 后面紧跟着 lo 的位置，并且因为它有两个捕获组 (hel) 和 (lo)，所以每个匹配项都会包含这两个捕获组。
+```js
+[  
+  [完整匹配项, 捕获组1, 捕获组2, ...],  
+  [完整匹配项, 捕获组1, 捕获组2, ...],  
+  ...  
+]
+```
+#### substring slice字符串处理区别
++ substring可以反向截取，既第二个参数可以比第一个参数小，而slcie不可以
++ slice支持负值，就是字符串末尾开始计算，而substring遇到负值自动归为0
+
+
+### event loop
+js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
+
++ 同步任务：都在主线程(这里的主线程就是JS引擎线程)上执行，会形成一个执行栈
++ 异步任务：事件触发线程管理着一个任务队列，只要异步任务有了运行结果，就在任务队列之中放一个事件回调
+
++ macro-task(宏任务)：包括整体代码script，setTimeout，setInterval，setImmediate ()-Node,requestAnimationFrame (存在争议,但是符合宏任务特征)-浏览器，I/O 操作、UI 渲染（浏览器）.
++ micro-task(微任务)：Promise，process.nextTick（Node.js）,Object.observe,MutationObserver,在ECMAScript中，microtask也被称为jobs
+
+![同步异步](book_files/30.jpg)
+![事件循环机制](book_files/29.jpg)
+![宏任务与微任务](book_files/31.jpg)
+
+
+#### event loop 宏任务 微任务 和dom渲染的关联
+每一次 call stack（当前轮询结束） 结束，都会触发 DOM 渲染（**不一定非得渲染，就是给一次 DOM 渲染的机会！！！**）然后再进行 event loop。
++ 宏任务：DOM 渲染后再触发，ES 语法没有，JS 引擎不处理，浏览器（或 nodejs）干预处理。
++ 微任务：DOM 渲染前会触发，ES 语法标准之内，JS 引擎来统一处理。即，不用浏览器有任何关于，即可一次性处理完，更快更及时。
+
+![处理](book_files/27.jpg)
+
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  <body>
+    <div id="container">
+      
+    </div>
+  </body>
+</html>
+<script>
+// 修改 DOM
+const $p1 = $('<p>一段文字</p>')
+const $p2 = $('<p>一段文字</p>')
+const $p3 = $('<p>一段文字</p>')
+$('#container')
+    .append($p1)
+    .append($p2)
+    .append($p3)
+console.log($('#container p'))
+// 微任务：渲染之前执行（DOM 结构已更新，未渲染在页面上）
+Promise.resolve().then(() => {
+    const length = $('#container').children().length
+    alert(`micro task ${length}`)
+})
+
+// 宏任务：渲染之后执行（DOM 结构已更新）
+setTimeout(() => {
+    const length = $('#container').children().length
+    alert(`macro task ${length}`)
+})
+</script>
+```
+
+![微任务执行](book_files/28.jpg)
