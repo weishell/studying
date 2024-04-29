@@ -1968,20 +1968,6 @@ function funcTest(){
 + 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。【页面滚动、鼠标移动、懒加载】
 
 #### 闭包为什么会延长变量的生命周期
-1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
-2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
-3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就创建一个函数对象 foo（oxa00），里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
-4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
-5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后解析函数，里面放入name:undefined,age:undefined
-
-![图](book_files/37.jpg)
-
-6. 然后执行一行一行执行foo里面的代码，同时把AO里面的name赋值'foo'，age赋值18；
-
-![图](book_files/38.jpg)
-
-7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
-8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
 
 ```js
 var message = 'hello'
@@ -2000,6 +1986,22 @@ function foo(){
 var fn = foo();
 fn()
 ```
+
+1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
+2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
+3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就**创建一个函数对象 foo（oxa00）**，里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
+4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
+5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后**解析函数**，里面放入name:undefined,age:undefined
+
+![图](book_files/37.jpg)
+
+6. 然后执行一行一行执行foo里面的代码，同时把AO里面的name赋值'foo'，age赋值18；
+
+![图](book_files/38.jpg)
+
+7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
+8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
+9. 把fn=null;虽然这时候bar和foo的AO循环引用，但是根据标记清除法，只要从根对象GO开始能找到的对象就不会被销毁。但是bar和foo的AO从根对象指不向他们，他们就会被销毁。
 
 ![图](book_files/39.jpg)
 ![图](book_files/40.jpg)
