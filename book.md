@@ -62,6 +62,8 @@
       - [不要滥用闭包](#不要滥用闭包)
       - [防抖和节流](#防抖和节流)
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
+    - [async await](#async-await)
+      - [async await异步本质](#async-await异步本质)
 
 
 ## html
@@ -1483,6 +1485,12 @@ console.warn({} == !{})//false
 // Number('[object Object]') -> NaN
 ```
 
+### Object.is() 与比较操作符 “===”、“==” 的区别？
+1. 使用双等号（==）进行相等判断时，如果两边的类型不一致，则会进行强制类型转化后再进行比较。
+2. 使用三等号（===）进行相等判断时，如果两边的类型不一致时，不会做强制类型准换，直接返回 false。
+3. 使用 Object.is 来进行相等判断时，一般情况下和三等号的判断相同，它处理了一些特殊的情况，比如 -0 和 +0 不再相等，两个 NaN是相等的。
+
+
 ### 深拷贝和浅拷贝
 
 ![深拷贝浅拷贝](book_files/24.jpg)
@@ -2005,3 +2013,111 @@ fn()
 
 ![图](book_files/39.jpg)
 ![图](book_files/40.jpg)
+
+
+### async await
+async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
+```js
+async function fn2() {
+    return new Promise(() => {})
+}
+console.log( fn2() ) //Promise {<pending>}
+
+async function fn1() {
+    return 100
+}
+console.log( fn1() ) // 相当于 Promise.resolve(100)
+```
+**await相当于Promise的then.**
+
++ await 后面跟 Promise 对象：会阻断后续代码，`等待状态变为 resolved` ，才获取结果并继续执行
++ await 后续跟非 Promise 对象：会直接返回该值，不过也是要等其他同步代码执行完后。如const f = await 400 ，内部相当于做了转换const f= await Promise.resolve(400)
+
+```js
+!(async function () {
+    const p1 = new Promise(() => {})
+    await p1
+    console.log('p1') // 不会执行
+})()
+
+!(async function () {
+    const p2 = Promise.resolve(100)
+    const res = await p2
+    console.log(res) // 100
+})()
+
+!(async function () {
+    const res = await 100
+    console.log(res) // 100
+})()
+
+!(async function () {
+    const p3 = Promise.reject('some err')
+    const res = await p3 
+    // new_file.html:34 Uncaught (in promise) some err
+    console.log(res) // 不会执行
+})()
+使用try…catch捕获异常
+(async function () {
+    const p4 = Promise.reject('some err')
+    try {
+        const res = await p4
+        console.log(res)
+    } catch (ex) {
+        console.error(ex)
+    }
+})()
+```
+
+#### async await异步本质
+await是同步写法，但本质还是异步调用。即只要遇到了await ，**后面的代码都相当于放在callback里。**
+
+await虽然会异步调用，但是它后面的函数是立刻执行的。
+```js
+async function async1 () {
+  console.log('async1 start')
+  await async2()
+  console.log('async1 end') // 关键在这一步，它相当于放在 callback 中，最后执行
+}
+
+async function async2 () {
+  console.log('async2')
+}
+
+console.log('script start')
+async1()
+console.log('script end')
+```
+
+### 对象的一些方法
++ Object.is():严格判断两个值是否相等，与严格比较===基本一致，除了+0和-0，NaN和NaN与之不一致
+
+```js
+let f1= {k1:1}
+let f2 =f1
+console.log(+0 === -0) //true
+console.log(NaN === NaN )//false
+console.log(Object.is(+0, -0) )//false
+console.log(Object.is(NaN, NaN) )//true
+console.log(Object.is([], []) )//false
+console.log(Object.is(f1, f2) )//true
+```
+
++ Object.assign 用于合并对象将`源对象`(不包括原型)的所有`可枚举`属性复制到目标对象
+```js
+const target = { a: 1, b: 1 };
+const source1 = { b: 2, c: 2 };
+const source2 = { c: 3 };
+Object.assign(target, source1, source2);
+target // {a:1, b:2, c:3}
+```
+
++ Object.fromEntries 键值对数组转对象
+
+```js
+console.warn(Object.fromEntries([
+ ['foo', 'bar'],
+ ['baz', 42]
+]))
+	
+```
