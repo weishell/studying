@@ -41,6 +41,7 @@
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
+    - [Object.is() 与比较操作符 “===”、“==” 的区别？](#objectis-与比较操作符--的区别)
     - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
     - [数据类型](#数据类型)
       - [undefined和null的区别](#undefined和null的区别)
@@ -64,6 +65,11 @@
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
+    - [对象的一些方法](#对象的一些方法)
+    - [this指向](#this指向)
+      - [this隐式绑定丢失](#this隐式绑定丢失)
+      - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
+    - [new操作做了什么](#new操作做了什么)
 
 
 ## html
@@ -1898,7 +1904,7 @@ console.log(person6);
 
 ![闭包](book_files/36.jpg)
 
-场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存]
+场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存][私有仓库]
 ```js
 // 闭包隐藏数据，只提供 API
 	function createCache() {
@@ -2119,5 +2125,201 @@ console.warn(Object.fromEntries([
  ['foo', 'bar'],
  ['baz', 42]
 ]))
-	
+```
+
+### this指向
+this是一个关键字，它引用的是`当前执行上下文中`的对象。this的值取决于函数是如何被调用的，而不是函数被定义的位置。
+
+第一种是函数调用模式，当一个函数不是一个对象的属性时，直接作为函数来调用时，this 指向全局对象。【在严格模式环境中，默认绑定的this指向undefined】
+```js
+function fn() {
+    console.log(this); //window
+};
+
+function fn1() {
+    "use strict";
+    console.log(this); //undefined
+};
+
+var name = '听风是风';
+
+fn(); 
+fn1();
+```
+```js
+// 如果在严格模式下调用不在严格模式中的函数，并不会影响this指向
+var name = '听风是风';
+function fn() {
+    console.log(this); //window
+    console.log(this.name); //听风是风
+};
+
+(function () {
+    "use strict";
+    fn();
+}());
+```
+第二种是方法调用模式，如果一个函数作为一个对象的方法来调用时，this 指向这个对象。
+```js
+//如果函数调用前存在多个对象，this指向距离调用自己最近的对象
+function fn() {
+    console.log(this.name);
+};
+let obj = {
+    name: '行星飞行',
+    func: fn,
+};
+let obj1 = {
+    name: '听风是风',
+    o: obj
+};
+obj1.o.func() //行星飞行
+
+//obj对象虽然obj1的属性，但它两原型链并不相同，并不是父子关系，由于obj未提供name属性，所以是undefined。
+function fn() {
+    console.log(this.name);
+};
+let obj = {
+    func: fn,
+};
+let obj1 = {
+    name: '听风是风',
+    o: obj
+};
+obj1.o.func() //？？
+```
+```js
+// 虽然obj对象并没有name属性，但顺着原型链，找到了产生自己的构造函数Fn，由于Fn原型链存在name属性，所以输出时间跳跃了。
+function Fn() {};
+Fn.prototype.name = '时间跳跃';
+
+function fn() {
+    console.log(this.name);
+};
+
+let obj = new Fn();
+obj.func = fn;
+
+let obj1 = {
+    name: '听风是风',
+    o: obj
+};
+obj1.o.func() //?
+```
+第三种是构造器调用模式，如果一个函数用 new 调用时，函数执行前会新创建一个对象，this 指向这个新创建的对象。
+
+第四种是 apply 、 call 和 bind 调用模式，这三个方法都可以显示的指定调用函数的 this 指向。如果在使用call之类的方法改变this指向时，指向参数提供的是`null或者undefined`，那么 this 将指向全局对象。另外，在js API中部分方法也内置了显式绑定，以**forEach**为例：
+```js
+let obj1 = {
+    name: '听风是风'
+};
+let obj2 = {
+    name: '时间跳跃'
+};
+var name = '行星飞行';
+
+function fn() {
+    console.log(this.name);
+};
+fn.call(undefined); //行星飞行
+fn.apply(null); //行星飞行
+fn.bind(undefined)(); //行星飞行
+let obj = {
+    name: '听风是风'
+};
+
+[1, 2, 3].forEach(function () {
+    console.log(this.name);//听风是风*3
+}, obj);
+```
+这四种方式，使用构造器调用模式的优先级最高，然后是 apply、call和 bind 调用模式，然后是方法调用模式，然后是函数调用模式。
+
+
+```js
+function foo(a) {
+  this.a = a;
+}
+
+const obj1 = {};
+var bar = foo.bind(obj1);
+bar(2);
+console.log(obj1.a); // 2
+
+var baz = new bar(3)
+console.log(baz.a) // 3
+
+console.log(obj1)//{a: 2}
+
+```
+bar 函数本身是通过 bind 方法构造的函数，其内部已经对将 this 绑定为 obj1，它再作为构造函数，通过 new 调用时，返回的实例已经与 obj1 解绑。
+
+#### this隐式绑定丢失
+隐式丢失最常见的就是作为`参数传递以及变量赋值` ,一个最常见的 this 绑定问题就是被隐式绑定的函数会丢失绑定对象，也就是说它会应用默认绑定，从而把 this 绑定到全局对象或者 undefined或者是新创建的隐式绑定的对象上，取决于是否是严格模式
+
+```js
+function foo() {
+console.log( this.a );
+}
+var obj = {
+a: 2,
+foo: foo
+};
+var bar = obj.foo; // 函数别名！
+var a = "oops, global"; // a 是全局对象的属性
+//bar作为一个独立的函数被调用，而不是作为 obj 的方法被调用
+bar(); // "oops, global"
+obj.foo()//2
+```
+> 这种情况还有在callback回调时也可能会发生（doFoo( obj.foo )）此时的obj.foo相当于fn = obj.foo
+
+注意，隐式绑定丢失并不是都会指向全局对象，比如下面的例子：
+```js
+var name = '行星飞行';
+let obj = {
+    name: '听风是风',
+    fn: function () {
+        console.log(this.name);
+    }
+};
+let obj1 = {
+    name: '时间跳跃'
+}
+obj1.fn = obj.fn;
+obj1.fn(); //时间跳跃
+```
+虽然丢失了 obj 的隐式绑定，但是在赋值的过程中，**又建立了新的隐式绑定**，这里this就指向了对象 obj1。
+
+#### call appy bind的用法和区别
+都是JavaScript中用于改变函数执行上下文（即this的指向）的方法
+
+1. call、apply只是临时的修改一次，即只在call或apply方法的那一次有效；当再次调用原函数的时候，它的指向还是原来的指向。而bind方法创建的新函数会`永久性地绑定this值`。
+2. call和apply基本一致，除了传参有些不同
+3. call和apply立刻执行，而bind则是返回一个函数，需要再次调用
+
+
+### new操作做了什么
+1. 创建一个新的`空对象`
+2. 这个新对象内部的`[[prototype]]`特性被赋值为构造函数的`prototype`属性
+3. 构造函数内部的this被赋值为这个新对象(即this指向新对象)
+4. 执行构造函数内部的代码:给对象`添加属性和方法`
+5. 如果构造函数返回 `一个对象` ，则返回`该对象`；否则返回**刚创建的对象**(如果return 1等数字/字符串/布尔值会被引擎忽略，然后返回刚创建的对象)
+
+```js
+function fn()
+{
+ this.user = 'xxx';
+ return {};
+}
+var a = new fn();
+console.log(a.user); //undefined
+```
+```js
+function fn()
+	{
+	 this.user = 'xxx';
+	 // return null;//null和其他基本类型返回的都是实例对象本身
+	 return'xxx1'
+	}
+	var a = new fn();
+	console.log(a.user); //xxx
 ```
