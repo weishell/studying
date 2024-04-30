@@ -43,6 +43,13 @@
       - [作用域链](#作用域链)
     - [执行上下文和执行栈](#执行上下文和执行栈)
       - [执行上下文的生命周期](#执行上下文的生命周期)
+    - [闭包](#闭包)
+      - [不要滥用闭包](#不要滥用闭包)
+      - [防抖和节流](#防抖和节流)
+      - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
+    - [内存泄漏](#内存泄漏)
+      - [垃圾回收机制](#垃圾回收机制)
+      - [可能的内存泄漏场景](#可能的内存泄漏场景)
     - [Promise](#promise)
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
@@ -65,10 +72,6 @@
       - [函数的特殊性](#函数的特殊性)
     - [js如何实现继承](#js如何实现继承)
       - [继承的方案](#继承的方案)
-    - [闭包](#闭包)
-      - [不要滥用闭包](#不要滥用闭包)
-      - [防抖和节流](#防抖和节流)
-      - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
     - [对象的一些方法](#对象的一些方法)
@@ -76,6 +79,16 @@
       - [this隐式绑定丢失](#this隐式绑定丢失)
       - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
     - [new操作做了什么](#new操作做了什么)
+    - [JS基本类型的装箱与拆箱](#js基本类型的装箱与拆箱)
+    - [new String 和String区别](#new-string-和string区别)
+    - [事件 事件流](#事件-事件流)
+      - [事件模型](#事件模型)
+        - [event.eventPhase](#eventeventphase)
+      - [IE事件模型](#ie事件模型)
+      - [事件代理](#事件代理)
+    - [监听一个div宽度变化](#监听一个div宽度变化)
+    - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
+    - [Js单线程详解](#js单线程详解)
 
 
 ## html
@@ -1442,6 +1455,8 @@ function bar(){
  foo();
 }
 bar()
+
+// 2
 ```
 
 ![词法环境应用](book_files/41.jpg)
@@ -1473,6 +1488,204 @@ JavaScript中有三种类型的执行上下文：
 	- 创建作用域链
 + 执行阶段：在此阶段，变量会被赋值，函数会被调用，代码的逻辑会按照顺序执行。
 + 回收阶段：在这个阶段，JavaScript引擎会进行垃圾回收，释放不再需要的内存和对象，清理执行上下文，并将其从执行栈中弹出。
+
+
+### 闭包
+函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。
+
+![闭包](book_files/36.jpg)
+
+场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存][私有仓库]
+```js
+// 闭包隐藏数据，只提供 API
+	function createCache() {
+	    const data = {} // 闭包中的数据，被隐藏，不被外界访问
+	    return {
+	        set: function (key, val) {
+	            data[key] = val
+	        },
+	        get (key) {
+	            return data[key]
+	        }
+	    }
+	}
+	
+	const c = createCache()
+	c.set('a', 100)
+	c.set('a', 160)
+	console.log( c.get('a') )
+```
+```js
+const updateCursor = (function () {
+  // 如果这个换成全局变量，其实也可以，找的时候都可能有些麻烦。
+  let selectTableCol = false
+  return function (updateLeftStaple: boolean) {
+   // xxx处理
+   // selectTableCol= xxxx
+  }
+})()
+```
+
+#### 不要滥用闭包
+1. 构造函数的方法尽可能定义在函数原型上
+```js
+// 定义在内部每次都要占内存且消耗时间，这种闭包不是需要的
+function MyObject(name, message) {
+ this.name = name.toString();
+ this.message = message.toString();
+ this.getName = function() {
+ return this.name;
+ };
+ this.getMessage = function() {
+ return this.message;
+ };
+}
+```
+2. 避免循环引用的问题
+```js
+function func() {
+	var test = document.getElementById('test');
+	test.onclick = function () {
+		console.log('hello world');
+	}
+	test = null;//没有这一步，则会形成不必要的闭包
+	//再给test赋值onclick的时候点击事件已经存在dom上了，test只是一个暂存dom元素的变量
+	//这仅仅断开了局部变量 test 和 DOM 元素之间的引用，但并没有改变 DOM 元素本身或它的任何属性，包括 onclick 事件处理器。，如果是要解绑点击事件，需要把dom上的onclick设置为null
+	// document.getElementById('test').onclick = null;
+}
+```
+```js
+function func() {
+    var test = document.getElementById('test');
+	// 使click的handler无法再满足闭包条件
+    test.onclick = funcTest;
+}
+function funcTest(){
+    console.log('hello world');
+}
+```
+> 当闭包不需要时，需要手动置为null，释放内存
+
+#### 防抖和节流
+防抖（debounce）和节流（throttle）是两种常用的浏览器事件处理方法，它们的主要目的都是为了减少事件触发频率，优化性能。
+
++ 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。【搜索框自动补全、表单验证、按钮点击等】
++ 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。【页面滚动、鼠标移动、懒加载】
+
+#### 闭包为什么会延长变量的生命周期
+
+```js
+var message = 'hello'
+function foo(){
+  var name = 'foo';
+  var age = 18;
+
+  function bar(){
+    console.log(name);
+    console.log(age);
+  }
+
+  return bar
+}
+
+var fn = foo();
+fn()
+```
+
+1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
+2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
+3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就**创建一个函数对象 foo（oxa00）**，里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
+4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
+5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后**解析函数**，里面放入name:undefined,age:undefined
+
+![图](book_files/37.jpg)
+
+6. 然后执行一行一行执行foo里面的代码，同时把AO里面的name赋值'foo'，age赋值18；
+
+![图](book_files/38.jpg)
+
+7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
+8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
+9. 把fn=null;虽然这时候bar和foo的AO循环引用，但是根据标记清除法，只要从根对象GO开始能找到的对象就不会被销毁。但是bar和foo的AO从根对象指不向他们，他们就会被销毁。
+
+![图](book_files/39.jpg)
+![图](book_files/40.jpg)
+
+
+### 内存泄漏
+内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
+
+#### 垃圾回收机制
+原理：垃圾收集器会定期找出不再继续使用的变量，然后释放其内存
+
++ 标记清除算法：
+
+标记清除算法是JavaScript中最常用的垃圾回收机制。它的工作原理大致可以分为两个阶段：`标记阶段和清除阶段。`
+
+在标记阶段，垃圾收集器从根对象（通常是全局对象）开始，递归地访问对象的属性，并将所有访问到的对象都标记为“活动”或“可达”。这样，所有从根对象直接或间接可达的对象都会被标记。
+
+在清除阶段，垃圾收集器会遍历堆中的所有对象，找出那些没有被标记为活动的对象。这些对象就是不再被引用的“垃圾”，垃圾收集器会释放它们的内存。
+
+标记清除算法的优点是它能够准确地识别出不再被使用的对象，并释放它们的内存。然而，它也有一定的开销，因为需要定期进行标记和清除操作。
+
+```js
+var m = 0,n = 19 // m,n,add()标记进入环境
+add(m, n) // a, b, c标记进入环境
+console.log(n) // a,b,c标记离开环境，准备回收
+function add(a, b) {
+ a++
+ var c = a + b
+ return c
+}
+```
+
++ 引用计数算法：引擎有一个“引用表”，保存所有资源的引用次数
+
+引用计数算法是另一种垃圾回收策略，它的工作原理是给每个对象维护一个引用计数器，记录当前有多少引用指向该对象。当一个新的引用指向某个对象时，该对象的引用计数会增加；当引用被释放或重新赋值时，引用计数会减少。当引用计数为0时，表示该对象已经没有任何引用指向它，可以被垃圾收集器回收。
+
+引用计数算法的优点是`实时性好`，可以及时回收不再使用的对象。然而，它也存在一些问题，特别是`循环引用`的情况。如果两个或多个对象相互引用，即使它们都不再被外部引用，它们的引用计数也不会变为0，从而导致内存泄漏。
+
+在现代的JavaScript引擎中，主要使用的是基于`标记清除`的垃圾回收机制，因为它能够更准确地识别出不再被使用的对象。然而，引用计数算法在某些情况下仍然可能被使用，或者作为标记清除算法的`辅助手段`。
+
+```js
+const arr = [1, 2, 3, 4];
+console.log('hello world');
+// 数组[1, 2, 3, 4]会占用内存，因为arr引用次数为1，尽管后面没用到arr，他还是一直占据
+arr = null
+// arr置为null，则引用次数为0
+// 这只是个例子，标记清除也是可以实现arr = null 后的回收机制
+```
+
+#### 可能的内存泄漏场景
++ 意外的全局变量
++ this创建的意外的全局变量
++ 循环引用
+```js
+// 使用严格模式可避免
+function fun(){
+	f = 1000
+}
+```
+```js
+// 使用严格模式可避免
+function fun(){
+	this.f =1000
+}
+fun()
+```
+```js
+var test = document.getElementById('test');
+...... //绑定事件
+test = null;//接触关联
+```
+```js
+const refA = document.getElementById('refA');
+document.body.removeChild(refA); // dom
+console.log(refA, 'refA'); // console div
+refA = null; //及时清除移除且不用的游离元素
+console.log(refA, 'refA'); // 
+```
+
 
 
 
@@ -1964,128 +2177,6 @@ console.log(person6);
 
 ![整体思路](book_files/35.jpg)
 
-### 闭包
-函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。
-
-![闭包](book_files/36.jpg)
-
-场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存][私有仓库]
-```js
-// 闭包隐藏数据，只提供 API
-	function createCache() {
-	    const data = {} // 闭包中的数据，被隐藏，不被外界访问
-	    return {
-	        set: function (key, val) {
-	            data[key] = val
-	        },
-	        get (key) {
-	            return data[key]
-	        }
-	    }
-	}
-	
-	const c = createCache()
-	c.set('a', 100)
-	c.set('a', 160)
-	console.log( c.get('a') )
-```
-```js
-const updateCursor = (function () {
-  // 如果这个换成全局变量，其实也可以，找的时候都可能有些麻烦。
-  let selectTableCol = false
-  return function (updateLeftStaple: boolean) {
-   // xxx处理
-   // selectTableCol= xxxx
-  }
-})()
-```
-
-#### 不要滥用闭包
-1. 构造函数的方法尽可能定义在函数原型上
-```js
-// 定义在内部每次都要占内存且消耗时间，这种闭包不是需要的
-function MyObject(name, message) {
- this.name = name.toString();
- this.message = message.toString();
- this.getName = function() {
- return this.name;
- };
- this.getMessage = function() {
- return this.message;
- };
-}
-```
-2. 避免循环引用的问题
-```js
-function func() {
-	var test = document.getElementById('test');
-	test.onclick = function () {
-		console.log('hello world');
-	}
-	test = null;//没有这一步，则会形成不必要的闭包
-	//再给test赋值onclick的时候点击事件已经存在dom上了，test只是一个暂存dom元素的变量
-	//这仅仅断开了局部变量 test 和 DOM 元素之间的引用，但并没有改变 DOM 元素本身或它的任何属性，包括 onclick 事件处理器。，如果是要解绑点击事件，需要把dom上的onclick设置为null
-	// document.getElementById('test').onclick = null;
-}
-```
-```js
-function func() {
-    var test = document.getElementById('test');
-	// 使click的handler无法再满足闭包条件
-    test.onclick = funcTest;
-}
-function funcTest(){
-    console.log('hello world');
-}
-```
-> 当闭包不需要时，需要手动置为null，释放内存
-
-#### 防抖和节流
-防抖（debounce）和节流（throttle）是两种常用的浏览器事件处理方法，它们的主要目的都是为了减少事件触发频率，优化性能。
-
-+ 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。【搜索框自动补全、表单验证、按钮点击等】
-+ 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。【页面滚动、鼠标移动、懒加载】
-
-#### 闭包为什么会延长变量的生命周期
-
-```js
-var message = 'hello'
-function foo(){
-  var name = 'foo';
-  var age = 18;
-
-  function bar(){
-    console.log(name);
-    console.log(age);
-  }
-
-  return bar
-}
-
-var fn = foo();
-fn()
-```
-
-1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
-2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
-3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就**创建一个函数对象 foo（oxa00）**，里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
-4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
-5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后**解析函数**，里面放入name:undefined,age:undefined
-
-![图](book_files/37.jpg)
-
-6. 然后执行一行一行执行foo里面的代码，同时把AO里面的name赋值'foo'，age赋值18；
-
-![图](book_files/38.jpg)
-
-7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
-8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
-9. 把fn=null;虽然这时候bar和foo的AO循环引用，但是根据标记清除法，只要从根对象GO开始能找到的对象就不会被销毁。但是bar和foo的AO从根对象指不向他们，他们就会被销毁。
-
-![图](book_files/39.jpg)
-![图](book_files/40.jpg)
-
-
 ### async await
 async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
 ```js
@@ -2388,3 +2479,241 @@ function fn()
 	var a = new fn();
 	console.log(a.user); //xxx
 ```
+
+### JS基本类型的装箱与拆箱
+装箱的概念：把基本类型转化为相应的对象。而装箱又分为`显式与隐式`
+
+在 JavaScript 中，基本类型是没有属性和方法的，但是为了便于操作基本类型的值，在调用基本类型的属性或方法时 JavaScript 会在`后台隐式`地将基本类型的值转换为对象
+```js
+var s1  = new String("some text");
+var s2 = s1.substring(2);
+s1 = null;
+```
+JavaScript 也可以使用 `Object 函数`显式地将基本类型转换为包装类型：
+```js
+Object(1)
+```
+拆箱：将引用类型对象转换为对应的值类型对象，它是通过引用类型的valueOf()或者toString()方法来实现的。
+
+二者并存的情况下，在数值运算中，优先调用了valueOf，字符串运算中，优先调用了toString。
+```js
+class A {
+    valueOf() {
+        return 2
+    }
+    toString() {
+        return '哈哈哈'
+    }
+}
+let a = new A()
+
+console.log(String(a))  // '哈哈哈'   => (toString)
+console.log(Number(a))  // 2         => (valueOf)
+console.log(a + '22')   // '222'     => (valueOf)
+console.log(a == 2)     // true      => (valueOf)
+console.log(a === 2)    // false     => (严格等于不会触发隐式转换)
+```
+**Symbol.toPrimitive** 是一个内置的 Symbol 值，它是作为对象的函数值属性存在的，当一个对象转换为对应的原始值时，会调用此函数。
+
+作用：同valueOf()和toString()一样，但是**优先级**要高于这两者
+
+### new String 和String区别
+```js
+let a1 ='a1'
+let a2 = new String('a2')
+let a3 = String('a3')
+a1.name='zs'
+a2.name='ls'
+a3.name='ww'
+console.log(a1)
+console.log(a2)
+console.log(a3)
+console.log(a1.name)
+console.log(a2.name)
+console.log(a3.name)
+console.log(typeof a1)
+console.log(typeof a2)
+console.log(typeof a3)
+console.log(a2+'333')
+console.log(a2.name)
+// a1
+// String {'a2', name: 'ls'}
+// a3
+// undefined
+// ls
+// undefined
+// string
+// object
+// string
+//a2333
+//ls
+```
+```js
+let a4 = 'a4'
+let a5 = String('a4')
+let a6 =new String('a4')
+console.log(a4===a5)//true
+console.log(a4===a6)//false
+```
+
+### 事件 事件流
+事件：html文档或浏览器发生的一种交互操作，如加载/鼠标事件/自定义事件等。
+
+事件流则是描述事件在DOM（文档对象模型）元素间的传播顺序。事件流包括三个阶段：`事件捕获阶段、目标阶段和事件冒泡阶段`。
+
+![事件机制](book_files/43.jpg)
+
+#### 事件模型
+原始事件模型（DOM0级事件模型）和标准事件模型（DOM2级事件模型）在JavaScript中分别代表了不同的事件处理机制。
+```html
+<input type="button" onclick="fun()">
+```
+```js
+var btn = document.getElementById('.btn');
+btn.onclick = fun;
+```
+原始事件模型可通过html或者js绑定，绑定速度快，同一事件只支持一次绑定，多次绑定后者覆盖前者。
+
+标准事件模型（DOM2级事件模型）则提供了更为完整和灵活的事件处理机制。它引入了事件传播的概念，包括事件捕获和事件冒泡两个阶段。
+
+还提供了更多的事件处理方法和属性，如addEventListener()用于添加事件监听器，removeEventListener()用于移除事件监听器。可同一个元素多次绑定同一类事件
+
+```js
+addEventListener(eventType, handler, useCapture) //useCapture:默认false，非捕获阶段监听
+```
+
+##### event.eventPhase
+
++ Event.NONE：值为0，表示事件不在任何阶段。
++ Event.CAPTURING_PHASE：值为1，表示事件当前正在捕获阶段。
++ Event.AT_TARGET：值为2，表示事件已经到达其目标元素。
++ Event.BUBBLING_PHASE：值为3，表示事件当前正在冒泡阶段。
+
+```html
+<div id="div">
+	22222
+	<p id='p'>1111</p>
+</div>
+<script>
+	var div = document.getElementById('div');
+	var p = document.getElementById('p');
+	function onClickFn (event) {
+	 var tagName = event.currentTarget.tagName;
+	 var phase = event.eventPhase;
+	 if(phase == Event.AT_TARGET){
+		 console.log('11111')
+	 }
+	 console.log(tagName, phase);
+	}
+	div.addEventListener('click', onClickFn, false);
+	p.addEventListener('click', onClickFn, false);
+</script>
+```
+
+点击1111
+
+![点击1111](book_files/44.jpg)
+
+
+#### IE事件模型
+
+IE事件模型主要基于冒泡型事件传播机制。
+
+```js
+attachEvent(eventType, handler)
+detachEvent(eventType, handler)
+```
+
+#### 事件代理 
+
+事件代理（Event Delegation），也被称为事件委托，其核心原理是DOM元素的事件冒泡。当有大量子元素需要触发事件时，事件代理可以将事件监听器绑定在父元素上，而非直接绑定在子元素上，这样数百个事件监听器就可以减少为一个，从而显著提高网页性能。
+
+事件代理的好处主要有以下几点：
+
++ 性能优化：通过减少事件监听器的数量，可以`节省内存`并提升性能。
++ 方便添加子元素：当新增子对象时，无需再次对其绑定事件，因为父元素已经负责监听这些事件。
++ 灵活性和可维护性：通过事件代理，可以更加灵活地处理事件，并且便于维护代码。
+
+> focus blur 不支持冒泡；mousemove mouseout 虽然支持，但是会影响性能不适合。
+
+
+### 监听一个div宽度变化
+```js
+const ro = new ResizeObserver((entries, observer) => {  
+	console.log(entries,observer)
+	for (let entry of entries) {  
+		console.log('Element:', entry.target);  
+		console.log('Element size:', entry.contentRect);  
+	}  
+});  
+	
+const div = document.querySelector('#myDiv');  
+ro.observe(div);
+```
+
+### MutationObserver触发机制及应用场景
++ 可以在`DOM修改`时`异步`执行回调
++ MutationObserver还可以用于监测元素的添加、删除、属性更改、文本内容变化等多种类型的DOM变化
++ 自动保存表单数据：当用户在表单中输入或修改数据时，MutationObserver可以监测到DOM的变化，并自动调用回调函数进行保存操作，实现数据的实时保存。
++ 动态内容加载：当页面中的内容是通过异步加载或动态生成时，MutationObserver可以用来监测内容的变化，并在变化发生后执行相应的操作，例如更新页面布局、添加事件监听器等。这在无限滚动加载的场景中尤为有用，当新的内容被加载到页面时，MutationObserver可以自动触发相应的处理逻辑。
+```js
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+	</head>
+	<body>
+		<div id="k"></div>
+	</body>
+</html>
+<script type="text/javascript">
+	let observer = new MutationObserver(() => console.log('<body> attributes changed'));
+	
+	observer.observe(document.body, { attributes: true });//页面初始化dom触发一次
+	
+	document.body.className = 'foo'; //更改触发一次
+	console.log('Changed body class');
+	setTimeout(()=>{
+		document.getElementById("k").innerHTML=333//更改子元素或者非body的属性内容泽不会触发函数执行
+		// document.body.className = 'foo1'; //如果不注释，会执行两次<body> attributes changed
+	})
+	//Changed body class
+	// <body> attributes changed
+	//回调的console是后执行的，表明回调并非与实际的DOM变化同步执行
+</script>
+```
+
+### Js单线程详解
+JavaScript和DOM渲染共用同一个线程。在浏览器中，有一个称为“主线程”的线程，它负责处理JavaScript代码的执行、布局和渲染。
+
+当JavaScript代码执行时，它会阻塞主线程，这意味着浏览器无法同时执行其他任务，包括DOM渲染。因此，JavaScript代码的执行速度对网页的性能有很大的影响。为了避免这种情况，可以使用`Web Workers`在后台运行JavaScript代码，或者使用异步编程技术来避免阻塞主线程。
+
+浏览器渲染进程是多线程的，它包括下面几个线程：
+
++ **GUI 渲染线程**:负责渲染浏览器界面，解析 HTML，CSS，构建 DOM 树和 RenderObject 树，布局和绘制等。
+	1.	解析html代码(HTML代码本质是字符串)转化为浏览器认识的节点，生成DOM树，也就是DOM Tree
+	2.	解析css，生成CSSOM(CSS规则树)
+	3.	把DOM Tree 和CSSOM结合，生成Rendering Tree(渲染树)
+当界面需要重绘（Repaint）或由于某种操作引发回流(reflow)时，该线程就会执行
+
+GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线程会被挂起（相当于被冻结了），GUI 更新会被保存在一个队列中等到 JS 引擎空闲时立即被执行。
++ **JS 引擎线程**:称为 JS 内核，负责处理 Javascript 脚本程序。（例如 V8 引擎）
+	1. JS引擎线程负责解析Javascript脚本，运行代码。
+	2. JS引擎一直等待着任务队列中任务的到来，然后加以处理，一个 Tab页（renderer进程）无论什么时候都只有一个JS线程在运行，JS程序同样注意，GUI渲染线程与JS引擎线程是互斥的，如果JS执行时间过长，会造成页面的渲染不连贯，页面渲染加载阻塞。
++ **事件触发线程**:归属于浏览器而不是 JS 引擎，用来控制事件循环（可以理解，JS 引擎自己都忙不过来，需浏览器另开线程协助）,用来控制事件循环，并且管理着一个事件队列(task queue)
+
+当js执行碰到事件绑定和一些异步操作(如setTimeOut，也可来自浏览器内核的其他线程，如鼠标点击、AJAX异步请求等)，会走事件触发线程将对应的事件添加到对应的线程中 (比如定时器操作，便把定时器事件添加到定时器线程)，等异步事件有了结果，便把他们的回调操作添加到事件队列，等待js引擎线程空闲时来处理。
+
+当对应的事件符合触发条件被触发时，该线程会把事件添加到待处理队列的队尾，等待 JS 引擎的处理
+
+注意，由于 JS 的单线程关系，所以这些待处理队列中的事件都得排队等待 JS 引擎处理（当 JS 引擎空闲时才会去执行）
++ **定时触发器线程**:setInterval 与 setTimeout 所在线程
+
+浏览器定时计数器并不是由JS引擎计数的,（因为JS引擎是单线程的, 如果处于阻塞线程状态就会影响记计准确）。因此通过单独线程来计时并触发定时（计时完毕后，添加到事件队列中，等待 JS 引擎空闲后执行）
+
+注意，W3C 在 HTML 标准中规定，规定要求 setTimeout 中低于 4ms 的时间间隔算为 4ms。
+
++ **异步 http 请求线程**:在 XMLHttpRequest 在连接后是通过浏览器新开一个线程请求
+将检测到状态变更时，如果设置有回调函数，异步线程就产生状态变更事件，将这个回调再放入事件队列中。再由 JavaScript 引擎执行。
