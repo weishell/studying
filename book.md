@@ -66,6 +66,7 @@
       - [substring slice字符串处理区别](#substring-slice字符串处理区别)
     - [数组常用的方法](#数组常用的方法)
       - [影响到原数组的方法](#影响到原数组的方法)
+    - [函数缓存](#函数缓存)
     - [event loop](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
     - [Class和实例的关系以及原型链](#class和实例的关系以及原型链)
@@ -89,6 +90,17 @@
     - [监听一个div宽度变化](#监听一个div宽度变化)
     - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
     - [Js单线程详解](#js单线程详解)
+    - [本地存储和场景](#本地存储和场景)
+      - [cookie的修改注意](#cookie的修改注意)
+      - [localstorange本地过期时间](#localstorange本地过期时间)
+  - [DOM](#dom)
+    - [DOM操作节点的基本API](#dom操作节点的基本api)
+      - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
+  - [BOM](#bom)
+    - [BOM的含义](#bom的含义)
+      - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
+      - [location](#location)
+      - [history](#history)
 
 
 ## html
@@ -2006,6 +2018,31 @@ arr.copyWithin(-2,0,2)
 console.log(arr)//[1, 3, 5, 1, 3]
 ```
 
+### 函数缓存
+
+场景：[昂贵的函数调用执行复杂计算的函数][纯函数][重复输入的递归函数]
+```js
+const memoize = function (func, content) {
+	 let cache = Object.create(null)
+	
+	 content = content || this
+	 return (...key) => {
+		 if (!cache[key]) {
+		 cache[key] = func.apply(content, key)
+	 }
+	 console.log(cache)//{100,200: 300}
+	 return cache[key]
+	 }
+	}
+	var add = function (x,y) {
+	 return x+y;
+	}
+	const calc = memoize(add);
+	const num1 = calc(100,200)
+	const num2 = calc(100,200) 
+	console.warn(num1,num2)
+```
+
 ### event loop
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
@@ -2717,3 +2754,265 @@ GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线
 
 + **异步 http 请求线程**:在 XMLHttpRequest 在连接后是通过浏览器新开一个线程请求
 将检测到状态变更时，如果设置有回调函数，异步线程就产生状态变更事件，将这个回调再放入事件队列中。再由 JavaScript 引擎执行。
+
+
+
+### 本地存储和场景
++ Cookies：它是由服务器发送到浏览器，并保存在浏览器上的一小段数据。Cookies主要用于跟踪会话信息，但由于其大小限制（通常不超过`4KB`）和每次`请求`都会发送到服务器的特性，不适合`大量数据`的存储。【标记用户和跟踪用户行为】
++ Web Storage API：包括localStorage和sessionStorage。提供了更大的存储空间，并且数据只保存在客户端，不会发送到服务器。
+	- localStorage：数据没有过期时间，会一直保存在浏览器中，直到用户手动清除或通过JavaScript代码清除。它非常适合存储那些不需要经常变动的数据，如[用户设置、主题偏好、登录令牌]等。
+	- sessionStorage：数据在页面会话结束时过期，即当页面关闭时数据会被清除。[敏感账号一次性登录]
++ IndexedDB：IndexedDB是一个事务型的数据库系统，用于客户端存储大量结构化数据（包括文件/二进制数据）。它使用索引来实现高性能搜索[在线文档编辑历史]
++ WebSQL：WebSQL是一个基于SQL的数据库API，允许在浏览器中存储、查询和管理数据。[停止维护]
++ File API 和 FileSystem API：这些API允许Web应用程序在用户的本地文件系统中读取和写入文件。然而，出于安全和隐私的考虑，这些API的使用受到严格限制，并且需要用户的明确许可。
+
+#### cookie的修改注意
+cookie必须domain和path一致才是修改的同一个，否则就是新增的另外一个cookie
+```js
+Set-Cookie:name=aa; domain=aa.net; path=/ #
+document.cookie =name=bb; domain=aa.net; path=/ #
+```
+
+#### localstorange本地过期时间
+
+```js
+// 设置带有过期时间的数据  
+function setWithExpiration(key, value, expirationTime) {  
+    const now = new Date().getTime();  
+    const item = {  
+        value: value,  
+        expiration: now + expirationTime  
+    };  
+    localStorage.setItem(key, JSON.stringify(item));  
+}  
+  
+// 获取带有过期时间的数据  
+function getWithExpiration(key) {  
+    const itemStr = localStorage.getItem(key);  
+    if (!itemStr) return null;  
+  
+    const item = JSON.parse(itemStr);  
+    const now = new Date().getTime();  
+    if (now > item.expiration) {  
+        // 数据已过期，删除它  
+        localStorage.removeItem(key);  
+        return null;  
+    }  
+    return item.value;  
+} 
+```
+
+
+## DOM
+文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
+
+
+DOM包含了以下几种类型的节点：
+
++ 元素节点（Element Nodes）：元素节点对应HTML或XML文档中的标签，如`<div>、<p>、<span>`等。是文档结构的主要组成部分，可包含其他类型的节点，如属性节点、文本节点等。
++ 属性节点（Attribute Nodes）：代表了元素的属性，如class、id等。包含了元素的附加信息，通常用于定义元素的样式、行为或与其他元素的关联。
++ 文本节点（Text Nodes）：实际文本内容,位于元素节点内部，用于显示给用户或作为其他类型节点的数据。
++ 注释节点（Comment Nodes）
++ 文档节点（Document Nodes）：文档节点代表了整个HTML或XML文档。它是DOM树的根节点，包含了文档中的所有其他节点。
++ 文档类型节点（Document Type Nodes）：这种节点通常代表文档类型定义（DTD）或XML文档中的DOCTYPE声明，它提供了关于文档类型和版本的信息。
++ 文档片段节点（Document Fragment Nodes）：这是一种特殊的节点类型，它并不直接对应于文档中的任何部分。文档片段节点用于临时存储一组DOM节点，以便进行高效的DOM操作。
+
+### DOM操作节点的基本API
++ 创建节点
+    - 元素 document.createElement('div')
+    - 文本 document.createTextNode('xxx')，`appendChild`添加到对应的元素节点
+    - 文档碎片 document.createDocumentFragment()
+    - 属性 document.createAttribute('custom')，需要`setAttributeNode`设置上对应的属性
++ 获取节点
+	- document.querySelector('#id/.class/div')返回`首个符合`要求，没有则返回null
+	- document.querySelectorAll
+	- getElementById、getElementsByClassName、getElementsByTagName...
++ 更新节点
+	- innerHTML
+	- innerText（不返回隐藏文本），textContent（返回所有文本）
++ 添加节点
+	- innerHTML
+	- appendChild: 把一个子节点添加到父节点最后位置
+	- `insertBefore`:parentElement.insertBefore(newElement, referenceElement),子节点添加到目标节点前
+	- setAttribute：添加/修改属性节点
++ 删除节点
+	- removeChild：会变成`游离`的元素，可再度利用，需要手动处理才可以真实删除。
+
+```js
+// 创建一个新的元素  
+	var elem = document.createElement('div');  
+	elem.innerHTML='1000'
+	  
+	// 创建一个新的属性节点  
+	var attr = document.createAttribute('data-custom');  
+	var attr1 = document.createAttribute('id');  
+	// 为新属性设置值  
+	attr.value = 'Hello, world!';  
+	attr1.value= 'china'
+	  
+	// 将新属性附加到元素上  
+	elem.setAttributeNode(attr);  
+	elem.setAttributeNode(attr1);
+	  
+	// 现在，你可以将这个元素添加到DOM中  
+	document.body.appendChild(elem);
+	
+	console.log(document.getElementById('china').innerHTML)//1000
+
+  // 更简便的方式
+  var elem1 = document.createElement('div');  
+	elem1.setAttribute('data-custom11', 'Hello, world!');  
+	document.body.appendChild(elem1)
+```
+
+```js
+// 删除一个节点，先找到父级节点，再调用删除方法
+const self = document.getElementById('to-be-removed');
+const parent = self.parentElement;
+const removed = parent.removeChild(self);
+removed === self; // true
+
+// 移除事件监听器（如果有的话）  
+removed.removeEventListener('click', someFunction);  
+// ... 移除其他事件监听器  
+  
+// 将引用设置为null  
+removed = null;
+```
+
+
+#### innerHTML outerHTML createTextNode innerText textContent异同
+
++ 相对于createTextNode而言，innerHTML和innerText可能会比通过DOM API逐个添加节点更快，因为它允许浏览器`一次性解析和渲染HTML内容`
++ innerHTML 属性可以设置或获取指定元素内部的HTML内容。可以解析HTML标签、实体字符等，并将它们转换为相应的DOM元素或字符。在使用 innerHTML 时，应始终确保内容是安全的或进行适当的转义(`防止XSS攻击`)
++ 使用 createTextNode **只会添加纯文本内容**，不会解析HTML标签或实体字符。createTextNode `更安全`，因为它不涉及HTML解析；在大型文档中，直接操作DOM节点可能会比使用 innerHTML 更慢一些，它所触发的 DOM 操作（如附加节点）可能会间接导致`重排`和重绘
++ outerHTML 属性用于获取或设置描述某个元素（包括其所有属性和内容）的序列化 HTML。当设置一个元素的 outerHTML 属性时，浏览器会尝试用新的 HTML 替换旧的元素。然而，如果这个元素没有父节点（即它是一个孤立的节点，没有附加到 DOM 中的任何位置），浏览器就无法执行替换操作，因此会`抛出错误`
++ innerText 是一个属性，用于获取或设置元素的文本内容。它获取的是元素内所有文本内容的拼接，包括子元素的文本内容
++ **textContent** 属性获取或设置指定元素的文本内容及其所有后代元素的文本内容。由于它只处理文本内容，不涉及 HTML 解析，因此通常比 innerHTML 更快
++ innerText 知道文本的渲染外观，而 textContent 不知道。所以展示时innerText会自动过滤掉隐藏的元素标签里的文本和一些不渲染的文本
+
+```js
+// 创建一个 div 元素  
+var div = document.createElement('div');  
+  
+// 使用 innerHTML 设置 div 的内部 HTML 内容  
+div.innerHTML = '这是通过 innerHTML 添加的文本，包括 <b>粗体</b> 文字。<div style="color:red">red</div>';  
+  
+// 将 div 元素添加到文档的 body 中  
+document.body.appendChild(div);
+```
+![innerHTML](book_files/45.jpg)
+
+
+```js
+// 创建一个 div 元素  
+var div = document.createElement('div');  
+  
+// 使用 createTextNode 创建一个文本节点  
+var textNode = document.createTextNode(
+'这是通过 innerHTML 添加的文本，包括 <b>粗体</b> 文字。<div style="color:red">red</div>'
+);  
+  
+// 将文本节点附加到 div 元素  
+div.appendChild(textNode);  
+  
+// 将 div 元素添加到文档的 body 中  
+document.body.appendChild(div);
+```
+![createTextNode](book_files/46.jpg)
+
+```js
+var newElement = document.createElement('div');  
+newElement.textContent = 'Some content';  
+document.body.appendChild(newElement); // 先附加到 body  
+newElement.outerHTML = '<a>这是通过 innerHTML 添加的文本，包括 <b>粗体</b> 文字。<div style="color:red">red</div></a>'
+```
+![outHTML](book_files/47.jpg)
+
+```html
+<body>
+		<h3>源元素：</h3>
+		<p id="source">
+		  <style>
+		    #source {
+		      color: red;
+		    }
+		    #text {
+		      text-transform: uppercase;
+		    }
+		  </style>
+		  <span id="text">
+		    来看看<br />
+		    这段文字<br />
+		    在下方怎么表示。
+		  </span>
+		  <span style="display:none">隐藏文字</span>
+		</p>
+		<h3>textContent 结果：</h3>
+		<textarea id="textContentOutput" rows="6" cols="30" readonly>…</textarea>
+		<h3>innerText 结果：</h3>
+		<textarea id="innerTextOutput" rows="6" cols="30" readonly>…</textarea>
+		
+</body>
+<script>
+	const source = document.getElementById("source");
+	const textContentOutput = document.getElementById("textContentOutput");
+	const innerTextOutput = document.getElementById("innerTextOutput");
+	
+	textContentOutput.value = source.textContent;
+	innerTextOutput.value = source.innerText;
+</script>
+```
+![innerText](book_files/48.jpg)
+
+## BOM
+
+### BOM的含义
+**浏览器对象模型（Browser Object Model）**的简称，它提供了一组JavaScript API，用于管理浏览器窗口和框架。
+
+BOM的核心是window，它表示浏览器的一个实例。
+
++ navigator.userAgent：判断浏览器类型
+
+#### moveTo moveBy scrollTo scrollBy resizeTo resizeBy
+
++ To:类似绝对，moveTo，以左上方原点，移动scrollTo，窗口滚动条横向最左侧或者纵向最上方位置计算，resizeTo：设置为宽高多少的窗口
++ By:类似相对，moveBy，以当前位置为原点，移动，scrollBy，以滚动条当前位置，挪动，resizeBy：以当前宽高为基准，增减
+
+```js
+window.resizeTo(800, 600); // 将窗口大小调整为800像素宽，600像素高
+window.resizeBy(100, -50); // 将窗口宽度增加100像素，高度减少50像素
+
+window.scrollTo(0, 1000); // 将窗口滚动到垂直位置1000像素处
+window.scrollBy(50, -100); // 将窗口向右滚动50像素，向上滚动100像素
+
+window.moveTo(0, 0); // 将窗口左上角移动到屏幕左上角  
+window.moveBy(50, 100); // 将窗口向右移动50像素，向下移动100像素  
+```
+
+#### location
+
+它提供了关于当前窗口或标签页中显示的URL的信息，并允许你解析URL的各个部分，以及重定向浏览器到新的URL
+
+![location](book_files/49.jpg)
+
++ hash改变，不会发送请求，因为 hash 部分（即URL中 # 符号及其后面的部分）通常用于表示页面内的某个位置或状态
++ 而路由history模式，由于使用了History API【`history.pushState()` 和 `history.replaceState()`（在不重新加载页面的情况下修改历史记录）】，它们不会导致页面重新加载或发送HTTP请求到服务器。相反，前端js代码会监听这些URL变化，并相应地更新页面内容或组件，从而实现SPA中的无刷新页面导航。
+
+#### history
+History 对象是 window 对象的一部分，可通过 window.history 属性对其进行访问。
+
+属性	|描述
+--|--
+length|	返回浏览器历史列表中的 URL 数量。
+
+方法	|描述
+---|--
+back()	|加载 history 列表中的前一个 URL。
+forward()|	加载 history 列表中的下一个 URL。
+go()	|可加载历史列表中的某个具体的页面。
+
+go() 方法。
+```js
+history.go(number) //-1上一个页面，1前进一个页面
+```
