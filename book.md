@@ -93,6 +93,7 @@
     - [本地存储和场景](#本地存储和场景)
       - [cookie的修改注意](#cookie的修改注意)
       - [localstorange本地过期时间](#localstorange本地过期时间)
+      - [cookie查看范围和跨域携带](#cookie查看范围和跨域携带)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -2800,6 +2801,42 @@ function getWithExpiration(key) {
     }  
     return item.value;  
 } 
+```
+
+#### cookie查看范围和跨域携带
+1. 一般来说，子域名可以读取上级域名的Cookie，但不能读取到下级域名的Cookie。这是因为Cookie的Domain属性指定了可以访问该Cookie的Web站点或域
+2. 跨域请求携带Cookie的方法主要涉及到前后端的配置。
+
+```js
+// 全局配置
+axios.defaults.withCredentials = true;//指示浏览器包含凭证信息  
+```
+```js
+//单个接口配置
+axios.get('http://example.com/api/data', { withCredentials: true })  
+  .then(response => {  
+    // 处理响应...  
+  })  
+  .catch(error => {  
+    console.error(error);  
+  });
+```
+后端配置
+```js
+const express = require('express');  
+const cors = require('cors');  
+const app = express();  
+  
+app.use(cors({  
+  origin: 'http://frontend.example.com', // 允许跨域的域名  
+  credentials: true, // 允许携带Credentials  
+}));  
+  
+// ... 其他中间件和路由 ...  
+  
+app.listen(3000, () => {  
+  console.log('Server running on port 3000');  
+});
 ```
 
 
