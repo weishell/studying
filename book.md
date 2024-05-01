@@ -18,9 +18,6 @@
     - [响应式设计](#响应式设计)
     - [元素水平垂直居中](#元素水平垂直居中)
     - [line-height继承](#line-height继承)
-    - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
-      - [移动端1px实现](#移动端1px实现)
-      - [移动端2X3X图](#移动端2x3x图)
     - [css预处理语言](#css预处理语言)
     - [flex布局](#flex布局)
     - [元素竖向的百分比设定是相对于容器的高度吗？](#元素竖向的百分比设定是相对于容器的高度吗)
@@ -50,7 +47,6 @@
     - [内存泄漏](#内存泄漏)
       - [垃圾回收机制](#垃圾回收机制)
       - [可能的内存泄漏场景](#可能的内存泄漏场景)
-    - [Promise](#promise)
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
@@ -73,9 +69,14 @@
       - [函数的特殊性](#函数的特殊性)
     - [js如何实现继承](#js如何实现继承)
       - [继承的方案](#继承的方案)
+    - [Promise](#promise)
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
+    - [正则表达式](#正则表达式)
+      - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
+    - [关于对象的遍历方案](#关于对象的遍历方案)
+      - [for...of 对象适配](#forof-对象适配)
     - [this指向](#this指向)
       - [this隐式绑定丢失](#this隐式绑定丢失)
       - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
@@ -87,6 +88,8 @@
         - [event.eventPhase](#eventeventphase)
       - [IE事件模型](#ie事件模型)
       - [事件代理](#事件代理)
+      - [阻止事件冒泡和默认事件](#阻止事件冒泡和默认事件)
+    - [判断一个元素是否在可视区](#判断一个元素是否在可视区)
     - [监听一个div宽度变化](#监听一个div宽度变化)
     - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
     - [Js单线程详解](#js单线程详解)
@@ -94,14 +97,30 @@
       - [cookie的修改注意](#cookie的修改注意)
       - [localstorange本地过期时间](#localstorange本地过期时间)
       - [cookie查看范围和跨域携带](#cookie查看范围和跨域携带)
+    - [单点登录](#单点登录)
+    - [跨域](#跨域)
+      - [解决方案](#解决方案)
+    - [web端常见的攻击方式](#web端常见的攻击方式)
+    - [js计算精度丢失问题](#js计算精度丢失问题)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
+    - [property 和attribute使用](#property-和attribute使用)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
       - [location](#location)
       - [history](#history)
+  - [移动端](#移动端)
+    - [上拉加载下拉刷新实现](#上拉加载下拉刷新实现)
+    - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
+      - [移动端1px实现](#移动端1px实现)
+      - [移动端2X3X图](#移动端2x3x图)
+  - [http](#http)
+    - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
+  - [write](#write)
+    - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
+    - [封装一个ajax函数](#封装一个ajax函数)
 
 
 ## html
@@ -775,138 +794,6 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 1.	写具体数值，如30px，则继承父级该值
 2.	写比例如1/2/3.5等,则继承该比例（**自己的**font-size*父级中的比例）
 3.	写百分比,如200%,则继承计算出来的结果(**父级**的font-size*200%)
-
-### rem em vw vh dpr
-1.	rem: 相对大小，但相对的只是HTML根元素
-2.	em:  继承父级元素的字体大小
-3.	vw:window.innerWidth = 100vw
-4.	vh:window.innerHeight = 100vh
-5.	vmax:取vh/vw中大值
-6.	vmin: 取vh/vw中小
-7.	dpr（设备像素比）：是指`设备物理像素的个数`除以`设备独立像素`的大小。物理像素是手机屏幕上一个一个的发光的点，大小是固定的；独立像素也叫做逻辑像素，css设置的像素大小就是逻辑像素。
-
-`window.devicePixelRatio`可获取，无缩放的情况下，1个css像素 === 一个设备独立像素
-
-![dpr](book_files/20.jpg)
-
-#### 移动端1px实现
-+  border-image:需要图片
-+  background-image：因为每个边框都是线性渐变颜色实现，因此无法实现圆角。
-+  box-shadow:不好控制
-+  媒体查询：兼容性
-+  :after transform (其实无非是把1px缩放为0.5px，**0.5px并不是所有都支持**(iOS8以上支持)。)
-
-```html
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>1px Border with Transform and After</title>  
-<style>  
-  .border-1px {  
-    position: relative;  
-    background-color: white;  
-  }  
-  .border-1px::after {  
-    content: "";  
-    position: absolute;  
-    left: 0;  
-    top: 0;  
-    width: 200%;  
-    height: 200%;  
-    border: 1px solid #000;  
-    transform: scale(0.5);  
-    transform-origin: 0 0;  
-    box-sizing: border-box;  
-    pointer-events: none; /* 防止影响点击事件 */  
-  }  
-</style>  
-</head>  
-<body>  
-<div class="border-1px" style="width: 200px; height: 100px;">  
-  使用transform和伪元素的1px边框  
-</div>  
-</body>  
-</html>
-```
-
-+  viewport + rem
-
-```html
-<meta name="viewport" id="WebViewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-```
-```js
-var viewport = document.querySelector("meta[name=viewport]")
-if (window.devicePixelRatio == 1) {
-    viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no')
-} 
-if (window.devicePixelRatio == 2) {
-    viewport.setAttribute('content', 'width=device-width, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no')
-} 
-if (window.devicePixelRatio == 3) {
-    viewport.setAttribute('content', 'width=device-width, initial-scale=0.333333333, maximum-scale=0.333333333, minimum-scale=0.333333333, user-scalable=no')
-} 
-var docEl = document.documentElement;
-var fontsize = 10 * (docEl.clientWidth / 320) + 'px';
-docEl.style.fontSize = fontsize;
-```
-+ svg，postcss-write-svg(小插件，只适合画直线)
-
-#### 移动端2X3X图
-+ srcset
-
-```html
-<img srcset="my-image@1x.png 1x, my-image@2x.png 2x, my-image@3x.png 3x"  
-     src="my-image@1x.png"  
-     alt="My Image"  
-     style="width:100%;height:auto;">
-```
-+ 媒体查询 兼容性差，目前之余IOS8+才支持，在IOS7及其以下、安卓系统都是显示0px。
-
-```css
-.my-element {  
-  /* 默认背景图像，用于1倍像素密度的设备 */  
-  background-image: url('my-image@1x.png');  
-}  
-  /* 针对2倍像素密度的设备 */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
-  .my-element {  
-    background-image: url('my-image@2x.png');  
-  }  
-}  
-  
-	/* 针对3倍像素密度的设备 */  
-@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {  
-  .my-element {  
-    background-image: url('my-image@3x.png');  
-  }  
-}
-```
-
-+ js处理
-
-```js
-function setAppropriateImageSrc() {  
-  var image = document.getElementById('my-image');  
-  var dpr = window.devicePixelRatio || 1;  
-  var src;  
-  
-  if (dpr >= 3) {  
-    src = 'my-image@3x.png';  
-  } else if (dpr >= 2) {  
-    src = 'my-image@2x.png';  
-  } else {  
-    src = 'my-image@1x.png';  
-  }  
-  
-  image.src = src;  
-}  
-  
-window.onload = setAppropriateImageSrc;  
-// 如果需要监听窗口大小变化，可以添加以下事件监听器  
-window.onresize = setAppropriateImageSrc;
-```
 
 ### css预处理语言
 扩充css语言，增加了变量，混合，函数，嵌套，代码模块化等功能，方便复用和开发
@@ -1702,41 +1589,6 @@ console.log(refA, 'refA'); //
 
 
 
-### Promise
-+ 三种状态 pending resolved rejected
-+ then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
-+ catch函数正常返回resolved，里面有报错返回rejected[同上]
-
-```js
-Promise.resolve().then(() => {
-    console.log(1) //1
-    }).catch(() => {
-        console.log(2)
-    }).catch(() => {
-        console.log(2)
-}).catch(() => {
-        console.log(2)
-    }).then((val) => {
-    console.warn(val)//undefined
-        console.log(3)//3
-})
-```
-
-```js
-Promise.resolve().then(() => { // 返回 rejected 状态的 promise
-    console.log(1)
-    throw new Error('erro1')
-}).catch((e) => { // 返回 resolved 状态的 promise
-  console.log(e)  //Error: erro1
-    console.log(2) // 2
-}).catch(() => { 
-    console.log(2)
-}).catch(() => { 
-    console.log(2)
-}).then(() => {
-    console.log(3)//3
-})
-```
 
 ### == 和 ===
 全等不会存在隐式转换问题
@@ -2215,6 +2067,43 @@ console.log(person6);
 
 ![整体思路](book_files/35.jpg)
 
+
+### Promise
++ 三种状态 pending resolved rejected
++ then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
++ catch函数正常返回resolved，里面有报错返回rejected[同上]
+
+```js
+Promise.resolve().then(() => {
+    console.log(1) //1
+    }).catch(() => {
+        console.log(2)
+    }).catch(() => {
+        console.log(2)
+}).catch(() => {
+        console.log(2)
+    }).then((val) => {
+    console.warn(val)//undefined
+        console.log(3)//3
+})
+```
+
+```js
+Promise.resolve().then(() => { // 返回 rejected 状态的 promise
+    console.log(1)
+    throw new Error('erro1')
+}).catch((e) => { // 返回 resolved 状态的 promise
+  console.log(e)  //Error: erro1
+    console.log(2) // 2
+}).catch(() => { 
+    console.log(2)
+}).catch(() => { 
+    console.log(2)
+}).then(() => {
+    console.log(3)//3
+})
+```
+
 ### async await
 async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
 ```js
@@ -2289,6 +2178,44 @@ async1()
 console.log('script end')
 ```
 
+### 正则表达式
+正则表达式使用一种特殊的语法来定义模式，这些模式可以被用来搜索、匹配或替换文本。
+
+```js
+// 字面量方式
+let regex = /pattern/;
+// 构造函数方式
+let regex1 = new RegExp('pattern');
+```
+![1](book_files/52.jpg)
+![2](book_files/53.jpg)
+
+#### 正则的贪婪模式和懒惰模式
++ 在匹配的过程中，尝试可能的顺序是从多往少的方向去尝试，显示bbb，然后再看整个正则是否能匹配，不能匹配时，突出一个b，即在bb的基础上，再尝试，以此类推，如果多个贪婪量词挨着，则深度优先搜索。
+```js
+const reg = /ab{1,3}c/
+```
++ 在贪婪量词后加？就是惰性模式，尽可能少的匹配
+
+```js
+const str = 'sd2345s423987sd2342'
+console.log(str.match(/\d{3,5}?/g))
+// 因为增加了"?"符合，导致只要有符合3个连续数字的就返回。
+// ["234", "423", "987", "234"]
+
+console.log(str.match(/\d{3,5}/g))
+// 去掉"?"后，变成了默认模式，就是贪婪匹配
+// ["2345", "42398", "2342"]
+```
+```js
+const string = "12345";
+const regx = /\d{1,3}\d{1,3}/;
+const reg1 = /(\d{1,3})\d{1,3}/; //括号表示分组
+console.log( string.match(regx) );//['12345', index: 0, input: '12345', groups: undefined]
+console.log( string.match(reg1) );//['12345', '123', index: 0, input: '12345', groups: undefined]
+```
+
+
 ### 对象的一些方法
 + Object.is():严格判断两个值是否相等，与严格比较===基本一致，除了+0和-0，NaN和NaN与之不一致
 
@@ -2320,6 +2247,90 @@ console.warn(Object.fromEntries([
  ['baz', 42]
 ]))
 ```
+
+### 关于对象的遍历方案
+1. for-in 循环循环自身和原型上的属性,不包括Symbol，`如果该属性设置了不可遍历`，则会忽略，可结合obj.hasOwnProperty(key)去规避原型上的属性
+
+```js
+	const desc = Object.getOwnPropertyDescriptor(Object.prototype, 'toString');  
+	console.log(desc.enumerable); //  false
+	Object.prototype.addFun = function(){
+		
+	}
+	// Object.getOwnPropertyDescriptor(obj,'x'),查出自身的属性的具体信息
+	const addFun= Object.getOwnPropertyDescriptor(Object.prototype, 'addFun');
+	console.log(addFun,addFun.enumerable); // true 
+
+	function Animal(params){
+　　　　this.species = "动物";
+		this.animal=function(){
+			console.log('1000'+params)
+		};
+		this.arr=[1,2,3,4];
+		
+　　}
+	Animal.prototype.dosomething = function(){
+		console.log("do something")
+	}
+　	function Cat(name,color){
+　　　　this.name = name;
+　　　　this.color = color;
+　　}
+	
+	Cat.prototype = new Animal();
+　　Cat.prototype.constructor = Cat;
+　　var cat1 = new Cat("大毛","黄色");
+	console.log(cat1)
+	
+	for(let item in cat1){
+		console.log(item)
+	}
+```
+
+![参考](book_files/54.jpg)
+
+2. Object.entries(obj)，Object.keys(obj)，Object.values(obj)只会给出对应的obj 自身的可遍历属性
+3. Object.getOwnPropertyNames(obj) ：只获取对象自身的属性的key值，包括**可遍历的和不可遍历的属性**
+4. 如果响应的属性key是Symbol设置的，那么是无法通过以上方法遍历的 ,可借助Object.getOwnPropertySymbols获取属性是symbol的
+
+```js
+let obj = {}
+let age=Symbol();
+let t1 =Symbol('t1')
+obj[age]=18;
+obj[t1]='t111'
+Object.getOwnPropertySymbols(obj).forEach(el=>{
+	console.log(obj[el])
+	//18
+	// t111
+})
+```
+5. for of也可以遍历有iterator接口的对象
+
+6. Reflect.ownKeys 方法返回一个由目标对象自身的属性键组成的数组。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
+
+
+#### for...of 对象适配
++ 借助generator
+
+```js
+function* objectEntries(obj) {
+  let propKeys = Reflect.ownKeys(obj);
+
+  for (let propKey of propKeys) {
+    yield [propKey, obj[propKey]];
+  }
+}
+
+let jane = { first: 'Jane', last: 'Doe' };
+
+for (let [key, value] of objectEntries(jane)) {
+  console.log(`${key}: ${value}`);
+}
+// first: Jane
+// last: Doe
+```
+
 
 ### this指向
 this是一个关键字，它引用的是`当前执行上下文中`的对象。this的值取决于函数是如何被调用的，而不是函数被定义的位置。
@@ -2674,6 +2685,81 @@ detachEvent(eventType, handler)
 
 > focus blur 不支持冒泡；mousemove mouseout 虽然支持，但是会影响性能不适合。
 
+#### 阻止事件冒泡和默认事件
++ event.stopPropagation():仅阻止事件冒泡，不影响同一元素上其他相同类型的事件处理程序。
++ event.stopImmediatePropagation():阻止事件冒泡并且阻止该元素上同事件类型的监听器被触发 【除了停止事件继续捕捉或冒泡传递外，也阻止事件被传入同元素中注册的其它相同事件类型监听器。】
++ event.preventDefalut():阻止默认事件
+
+```js
+// 假设有一个 div 元素和两个点击事件处理程序  
+const div = document.getElementById('myDiv');  
+  
+div.addEventListener('click', function(event) {  
+  console.log('处理程序 1');  
+  event.stopPropagation(); // 仅阻止冒泡  
+});  
+  
+div.addEventListener('click', function(event) {  
+  console.log('处理程序 2');  
+});  
+  
+// 当 div 被点击时，控制台将输出 "处理程序 1"，因为 stopPropagation() 阻止了冒泡  
+// 但 "处理程序 2" 仍然会执行，因为 stopPropagation() 不影响同一元素上的其他处理程序  
+  
+// 修改代码，使用 stopImmediatePropagation()  
+div.addEventListener('click', function(event) {  
+  console.log('处理程序 1');  
+  event.stopImmediatePropagation(); // 阻止冒泡和其他处理程序  
+});  
+  
+// 当 div 被点击时，控制台仅输出 "处理程序 1"，因为 stopImmediatePropagation() 阻止了冒泡和其他处理程序
+```
+
+
+### 判断一个元素是否在可视区
+对应的应用场景：【图片懒加载/列表的无限滚动/可点击链接的预加载】
+
++ getBoundingClientRect
+
+```js
+function isElementInView(element) {  
+    var rect = element.getBoundingClientRect();  
+    return (  
+        rect.top >= 0 &&  
+        rect.left >= 0 &&  
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&  
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)  
+    );  
+}  
+
+var myElement = document.getElementById('my-element');  
+if (isElementInView(myElement)) {  
+    console.log('Element is in view.');  
+} else {  
+    console.log('Element is not in view.');  
+}
+```
++ IntersectionObserver:它可以在元素进入或离开视口时异步观察目标元素与其祖先元素或顶级文档视口的交叉状态。
+
+```js
+function observeElement(element) {  
+    var observer = new IntersectionObserver(function(entries, observer) {  
+        entries.forEach(function(entry) {  
+            if (entry.isIntersecting) {  
+                console.log('Element is in view.');  
+            } else {  
+                console.log('Element is not in view.');  
+            }  
+        });  
+    });  
+    observer.observe(element);  
+}  
+  
+var myElement = document.getElementById('my-element');  
+observeElement(myElement);
+```
+
++ 滚动事件监听去判断 offsetTop scrollTop
 
 ### 监听一个div宽度变化
 ```js
@@ -2839,10 +2925,236 @@ app.listen(3000, () => {
 });
 ```
 
+### 单点登录
+单点登录（Single Sign-On，简称SSO）是一种在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统的技术。
+
++ 同域名：cookie父子域名实现单点登录，父域名的cookie子域名能查看到，但子域名的cookie父域名默认是不能查看到的。
++ 不同域名：
+	- 临时token拼接在url传给子系统（相对复杂，支持跨域，可扩展）
+	- 主要前端去实现：使用Window.postMessage和iframe，给别的域传入信息
+
+```js
+// token
+var token = result.data.token;
+// iframe iframe HTML
+var iframe = document.createElement("iframe");
+iframe.src = "http://app1.com/localstorage.html";
+document.body.append(iframe);
+// postMessage() token iframe
+setTimeout(function () {
+ iframe.contentWindow.postMessage(token, "http://app1.com");
+}, 4000);
+setTimeout(function () {
+ iframe.remove();
+}, 6000);
+// iframe HTML token
+window.addEventListener('message', function (event) {
+ localStorage.setItem('token', event.data)
+}, false);
+```
+
+### 跨域
+跨域本质是浏览器基于同源策略的一种安全手段,端口域名协议一个不相同即为跨域.
+
+一定要注意跨域是浏览器的限制，用抓包工具抓取接口数据，是可以看到接口已经把数据返回回来了，只是浏览器的限制，我们获取不到数据。
+
+#### 解决方案
++ jsonp
++ websocket
++ 跨域资源共享
++ nginx反向代理(Proxy方案1)
++ 本地服务器代理-webpack/vite(Proxy方案2)
++ 服务端代理转发(Proxy方案3)
++ postMessage+iframe(不灵活，适合做些单点登录，传递信息之类的小技巧之类的)
++ document.domain + iframe跨域（只适合有共有的主域名情况）
+
+```js
+// Access-Control-Allow-Origin
+app.use(async (ctx, next)=> {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+  ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+  if (ctx.method == 'OPTIONS') {
+    ctx.body = 200; 
+  } else {
+    await next();
+  }
+})
+```
+
+代理（Proxy）也称网络代理，是一种特殊的网络服务，允许一个（一般为客户端）通过这个服务与另一个网络终端（一般为服务器）进行非直接的连接。一些网关、路由器等网络设备具备网络代理功能。一般认为代理服务有利于保障网络终端的隐私或安全，防止攻击
+
+```js
+// 服务端代理转发
+var express = require('express');
+const proxy = require('http-proxy-middleware')
+const app = express()
+app.use(express.static(__dirname + '/'))
+app.use('/api', proxy({ target: 'http://localhost:4000', changeOrigin: false
+                      }));
+module.exports = app
+```
+
+postMessage实现AB跨域页面通信，但是不推荐使用window.open，浏览器可能存在拦截等行为，使用iframe+postMessage
+
+```bash
+otherWindow.postMessage(message, targetOrigin, [transfer]);
+```
+
+```html
+<!-- A页面 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<body>
+		<button onclick="openHtml()">打开B页面</button>
+		<button onclick="send()">发送消息</button>
+	</body>
+	<script>
+		var win1,win2 ;
+	    function send(){
+			// 可以配置具体允许哪个端口去获取信息
+			// 如http://127.0.0.1:5501
+	    	// win1.postMessage("hide",'*');
+			win2.postMessage("hide",'*');
+	    }
+		
+		function openHtml(){
+			// 可以跨域场景，也可以同源页面
+			// win1 = window.open("http://127.0.0.1:8848/code/index.html")
+			win2 = window.open("http://127.0.0.1:7000/index.html")
+		}
+	</script>
+</html>
+```
+```html
+<!-- B页面 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		
+	</body>
+	<script>
+		window.addEventListener('message',function(e){
+		    console.log(e.data);
+		},false);
+	</script>
+</html>
+
+```
+
+```html
+<h1>父页面</h1>
+<!-- <iframe id="iframe" src="http://127.0.0.1:8848/word/demo1/index2.html"></iframe> -->
+<iframe id="iframe" src="./index2.html"></iframe>
+<script>
+	const iFrame = document.getElementById('iframe')
+	//需要等到iframe中的子页面加载完成后才发送消息，否则子页面接收不到消息
+	iFrame.onload = function(){
+	  // <!-- iFrame.contentWindow获取到iframe的window对象 -->
+	  iFrame.contentWindow.postMessage('父页面发送的消息','*');
+	  // 这里可做限制，限制范围
+	}
+	
+	
+	window.addEventListener('message',e=>{
+	    //<!-- 对消息来源origin做一下过滤，避免接收到非法域名的消息导致的xss攻击 -->
+	    // if(e.origin===''){
+			console.warn(e)
+	        console.log(e.origin) //子页面URL，这里是http://b.index.com
+	        console.log(e.source) // 子页面window对象，全等于iframe.contentWindow
+	        console.log(e.data) //子页面发送的消息
+	    // }
+	},false)
+	
+</script>
+```
+```html
+<html>
+	<button id='child'>child</button>
+</html>
+<script>
+	// 有发送就有接收，与postMessage配套使用的就是message事件
+	window.addEventListener('message',e=>{
+	    //<!-- 对消息来源origin做一下过滤，避免接收到非法域名的消息导致的xss攻击 -->
+	    // if(e.origin==='http://a.index.com'){
+	        console.log(e.origin) //父页面URL，这里是http://a.index.com
+	        console.log(e.source) // 父页面window对象，全等于window.parent/window.top
+	        console.log(e.data)  //父页面发送的消息
+	    // }
+	},false)
+	
+	const child =document.getElementById('child')
+	child.onclick =function(){
+		window.parent.postMessage('子页面发送的消息','*')
+	}
+	
+</script>
+```
+
+![postMessage](book_files/50.jpg)
+
+### web端常见的攻击方式
++ 跨站脚本攻击（XSS攻击），攻击者利用Web应用未对用户提交的数据进行过滤或转义的漏洞，向网页中注入恶意脚本代码。（xss两大要素：攻击者输入恶意代码，浏览器执行恶意代码）前端校验只能解决输入的，如果绕开前端请求，直接构造请求就需要额外处理了。
+	- 存储型：存储在数据库【论坛 私信】
+	- 反射型：存在url中【网站跳转 搜索】
+	- DOM型：有浏览器端完成
++ 跨站请求伪造（CSRF攻击），`攻击者诱导受害者进入第三方网站，该网站向被攻击网站发送跨站请求。`由于请求携带了受害者的合法cookie，因此验证通过，攻击得以完成。
++ SQL注入攻击
+
+```
+XSRF流程
+受害者登录一个受信任的网站A，并在本地生成Cookie。
+在不登出网站A的情况下，受害者访问一个危险的网站B。
+攻击者在网站B上设置一些恶意的代码或链接，诱导受害者点击或执行。
+当受害者执行这些恶意操作时，他们的浏览器会携带网站A的Cookie向网站A发送请求。
+网站A接收到请求后，由于Cookie是有效的，因此会误以为是用户自己发送的请求，并执行相应的操作。
+```
+
+为了防范CSRF攻击，可以采取以下措施：
+
++ 验证请求的来源：服务器在接收到请求时，可以检查请求的来源是否合法，即是否来自受信任的域名。
++ 使用验证码：对于关键操作，可以要求用户输入验证码，以确保操作是由用户本人执行的。
++ 设置Token：服务器在用户登录后生成一个随机的Token，并将其保存在用户的Session中。在后续请求中，要求客户端携带这个Token。由于Token是随机的，攻击者很难伪造。
++ 避免在URL中传递敏感信息：敏感信息应该通过POST请求传递，而不是通过URL的查询参数。
++ 实施安全的Cookie策略：设置HttpOnly属性，防止JavaScript访问Cookie；设置Secure属性，确保Cookie只能通过HTTPS传输。
+
+### js计算精度丢失问题
+```js
+0.1+0.2=== 0.3 false 
+```
+```js
+1/3=0.3333...
+```
+可以有无限个3，但是计算机要存储，所以最后只能取`近似值`，当计算机存储后再取出就存在错误的可能。
+
+对于整数，很容易转换成十进制或者二进制，而浮点数则不知道小数位数多少位，采取的是科学计数法。因为存储时有位数限制，某些十进制转二进制存在无限循环，二进制会采取舍入操作。
+
+解决思路：转成整数
+```js
+function add(num1, num2) {
+ const num1Digits = (num1.toString().split('.')[1] || '').length;
+ const num2Digits = (num2.toString().split('.')[1] || '').length;
+ const baseNum = Math.pow(10, Math.max(num1Digits, num2Digits));
+ return (num1 * baseNum + num2 * baseNum) / baseNum;
+}
+
+console.log(add(0.1,0.2))
+```
+
+> Math.js BigDecimal.js
+
+
 
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
-
 
 DOM包含了以下几种类型的节点：
 
@@ -3002,6 +3314,55 @@ newElement.outerHTML = '<a>这是通过 innerHTML 添加的文本，包括 <b>�
 ```
 ![innerText](book_files/48.jpg)
 
+### property 和attribute使用
+1. Attribute：HTML属性，书写在标签内的属性，使用setAttribute()和getAttribute()进行设置和获取。
+2. Property：DOM属性，html标签对应的DOM节点属性，使用 .属性名 或者 ['属性名']进行设置和获取。
+
+简单理解，Attribute就是dom节点自带的属性，例如html中常用的id、class、title、align等;而Property是这个DOM元素作为对象，其附加的内容，例如childNodes、firstChild等。
+
+另外，常用的Attribute，例如id、class等，已经被作为Property附加到DOM对象上，可以和Property一样取值和赋值。但是自定义的Attribute，就不会有这样的优待。
+
+两者都可能造成重新渲染，**优先使用Property**。
+
+不管是修改attribute还是property都会影响到对方的属性值，但是输入框的input value比较特殊例外！
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+	</head>
+	<body>
+		<div class="switch">
+			<input type="text" value="1" name="sex" class="k1">男
+			
+	</div>
+	</body>
+</html>
+<script type="text/javascript">
+	let a=document.querySelectorAll('input')[0];
+	console.log(a.value===a.getAttribute('value'))//true
+	a.setAttribute('value',99);
+	console.log(a.value===a.getAttribute('value'))//true
+	a.value="19"
+	console.log(a.value===a.getAttribute('value'))//false
+	console.log(a.value)//19
+	console.log(a.getAttribute("value"))//99
+	a.setAttribute('value',88)
+	console.log(a.value)//19
+	console.log(a.getAttribute("value"))//88
+</script>
+
+```
+
+1. 如果input在html中初始设置了value，在没有任何input.value=“xxx”这种操作时，input.value===input.getAttribute("value");而且还可以继续通过input.setAttribute('value','xxx')来更改新值，input.value会同步修改。
+2. 当修改了input.value='xxx'后，input.getAttribute('value')和input.value似乎再也没任何交集了，input.value会反映在页面上的input框中的数据,而input的attribue中的value也就是打开控制台里的元素结构会看到`<input type="text" value="1" name="sex" class="k1">`是某个值，这个值只能通过setAttribute来修改
+3. value的Attriubte和property没有映射关系
+
+
+
 ## BOM
 
 ### BOM的含义
@@ -3052,4 +3413,241 @@ go()	|可加载历史列表中的某个具体的页面。
 go() 方法。
 ```js
 history.go(number) //-1上一个页面，1前进一个页面
+```
+
+## 移动端
+
+### 上拉加载下拉刷新实现
+上拉加载本质是触底
+![原理](book_files/51.jpg)
+
+```js
+scrollTop + clientHeight >= scrollHeight
+```
+```js
+let clientHeight = document.documentElement.clientHeight; //
+let scrollHeight = document.body.scrollHeight;
+let scrollTop = document.documentElement.scrollTop;
+let distance = 50; // 50
+if ((scrollTop + clientHeight) >= (scrollHeight - distance)) {
+ console.log("xxx");
+}
+```
+
+下拉刷新则是监听touch事件
+
+
+### rem em vw vh dpr
+1.	rem: 相对大小，但相对的只是HTML根元素
+2.	em:  继承父级元素的字体大小
+3.	vw:window.innerWidth = 100vw
+4.	vh:window.innerHeight = 100vh
+5.	vmax:取vh/vw中大值
+6.	vmin: 取vh/vw中小
+7.	dpr（设备像素比）：是指`设备物理像素的个数`除以`设备独立像素`的大小。物理像素是手机屏幕上一个一个的发光的点，大小是固定的；独立像素也叫做逻辑像素，css设置的像素大小就是逻辑像素。
+
+`window.devicePixelRatio`可获取，无缩放的情况下，1个css像素 === 一个设备独立像素
+
+![dpr](book_files/20.jpg)
+
+#### 移动端1px实现
++  border-image:需要图片
++  background-image：因为每个边框都是线性渐变颜色实现，因此无法实现圆角。
++  box-shadow:不好控制
++  媒体查询：兼容性
++  :after transform (其实无非是把1px缩放为0.5px，**0.5px并不是所有都支持**(iOS8以上支持)。)
+
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>1px Border with Transform and After</title>  
+<style>  
+  .border-1px {  
+    position: relative;  
+    background-color: white;  
+  }  
+  .border-1px::after {  
+    content: "";  
+    position: absolute;  
+    left: 0;  
+    top: 0;  
+    width: 200%;  
+    height: 200%;  
+    border: 1px solid #000;  
+    transform: scale(0.5);  
+    transform-origin: 0 0;  
+    box-sizing: border-box;  
+    pointer-events: none; /* 防止影响点击事件 */  
+  }  
+</style>  
+</head>  
+<body>  
+<div class="border-1px" style="width: 200px; height: 100px;">  
+  使用transform和伪元素的1px边框  
+</div>  
+</body>  
+</html>
+```
+
++  viewport + rem
+
+```html
+<meta name="viewport" id="WebViewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+```
+```js
+var viewport = document.querySelector("meta[name=viewport]")
+if (window.devicePixelRatio == 1) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no')
+} 
+if (window.devicePixelRatio == 2) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no')
+} 
+if (window.devicePixelRatio == 3) {
+    viewport.setAttribute('content', 'width=device-width, initial-scale=0.333333333, maximum-scale=0.333333333, minimum-scale=0.333333333, user-scalable=no')
+} 
+var docEl = document.documentElement;
+var fontsize = 10 * (docEl.clientWidth / 320) + 'px';
+docEl.style.fontSize = fontsize;
+```
++ svg，postcss-write-svg(小插件，只适合画直线)
+
+#### 移动端2X3X图
++ srcset
+
+```html
+<img srcset="my-image@1x.png 1x, my-image@2x.png 2x, my-image@3x.png 3x"  
+     src="my-image@1x.png"  
+     alt="My Image"  
+     style="width:100%;height:auto;">
+```
++ 媒体查询 兼容性差，目前之余IOS8+才支持，在IOS7及其以下、安卓系统都是显示0px。
+
+```css
+.my-element {  
+  /* 默认背景图像，用于1倍像素密度的设备 */  
+  background-image: url('my-image@1x.png');  
+}  
+  /* 针对2倍像素密度的设备 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
+  .my-element {  
+    background-image: url('my-image@2x.png');  
+  }  
+}  
+  
+	/* 针对3倍像素密度的设备 */  
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {  
+  .my-element {  
+    background-image: url('my-image@3x.png');  
+  }  
+}
+```
+
++ js处理
+
+```js
+function setAppropriateImageSrc() {  
+  var image = document.getElementById('my-image');  
+  var dpr = window.devicePixelRatio || 1;  
+  var src;  
+  
+  if (dpr >= 3) {  
+    src = 'my-image@3x.png';  
+  } else if (dpr >= 2) {  
+    src = 'my-image@2x.png';  
+  } else {  
+    src = 'my-image@1x.png';  
+  }  
+  
+  image.src = src;  
+}  
+  
+window.onload = setAppropriateImageSrc;  
+// 如果需要监听窗口大小变化，可以添加以下事件监听器  
+window.onresize = setAppropriateImageSrc;
+```
+
+## http
+
+### 从输入URL到渲染页面的整个过程
+1. DNS解析：域名=>IP地址
+2. 浏览器根据IP地址向服务器发起http请求
+3. 服务器处理http请求，并将对应资源返回给浏览器
+4. 根据HTML代码生成DOM Tree，根据CSS代码生成CSSOM（css对象模型）
+5. 将DOM Tree和 CSSOM整合形成Render Tree
+6. 根据Render Tree渲染页面
+7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
+8. 直至整个Render 渲染完成
+
+
+## write
+
+### 封装一个通用的事件监听函数
++ 事件代理原理：**事件冒泡**
++ **Element.matches()**：如果元素被指定的选择器字符串选择，Element.matches() 方法返回 true; 否则返回 false。(API可能存在兼容问题)
+
+```js
+function bindEvent(elem, type, selector, fn) {
+    if (fn == null) {
+        fn = selector
+        selector = null
+    }
+    elem.addEventListener(type, event => {
+        const target = event.target        
+        if (selector) {
+            // 代理绑定
+            if (target.matches(selector)) {
+                fn.call(target, event)
+            }
+        } else {
+            // 普通绑定
+            fn.call(target, event)
+        }
+    })
+}
+
+// 普通绑定
+const btn1 = document.getElementById('btn1')
+bindEvent(btn1, 'click', function (event) {
+    // console.log(event.target) // 获取触发的元素
+    event.preventDefault() // 阻止默认行为
+    alert(this.innerHTML)
+})
+
+// 代理绑定
+const div3 = document.getElementById('div3')
+bindEvent(div3, 'click', 'a', function (event) {
+    event.preventDefault()
+    alert(this.innerHTML)
+})
+```
+
+### 封装一个ajax函数
+```js
+function ajax(url) {
+    const p = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', url, true)
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    resolve(
+                        JSON.parse(xhr.responseText)
+                    )
+                } else if (xhr.status === 404 || xhr.status === 500) {
+                    reject(new Error('404 not found'))
+                }
+            }
+        }
+        xhr.send(null)
+    })
+    return p
+}
+
+const url = '/data/test.json'
+ajax(url)
+.then(res => console.log(res))
+.catch(err => console.error(err))
 ```
