@@ -102,10 +102,15 @@
       - [解决方案](#解决方案)
     - [web端常见的攻击方式](#web端常见的攻击方式)
     - [js计算精度丢失问题](#js计算精度丢失问题)
+  - [ES6](#es6)
+    - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
+    - [数组的静态方法](#数组的静态方法)
+      - [创建数组的方法](#创建数组的方法)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
     - [property 和attribute使用](#property-和attribute使用)
+    - [说说 Real DOM 和 Virtual DOM 的区别？优缺点？](#说说-real-dom-和-virtual-dom-的区别优缺点)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -3151,7 +3156,47 @@ console.log(add(0.1,0.2))
 
 > Math.js BigDecimal.js
 
+## ES6
 
+### 扩展运算符 剩余运算符
++ 扩展运算符用三个点（...）表示，它可以用于将一个数组或对象的所有元素/属性**展开**到新的数组或对象中。`可实现浅拷贝`
+```js
+const arr1 = [1, 2, 3];  
+const arr2 = [...arr1, 4, 5]; // [1, 2, 3, 4, 5]
+```
++ 剩余运算符也用三个点（...）表示，但它用于将数组或对象的剩余元素/属性收集到一个新的变量中。
+```js
+function sum(a, b, ...rest) {  
+  let total = a + b;  
+  rest.forEach(num => total += num);  
+  return total;  
+}  
+  
+sum(1, 2, 3, 4, 5); // 返回 15
+```
+
+### 数组的静态方法
++ Array.isArray(obj):检测是否是数组
++ Array.from(arrayLike[, mapFunction[, thisArg]])
+	- 从一个`类数组`或`可迭代`的对象创建一个新的数组实例
+	- 可以提供一个映射函数作为第二个参数来转换每个元素
++ Array.of(...items):创建一个具有可变数量参数的新数组实例，不论参数数量或类型。
++ Array.prototype.slice():可以静态地通过 Array.prototype.slice.call(arrayLike) 的形式使用，将`类数组对象`或可迭代对象转换为真正的数组。
+
+#### 创建数组的方法
+1. Array.of
+2. new Array
+3. arr=[]确定length
+```js
+console.log(Array.of(7)) //[7]
+console.log(Array.of(1, 2, 3))//[1,2,3]
+console.log(Array(7))//[,,,,,,,]
+console.log(Array(1, 2, 3))[1,2,3]
+
+let arr = []
+arr.length =10
+console.log(arr) //[empty*10]
+```
 
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
@@ -3361,7 +3406,61 @@ newElement.outerHTML = '<a>这是通过 innerHTML 添加的文本，包括 <b>�
 2. 当修改了input.value='xxx'后，input.getAttribute('value')和input.value似乎再也没任何交集了，input.value会反映在页面上的input框中的数据,而input的attribue中的value也就是打开控制台里的元素结构会看到`<input type="text" value="1" name="sex" class="k1">`是某个值，这个值只能通过setAttribute来修改
 3. value的Attriubte和property没有映射关系
 
+### 说说 Real DOM 和 Virtual DOM 的区别？优缺点？
+Real DOM，真实 DOM，意思为文档对象模型，是一个结构化文本的抽象，在页面渲染出的每一个结点都是一个真实 DOM结构
 
+![real dom](book_files/55.jpg)
+
+Virtual Dom，本质上是以 JavaScript 对象形式存在的对 DOM 的描述
+
+创建虚拟 DOM 目的就是为了更好将虚拟的节点渲染到页面视图中，虚拟 DOM 对象的节点与真实 DOM 的属性一一照应
+
+```js
+// 创建 h1 标签，右边千万不能加引号
+const vDom = <h1>Hello World</h1>; 
+// 找到 <div id="root"></div> 节点
+const root = document.getElementById("root"); 
+// 把创建的 h1 标签渲染到 root 节点上
+ReactDOM.render(vDom, root); 
+```
+JSX 实际是一种语法糖，在使用过程中会被 babel 进行编译转化成 JS 代码
+```js
+const vDom = React.createElement(
+  'h1'，
+  { className: 'hClass', id: 'hId' },
+  'hello world'
+)
+console.log(vDom)
+```
+
+![vdom](book_files/56.jpg)
+
+JSX 通过 babel 的方式转化成 React.createElement 执行，返回值是一个对象，也就是虚拟 DOM
+
+1. 两者的区别如下：
+	+ 虚拟 DOM 不会进行排版与重绘操作，而真实 DOM 会频繁重排与重绘
+	+ 虚拟 DOM 的总损耗是“虚拟 DOM 增删改+真实 DOM 差异增删改+排版与重绘”，真实 DOM 的总损耗是“真实 DOM 完全增删改+排版与重绘”
+
+传统的原生 api 或 jQuery 去操作 DOM 时，浏览器会从构建 DOM 树开始从头到尾执行一遍流程
+
+当你在一次操作时，需要更新 10 个 DOM 节点，浏览器没这么智能，收到第一个更新 DOM 请求后，并不知道后续还有 9 次更新操作，因此会马上执行流程，最终执行 10 次流程
+
+而通过 VNode，同样更新 10 个 DOM 节点，虚拟 DOM 不会立即操作 DOM，而是将这 10 次更新的 diff 内容保存到本地的一个 js 对象中，最终将这个 js 对象一次性 attach 到 DOM 树上，避免大量的无谓计算
+
+
+2. 真实 DOM 的优势：易用
+3. 缺点：
+	+ 效率低，解析速度慢，内存占用量过高
+	+ 性能差：频繁操作真实 DOM，易于导致重绘与回流
+
+使用虚拟 DOM 的优势如下：
++ 简单方便：如果使用手动操作真实 DOM 来完成页面，繁琐又容易出错，在大规模应用下维护起来也很困难
++ 性能方面：使用 Virtual DOM，能够有效避免真实 DOM 数频繁更新，减少多次引起重绘与回流，提高性能
++ 跨平台：React 借助虚拟 DOM，带来了跨平台的能力，一套代码多端运行
+
+缺点：
++ 在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化
++ 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，速度比正常稍慢
 
 ## BOM
 
