@@ -110,6 +110,16 @@
       - [创建数组的方法](#创建数组的方法)
     - [Set和Map的应用](#set和map的应用)
       - [weakSet weakMap](#weakset-weakmap)
+    - [Decorator应用场景](#decorator应用场景)
+  - [Vue2](#vue2)
+    - [Vue 生命周期](#vue-生命周期)
+      - [mounted created 请求数据](#mounted-created-请求数据)
+    - [数据双向绑定](#数据双向绑定)
+    - [Vue双向绑定的原理](#vue双向绑定的原理)
+    - [Vue组件通信方式](#vue组件通信方式)
+    - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
+    - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
+    - [v-if和v-for的优先级](#v-if和v-for的优先级)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -3352,6 +3362,275 @@ const wm = new WeakMap();
 const element = document.getElementById('example');
 wm.set(element, 'some information');
 wm.get(element) // "some information"
+```
+
+### Decorator应用场景
+装饰器，其本质就是一个普通的函数，用于扩展类属性和类方法。（装饰器模式）
+
++ 代码可读性更强，装饰器命名相当于一个注释
++ 在不改变原有代码情况下，对原有的功能进行扩展
++ 可以添加在类上，也可以添加在类的属性方法上
++ decorator 就是一个普通函数，只不过它接收 3 个参数，与 Object.defineProperty 一致。
++ 作用在方法上的 decorator 接收的第一个参数（ target ）是**类的 prototype**；如果把一个 decorator 作用到类上，则它的第一个参数 target 是**类本身**
+
+```js
+class Dog {
+  @readonly
+  bark () {
+    return 'wang!wang!'
+  }
+}
+
+let dog = new Dog()
+dog.bark = 'bark!bark!'
+// Cannot assign to read only property 'bark' of [object Object]
+// <=====>
+// 步骤 1
+function Dog () {}
+
+// 步骤 2
+Object.defineProperty(Dog.prototype, 'bark', {
+  value: function () { return 'wang!wang!' },
+  enumerable: false,
+  configurable: true,
+  writable: true
+})
+```
+
+```js
+function doge (isDoge) {
+  // 不传参
+  // target.isDoge = true
+  
+  //传参
+  return function(target) {
+    target.isDoge = isDoge
+  }
+}
+
+@doge(true)
+class Dog {}
+
+console.log(Dog.isDoge)
+// true
+```
+
+作用在类属性方法上亦可以这样
+```js
+function enumerable (isEnumerable) {
+  return function(target, key, descriptor) {
+    descriptor.enumerable = isEnumerable
+  }
+}
+
+// 属性方法上不建议直接改target，因为是类的原型，影响所有的
+// function enumerable (target, key, descriptor){
+// 	descriptor.enumerable  =true
+// }
+
+class Dog {
+  @enumerable(false)
+  eat () { }
+}
+
+```
+多个装饰器时，类似洋葱圈模式，先从外到内，再有内到外
+```js
+function dec(id){
+ console.log('evaluated', id);
+ return (target, property, descriptor) =>console.log('executed', id);
+}
+class Example {
+ @dec(1)
+ @dec(2)
+ method(){}
+}
+// evaluated 1
+// evaluated 2
+// executed 2
+// executed 1
+```
+> 应用场景：react-redux的connect，类的混入某些新属性或者修改属性
+
+
+## Vue2
+
+### Vue 生命周期
+Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
+
+![生命周期](book_files/58.jpg)
+
+#### mounted created 请求数据
++ 如果不涉及到操作dom，created时机更早更好
++ 如果mounted有对dom处理，那需放在mounted处理
+
+### 数据双向绑定
+模型Model的变动会改变视图View,View变动会影响Model
+
+![1](book_files/60.jpg)
+![2](book_files/61.jpg)
+
+### Vue双向绑定的原理
+
+![数据双向绑定](book_files/59.jpg)
+
++ Model  代表数据模型，数据和业务逻辑都在Model层中定义；
++ View 视图层 代表UI视图，负责数据的展示；
++ ViewModel  负责监听 Model 中数据的改变并且控制视图的更新，处理用户交互操作； Model 和 View 并无直接关联，而是通过 ViewModel 来进行联系的，Model 和 ViewModel 之间有着双向数据绑定的联系。因此当 Model 中的数据改变时会触发 View 层的刷新，View 中由于用户交互操作而改变的数据也会在 Model 中同步。
+
+![vue基本实现方式](book_files/62.jpg)
+![对应关系](book_files/63.jpg)
+
+### Vue组件通信方式
+1. props 和 $emit
+2. ref
+3. EventBus
+4. parent root children
+5. attrs 和listeners
+6. Provide 和 Inject
+7. Vuex
+
+$root
+```js
+// 根组件
+// this等于this$root 
+
+new Vue({
+  render: h => h(App),
+  methods: {  
+    showAlert: function() {  
+      alert('Message from root method!');  
+      this.$root.$emit('myname')
+    }  
+  }  
+}).$mount('#app')
+```
+```html
+// 后代组件可以触发根组件的方法
+<button @click="$root.showAlert()">Call root method</button>  
+```
+```js
+// 也可以监听或者派发事件，在其他的组件中可以监听接受到派发事件
+  export default {
+    mounted(){
+      console.log(this.$root)
+     
+      this.$root.$on('myname',()=>{
+        console.log('后代组件监听')
+      })
+      this.$root.$on('app',()=>{
+        console.log('apppp')
+      })
+    },
+    methods:{
+        childFun(){
+            console.log(this.$root)
+            this.$root.$emit('kkk',1000)
+        }
+    }
+  }
+```
+
+provide 和inject
+```js
+  provide() {   
+    return{
+      for1: this.k,
+      arr:this.arr,
+      test:this.test
+    }   //重要一步，在父组件中注入一个变量
+  },
+  methods:{
+    changeF(){
+      this.k =1000 //简单类型后代组件不会随之改变
+      this.arr=[2] // 直接重新给值不会
+      this.test.f=30 //只修改对应属性后代组件可以改变
+    }
+  }
+```
+
+
+```js
+//
+class Bus {
+ constructor() {
+	this.callbacks = {}; //
+ }
+ $on(name, fn) {
+	this.callbacks[name] = this.callbacks[name] || [];
+	this.callbacks[name].push(fn);
+ }
+ $emit(name, args) {
+	if (this.callbacks[name]) {
+	this.callbacks[name].forEach((cb) => cb(args));
+ }
+ }
+}
+
+// main.js
+Vue.prototype.$bus = new Bus() //方案1 自己写bus
+//
+Vue.prototype.$bus = new Vue() //方案2 Vue2自身支持
+```
+
+```html
+// child props foo
+<p>{{$attrs.foo}}</p>
+
+// parent
+<HelloWorld foo="foo"/>
+```
+
+ 组件通过 Child2 间接地与 Grandson 组件通信，传递属性和监听事件，而 Child2 组件仅作为属性和事件的“中继站”。这种模式在构建大型 Vue.js 应用程序时非常有用，因为它允许你构建可重用的组件，同时保持组件之间的解耦。
+```html
+// Grandson communication/index.vue 祖辈
+<Child2 msg="lalala" @some-event="onSomeEvent"></Child2>
+
+// Child2 父辈
+<Grandson v-bind="$attrs" v-on="$listeners"></Grandson>
+
+v-bind="$attrs"：这个指令将父组件传递给 Child2 的所有`未被 Child2 组件显式声明的属性`（props）`向下传递`给 Grandson 组件。在这个例子中，msg 属性就是这样被传递的。
+
+v-on="$listeners"：这个指令将父组件（即 Grandson communication/index.vue）监听的所有事件监听器传递给 `Grandson 组件`。这意味着 some-event 事件监听器也会被传递给 Grandson 组件。
+
+
+// Grandson
+<div @click="$emit('some-event', 'msg from grandson')">
+	{{msg}}
+</div>
+```
+
+```js
+// 一个组件监听
+this.$parent.on('add',this.add)
+// 另一个组件发出自定义事件
+this.$parent.emit('add')
+```
+
+### data的写法是函数不是对象的原因
++ 如果根实例对象，data可以使函数也可以是对象
++ 如果是组件实例对象，则必须是函数，目的是为了防止公用data会造成数据污染，使用函数返回一个全新的data对象
+
+### vue直接给对象添加属性的问题
+vue2的响应式依赖Object.defineProperty去添加依赖收集触发，但是这个操作是在编译模板时已经触发了，现在手动添加，无法感知到，所以vue2提供了Vue.set()方法，去再次触发收集依赖。
+
+### v-if和v-for的优先级
+vue2中通过编译后发现，v-for的优先级高于v-if，vue3中v-if高于v-for，但是不建议v-if和v-for放在一个层级.
+
+如果是items这个数据内部某些值不展示，则可以考虑借助computed去过滤掉
+```js
+<template v-if="isShow">
+ <p v-for="item in items">
+</template>
+```
+```js
+computed: {
+ items: function() {
+	 return this.list.filter(function (item) {
+		return item.isShow
+	})
+ }
+}
 ```
 
 ## DOM
