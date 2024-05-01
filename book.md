@@ -104,6 +104,7 @@
       - [解决方案](#解决方案)
     - [web端常见的攻击方式](#web端常见的攻击方式)
     - [js计算精度丢失问题](#js计算精度丢失问题)
+    - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -120,6 +121,9 @@
     - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
     - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
     - [v-if和v-for的优先级](#v-if和v-for的优先级)
+    - [v-show v-if的应用场景](#v-show-v-if的应用场景)
+    - [vue中key的原理](#vue中key的原理)
+    - [Vue.extend 和 Vue.component](#vueextend-和-vuecomponent)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -3259,6 +3263,80 @@ console.log(add(0.1,0.2))
 
 > Math.js BigDecimal.js
 
+### 前端防护xss和xsrf攻击
+【Cross Site Script】跨站脚本攻击 恶意攻击者往Web页面里插入恶意Script代码，当用户浏览该页之时，嵌入其中Web里面的Script代码会被执行，从而达到恶意攻击用户的目的。可以直接安装xss对应插件。
+```js
+function escape(str) {
+  str = str.replace(/&/g, '&amp;')// h5之后可以不做转义，且&符号转义要放在第一个否则对其他的有干扰
+  str = str.replace(/</g, '&lt;')
+  str = str.replace(/>/g, '&gt;')
+  str = str.replace(/"/g, '&quto;')
+  str = str.replace(/'/g, '&#39;')
+  str = str.replace(/`/g, '&#96;')
+  str = str.replace(/\//g, '&#x2F;')
+  str = str.replace(/ /g, '&#39;')
+  return str
+}
+escape('<script>alert(1)</script>')
+//&lt;script&gt;alert(1)&lt;&#x2F;script&gt;
+```
+
+CSP: Content-Security-Policy 内容安全策略(白名单制度)
++ 设置 HTTP 的 Content-Security-Policy 头部字段
++ 设置网页的`<meta>`标签。
++ form-action用来控制表单之类的，default-src用来控制其他的，如果需要放开某些白名单，需要写入在列表里
++ default-src会影响到img，要么也把img也配置上，要么如果只限制js的话可以吧**default-src改为script-src**
+
+```js
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <!-- 前端页面上设置，加了jquery就访问不了了-->
+        <meta http-equiv="Content-Security-Policy" content="form-action 'self';default-src 'self';">
+    </head>
+    <body>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript">
+            console.log($)
+        </script>
+    </body>
+</html>
+```
+![csp](book_files/66.jpg)
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <!-- 前端页面上设置，加了jquery就访问不了了-->
+        <meta http-equiv="Content-Security-Policy" content="form-action 'self';default-src 'self' http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js https://unpkg.com/vue@3/dist/vue.global.js;">
+    </head>
+    <body>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script type="text/javascript">
+            console.log($)
+        </script>
+    </body>
+</html>
+```
+![加载成功](book_files/67.jpg)
+
+
+XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
+
+通过在访问用户被认为已经通过身份验证的Web应用程序的页面中包含恶意代码或链接来工作。 
+1.	**在请求地址中添加 token+(验证码) 并验证：限制从别的网址登录的可能**
+2.	在HTTP 头中自定义属性并验证
+3.	验证 HTTP Referer 字段 ( req.headers.referer )(不推荐，存在篡改和浏览器默认阻止)
+4.	Get 请求不对数据进行修改
+5.	不让第三方网站访问到用户 Cookie =>后台cookie配置设置 same-site 属性进行控制
+6.	CORS是否必要[JSONP]，是否兼容老浏览器
+
 ## ES6
 
 ### 扩展运算符 剩余运算符
@@ -3632,6 +3710,41 @@ computed: {
  }
 }
 ```
+
+### v-show v-if的应用场景
+1. 都是从页面移除元素，v-show的原理是display:none，成为游离页面还可再用，v-if则是直接删除。
+2. 频繁切换用v-show
+3. v-show的切换只是css的变化，v-if切换会触发生命周期(true:beforeCreated=>...=>mounted,false:beforeDestory=>destoryed),事件监听器和子组件也会适当的销毁和重建
+
+### vue中key的原理
+key是每一个vnode的唯一id，是diff的一种优化侧率，根据key，可以更准确更快找到对应的vnode节点
+
+![key1](book_files/64.jpg)
+![key2](book_files/65.jpg)
+
+### Vue.extend 和 Vue.component
+Vue.extend() 是 Vue.js 中的一个全局 API，它用于创建一个“子类”或“扩展”的 Vue 构造器。这个扩展的构造器可以用来创建可复用的组件构造器，这些构造器可以用来创建新的 Vue 组件实例。
+
+在某些情况下，可能需要动态地创建组件实例，或者需要一种更底层的、编程式的方式来创建组件，这时 Vue.extend() 就非常有用。
+
+```js
+// 创建一个扩展的 Vue 构造器  
+const MyComponent = Vue.extend({  
+  template: '<div>这是一个通过 Vue.extend 创建的组件</div>'  
+});  
+  
+// 使用这个扩展的构造器来创建组件实例  
+const instance = new MyComponent().$mount();  
+  
+// 假设你有一个 DOM 元素，你可以将组件挂载到这个元素上  
+// document.body.appendChild(instance.$el);  
+  
+// 在实际开发中，你通常不会直接这样做，而是将这个扩展的构造器注册为全局或局部组件  
+// 并在模板中使用它
+```
+
+Vue.component：在内部，它实际上也调用了 Vue.extend 来创建一个构造器，但随后它还进行了组件的注册和命名等额外操作。因此，你可以将 Vue.component 看作是 Vue.extend 和组件注册的结合体。
+
 
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
