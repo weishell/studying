@@ -70,8 +70,10 @@
     - [js如何实现继承](#js如何实现继承)
       - [继承的方案](#继承的方案)
     - [Promise](#promise)
+      - [应用场景](#应用场景)
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
+    - [Generator理解和应用](#generator理解和应用)
     - [正则表达式](#正则表达式)
       - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
@@ -106,11 +108,14 @@
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
       - [创建数组的方法](#创建数组的方法)
+    - [Set和Map的应用](#set和map的应用)
+      - [weakSet weakMap](#weakset-weakmap)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
     - [property 和attribute使用](#property-和attribute使用)
     - [说说 Real DOM 和 Virtual DOM 的区别？优缺点？](#说说-real-dom-和-virtual-dom-的区别优缺点)
+    - [Window.onload和 DOMContentLoaded（即ready）区别](#windowonload和-domcontentloaded即ready区别)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -123,6 +128,9 @@
       - [移动端2X3X图](#移动端2x3x图)
   - [http](#http)
     - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
+  - [性能优化](#性能优化)
+    - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
+    - [浅谈前端性能优化](#浅谈前端性能优化)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -2109,6 +2117,20 @@ Promise.resolve().then(() => { // 返回 rejected 状态的 promise
 })
 ```
 
+#### 应用场景
++ 图片加载
+
+```js
+const preloadImage = function (path) {
+ return new Promise(function (resolve, reject) {
+ const image = new Image();
+ image.onload = resolve;
+ image.onerror = reject;
+ image.src = path;
+ });
+};
+```
+
 ### async await
 async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
 ```js
@@ -2182,6 +2204,77 @@ console.log('script start')
 async1()
 console.log('script end')
 ```
+
+### Generator理解和应用
+Generator通过yield标识位和next()方法调用，实现函数的分段执行。
+
+function与函数名之间有一个星号 * ；函数体内部使用 yield 表达式，定义不同的内部状态。箭头函数不能用来定义生成器函数。
+
+```js
+//它内部有两个 yield表达式（hello和world），即该函数有三个状态：hello，world 和 return 语句（结束执行）。
+function* helloWorldGenerator() {
+  yield 'hello';
+  yield 'world';
+  return 'ending';
+}
+var hw = helloWorldGenerator();
+```
+```js
+hw.next()
+// { value: 'hello', done: false } 
+hw.next()
+// { value: 'world', done: false }
+hw.next()
+// { value: 'ending', done: true }
+hw.next()
+// { value: undefined, done: true }
+```
+生成器对象实现了Iterator接口，它默认的迭代器是自引用的。
+
+```js
+function *fun(){}
+const test =fun()
+console.log(test === test[Symbol.iterator]())//true
+```
+
+```js
+function* helloWorldGenerator(x,y) {
+  const f1 = yield(x+'hello');
+  const f2 = 3 * (yield (y+'world'+f1));
+  console.log(f1,f2)// 1 6
+  return 'ending';
+}
+var hw = helloWorldGenerator(20,50);
+const v1= hw.next() 
+const v2 = hw.next(1)
+const v3 = hw.next(2)
+console.warn(v1,v2,v3)
+// {value: "20hello", done: false} {value: "50world1", done: false} {value: "ending", done: true}
+```
+1. 初始化生成器:
+	+ 调用 helloWorldGenerator(20,50) 来初始化生成器，并传入参数 20,50。
+	+ 生成器函数内部的 x 被赋值为 20,y为50。
+2. 第一次调用 hw.next():
+	+ 生成器函数开始执行，直到遇到第一个 yield 表达式 yield(x+'hello')。
+	+ x 的值是 20，所以 yield 的值是 '20hello'。
+	+ 生成器暂停执行，返回 { value: '20hello', done: false }。
+	+ v1 接收这个对象，所以 v1.value 是 '20hello'，v1.done 是 false。
+	+ `此时 f1 还没有被赋值`。
+3. 第二次调用 hw.next(1):
+	+ 生成器恢复执行，并将 1 赋值给yield的右边(或者yield整体) const f1 = yield(x+'hello') 中的 `f1`。
+	+ 接着，执行到 const f2 = 3 * (yield (y+'world'+f1))，生成器再次暂停执行。
+	+ yield 3 * (yield (y+'world'+f1)) 的值是 `50world1`。(y的50，f1的1)
+	+ 生成器返回 { value: "50world1", done: false }。
+	+ v2 接收这个对象。
+	+ **此时 f2 还没有被计算，因为它依赖于下一次 next() 方法的参数。**
+4. 第三次调用 hw.next(2):
+	+ 生成器恢复执行，并将 2 用于计算 const f2 =  3 * (yield (y+'world'+f1)) 中的 f2，即 f2 被赋值为 3 * 2 = 6。
+	+ 然后执行 console.log(f1, f2)，输出 1 6。
+	+ 生成器函数返回 'ending'，并结束执行。
+	+ 生成器返回 { value: 'ending', done: true }。
+	+ v3 接收这个对象，所以 v3.value 是 'ending'，v3.done 是 true。
+
+> for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
 
 ### 正则表达式
 正则表达式使用一种特殊的语法来定义模式，这些模式可以被用来搜索、匹配或替换文本。
@@ -3198,6 +3291,69 @@ arr.length =10
 console.log(arr) //[empty*10]
 ```
 
+### Set和Map的应用
+Set是一种叫做集合的数据结构，而Map是一种叫做字典的数据结构。
++ 集合：一堆无需相关联，且不重复的内存结构组成的组合
++ 字典：一些元素的集合，每个元素有一个称做key的域，不同元素的key各不相同
+
++ Set的方法
+	- add
+	- delete：返回布尔值
+	- has
+	- clear
+	- keys() values() entries()
+	- forEach
++ set的应用场景
+
+```js
+let a = new Set([1, 2, 3]);
+let b = new Set([4, 3, 2]);
+// 并集
+let union = new Set([...a, ...b]);
+// Set {1, 2, 3, 4}
+// 交集
+let intersect = new Set([...a].filter(x => b.has(x)));
+// set {2, 3}
+// a相对于b的差集
+let difference = new Set([...a].filter(x => !b.has(x)));
+// Set {1}
+```
+
++ Map的方法
+	- size
+	- set
+	- get
+	- has
+	- delete：返回布尔值
+	- clear
+
+#### weakSet weakMap
++ weakSet的成员只能使用引用对象
++ weakMap的key也只能是引用对象，二者都没size属性，无法遍历
++ 外面的引用消失，二者里面的引用也会自动消失
+
+```js
+// 非引用变量
+let ws=new WeakSet();
+let weakSet=new WeakSet([2,3]);
+console.log(weakSet) // error
+
+// 成员为引用变量
+let obj1={name:1}
+let obj2={name:1}
+let ws=new WeakSet([obj1,obj2]);
+console.log(ws) //WeakSet {{…}, {…}}
+```
+
+应用场景：处理dom
+
+```js
+const wm = new WeakMap();
+const element = document.getElementById('example');
+wm.set(element, 'some information');
+wm.get(element) // "some information"
+```
+
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
 
@@ -3462,6 +3618,11 @@ JSX 通过 babel 的方式转化成 React.createElement 执行，返回值是一
 + 在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化
 + 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，速度比正常稍慢
 
+### Window.onload和 DOMContentLoaded（即ready）区别
+如非必要，优先使用DOMContentLoaded（jquery采用），体验感更好
+
+![load](book_files/57.jpg)
+
 ## BOM
 
 ### BOM的含义
@@ -3679,6 +3840,41 @@ window.onresize = setAppropriateImageSrc;
 6. 根据Render Tree渲染页面
 7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
 8. 直至整个Render 渲染完成
+
+## 性能优化
+
+### 为什么css在页面head，js在body尾部
+CSS在加载过程中，不影响HTML的解析。但影响HTML渲染。
+
+假如将css放在body的尾部，会产生一种情况。解析html生成DOM树，而后没有css。所以直接生成渲染树，然后生成布局树渲染网页。直到解析到css时，生成CSSOM。CSSOM与DOM树合并生成渲染树，然后再一次生成布局树渲染网页。
+
+这样会渲染树多生成了一次，并且页面也多渲染了一次。造成性能损耗。
+
+JS在加载时，HTML会暂停解析。
+
+如果JS在页面的首部，那么会造成一种情况。长时间加载JS导致HTML无法解析，页面长时间无法响应。所以JS放在body尾部。
+
+或者给JS添加defer/async
+
+defer和async都是异步加载JS的方法：
+
+不同：defer脚本加载完后立即执行。
++ async脚本是html完全解析生成DOM树后立即执行。
++ 如果多个JS脚本添加defer 执行顺序是无序的。而async是按加载顺序执行的。
+
+### 浅谈前端性能优化
+优化原则：多使用内存，缓存，减少cpu计算量，减少网络加载耗时【空间换时间】
+1. 减少资源体积：代码压缩
+2. 减少访问次数：代码合并，SSR服务端渲染（网页和数据一起渲染），缓存【如webpack打包文件对应的名称和hash值没变，会走304】
+3. 使用更快的网络：CDN
+4. css放在头部，js放在底部
+5. 尽早的执行js，用DOMContnetLoaded触发
+6. 懒加载
+7. 对DOM查询进行缓存
+8. 利用fragment文档碎片一次插入多条
+9. 节流（拖拽） 防抖（输入框）
+10. 根据项目需要，按需加载
+11. 动画帧代替定时器动画或者结合动画帧优化定时器动画（使用动画帧切屏浏览器会帮助自动停止动画渲染）
 
 
 ## write
