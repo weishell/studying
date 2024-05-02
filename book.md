@@ -47,6 +47,8 @@
     - [内存泄漏](#内存泄漏)
       - [垃圾回收机制](#垃圾回收机制)
       - [可能的内存泄漏场景](#可能的内存泄漏场景)
+    - [\[10, 20, 30\].map(parseInt)](#10-20-30mapparseint)
+    - [函数声明和函数表达式区别](#函数声明和函数表达式区别)
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
@@ -112,6 +114,8 @@
     - [Set和Map的应用](#set和map的应用)
       - [weakSet weakMap](#weakset-weakmap)
     - [Decorator应用场景](#decorator应用场景)
+    - [Proxy的应用场景](#proxy的应用场景)
+    - [ES6中的Module](#es6中的module)
   - [Vue2](#vue2)
     - [Vue 生命周期](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
@@ -124,6 +128,25 @@
     - [v-show v-if的应用场景](#v-show-v-if的应用场景)
     - [vue中key的原理](#vue中key的原理)
     - [Vue.extend 和 Vue.component](#vueextend-和-vuecomponent)
+    - [vue中mixin的理解和应用场景](#vue中mixin的理解和应用场景)
+      - [mixin注意事项](#mixin注意事项)
+      - [mixins 和 composition api的优缺点](#mixins-和-composition-api的优缺点)
+    - [vue中的修饰符](#vue中的修饰符)
+      - [注意修饰符顺序](#注意修饰符顺序)
+    - [vue中的$nextTick](#vue中的nexttick)
+      - [为什么要有$nextTick](#为什么要有nexttick)
+      - [使用场景](#使用场景)
+    - [diff算法](#diff算法)
+    - [Vue中组件和插件有什么区别](#vue中组件和插件有什么区别)
+    - [自定义指令的应用场景](#自定义指令的应用场景)
+    - [vue过滤器](#vue过滤器)
+    - [vue插槽slot](#vue插槽slot)
+    - [vue虚拟dom](#vue虚拟dom)
+    - [Vue.observable](#vueobservable)
+    - [vue处理错误](#vue处理错误)
+      - [vue前端代码错误处理](#vue前端代码错误处理)
+    - [vue keep-alvie](#vue-keep-alvie)
+      - [缓存后如何获取数据](#缓存后如何获取数据)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -1613,9 +1636,40 @@ refA = null; //及时清除移除且不用的游离元素
 console.log(refA, 'refA'); // 
 ```
 
+### [10, 20, 30].map(parseInt)
+在 JavaScript 中，map() 方法用于对数组的每个元素执行一个函数，并创建一个新数组，其结果是该函数在原始数组的每个元素上执行的结果。但是，当 map() 与 parseInt() 结合使用时，特别是在没有指定基数（即第二个参数）时，可能会产生意外的结果。
 
+对于 parseInt() 函数，其接受两个参数：
 
+1. 要解析的字符串
+2. 解析时使用的基数（介于 2 和 36 之间）。如果没有提供基数，并且字符串以 "0x" 或 "0X" 开头，那么基数为 16（十六进制）。如果字符串以 "0" 开头且没有 "x" 或 "X"，那么 JavaScript 可能会将其解析为八进制数（但在 ECMAScript 5 严格模式以及之后的版本中，前导零被视为十进制）。
 
+在 [10, 20, 30].map(parseInt) 的情况下，map() 会将数组的每个元素（这里是数字）转换为字符串，并作为 parseInt() 的第一个参数传递。同时，map() 的回调函数默认接收三个参数：当前元素的值、当前元素的索引和数组本身。在这里，由于我们没有为 map() 提供自定义的回调函数，它默认使用这些参数。因此，parseInt() 的第二个参数（基数）实际上是数组的索引。
+
+所以，对于 [10, 20, 30].map(parseInt)：
+
++ 对于第一个元素 10（索引为 0）：parseInt('10', 0)，由于基数为 0 并且字符串不以 "0x" 或 "0X" 开头，所以将其解析为十进制数 10。
++ 对于第二个元素 20（索引为 1）：parseInt('20', 1)，由于基数为 1（这不是一个有效的基数），所以结果将是 NaN（不是一个数字）。
++ 对于第三个元素 30（索引为 2）：parseInt('30', 2)，由于基数为 2（二进制），但字符串 '30' 在二进制中不是有效的，所以结果将是 NaN。
+
+因此，[10, 20, 30].map(parseInt) 的结果将是 [10, NaN, NaN]。
+
+### 函数声明和函数表达式区别
+```js
+// 函数声明 函数提升
+const res = sum(10, 20)
+console.log(res)
+function sum(x, y) {
+    return x + y
+}
+
+// 函数表达式 直接报错
+var res = sum(10, 20)
+console.log(res)
+var sum = function (x, y) {
+    return x + y
+}
+```
 
 ### == 和 ===
 全等不会存在隐式转换问题
@@ -3281,6 +3335,17 @@ escape('<script>alert(1)</script>')
 //&lt;script&gt;alert(1)&lt;&#x2F;script&gt;
 ```
 
+当 5 < 7 作为 HTML 拼接页面时，可以正常显示：
+```html
+<div title="comment">5 &lt; 7</div>
+```
+当 5 < 7 通过 Ajax 返回，然后赋值给 JavaScript 的变量时，前端得到的字符串就是转义后的字符。这个内容不能直接用于 Vue 等模板的展示，也不能直接用于内容长度计算。不能用于标题、alert 等
+可以看到，过滤并非可靠的，下面就要通过防止浏览器执行恶意代码：
+
+在使用 .innerHTML、.outerHTML、document.write() 时要特别小心，不要把不可信的数据作为 HTML 插到页面上，而应尽量使用 .textContent、.setAttribute() 等
+
+如果用 Vue/React 技术栈，并且不使用 v-html/dangerouslySetInnerHTML 功能，就在前端 render 阶段避免 innerHTML、outerHTML 的 XSS 隐患在使用 .innerHTML、.outerHTML、document.write() 时要特别小心，不要把不可信的数据作为 HTML 插到页面上，而应尽量使用 .textContent、.setAttribute() 等
+
 CSP: Content-Security-Policy 内容安全策略(白名单制度)
 + 设置 HTTP 的 Content-Security-Policy 头部字段
 + 设置网页的`<meta>`标签。
@@ -3531,6 +3596,89 @@ class Example {
 > 应用场景：react-redux的connect，类的混入某些新属性或者修改属性
 
 
+### Proxy的应用场景
+
+```js
+var proxy = new Proxy(target, handler)
+```
+```js
+var person = {
+ name: "aaa"
+};
+var proxy = new Proxy(person, {
+ get: function(target, propKey) {
+ return Reflect.get(target,propKey)
+ }
+});
+// proxy.name 
+```
+
+取消代理
+
+```js
+Proxy.revocable(target, handler);
+```
+
+应用场景
+
++ 拦截，监视外部对象访问
++ 降低函数或类的复杂度
++ 在复杂操作前对操作进行校验和所需资源进行管理
++ 观察者模式
+
+```js
+const queuedObservers = new Set();
+const observe = fn => queuedObservers.add(fn);
+const observable = obj => new Proxy(obj, {set});
+function set(target, key, value, receiver) {
+ const result = Reflect.set(target, key, value, receiver);
+ queuedObservers.forEach(observer => observer());
+ return result;
+}
+```
+
+### ES6中的Module
+模块，是能够单独命名独立完成一定功能的程序语句的集合。
+
+作用：代码抽象，封装，复用，依赖管理。
+
+没有模块化，方法和变量不易维护，容易污染全局作用域。加载资源方式使用script从上往下，后期不容易维护。
+
++ AMD(Asynchronous ModuleDefinition),异步模块定义，采用异步方式加载模块。所有依赖模块的语句，都定义在一个回调函数中，等到模块加载完之后，这个回调函数才会运行
+
+```js
+// 以reqiure.js为例
+/** main.js / **/
+// config()
+require.config({
+ baseUrl: "js/lib",
+ paths: {
+ "jquery": "jquery.min", // js/lib/jquery.min.js
+ "underscore": "underscore.min",
+ }
+});
+//
+require(["jquery","underscore"],function($,_){
+ // some code here
+});
+```
+
++ ES Module设计思想静态化，使得`编译`时就能确定依赖关系，以及输入输出的变量，而commonjs和amd只有在运行时才能确定
+
+```js
+// 只加载三个方法，其他方法不加载
+import { stat, exists, readFile } from 'fs';
+```
+```js
+// CommonJS
+let { stat, exists, readfile } = require('fs');
+//
+let _fs = require('fs');
+let stat = _fs.stat;
+let exists = _fs.exists;
+let readfile = _fs.readfile;
+```
+
 ## Vue2
 
 ### Vue 生命周期
@@ -3744,6 +3892,648 @@ const instance = new MyComponent().$mount();
 ```
 
 Vue.component：在内部，它实际上也调用了 Vue.extend 来创建一个构造器，但随后它还进行了组件的注册和命名等额外操作。因此，你可以将 Vue.component 看作是 Vue.extend 和组件注册的结合体。
+
+### vue中mixin的理解和应用场景
+Mixin是面向对象程序设计语言中的类，提供了方法实现。其他类可以访问mixin类的方法而不必成为其子类。
+
+Mixin类通常作为功能模块使用，在需要该功能时“混入”，有利于代码复用有避免多继承的复杂。
+
+Vue的mixin本质就是一个js对象，包括data，components，methods，created等
+
+```js
+export function initMixin (Vue: GlobalAPI) {
+ Vue.mixin = function (mixin: Object) {
+ this.options = mergeOptions(this.options, mixin)
+ return this
+ }
+}
+```
+
+```js
+var myMixin = {
+ created: function () {
+	this.hello()
+ },
+ methods: {
+	hello: function () {
+		console.log('hello from mixin!')
+	}
+ }
+}
+// 局部混入
+Vue.component('componentA',{
+ mixins: [myMixin]
+})
+```
+> 全局混入可能对第三方插件也有影响，一般用于插件的编写
+```js
+//全局混入
+Vue.mixin({
+ created: function () {
+	console.log(" ")
+ }
+})
+```
+#### mixin注意事项
++ 组件 data, methods，computed等 优先级高于 mixin data, methods,computed... 优先级(存在相同的组件覆盖混入)
++ 生命周期函数，先执行 mixin 里面的，再执行组件里面的(数组形式，都会执行)
+
+```js
+const toggle = {
+    data() {
+		return {
+		 isShowing: false,
+		 test:{
+			go:'20',
+			f:10000
+		 }
+		}
+    }
+}
+export default toggle
+```
+```html
+<template>
+  <div id="app">
+   {{test}}
+  </div>
+</template>
+
+<script>
+import toggle from './view-01/mixin.js'
+export default {
+  name: 'App',
+  mixins:[toggle],
+  data(){
+    return {
+      test:{
+        f:120
+      }
+    }
+  }
+}
+</script>
+```
+Mixins 在 Vue.js 中的实现原理主要基于 `JavaScript 的对象合并和原型链机制。`
+
++ 替换型:props inject methods computed 重复的会被替换
++ 合并型:data 类似Object.assign(mixins.data,this.data)
++ 队列型:watch 生命周期 =>合并成一个数组，依次执行
+
+#### mixins 和 composition api的优缺点
+
+1. Mixins的优缺点
++ 优点：
+	- 代码复用：如方法、计算属性、生命周期钩子等。
+	- 逻辑共享：通过混入多个mixin对象，可以将不同的功能组合在一起，为组件提供更多的能力，使得组件更加灵活和可扩展。
+	- 解耦逻辑：将与UI无关的逻辑（如数据处理、网络请求等）抽取为mixin，有助于将组件的关注点更集中在UI层面，提高代码的可读性和可维护性。
++ 缺点：
+	- 命名冲突
+	- 难以追踪
+	- 维护困难
+2. Composition API的优缺点
++ 优点：
+	- 更灵活的代码组织：Composition API支持将逻辑代码以函数或一组相关联的函数形式封装为可复用的组合式函数，使得代码组织更加直观和模块化。
+	- 逻辑复用和组合：通过组合式函数，可以更轻松地在组件之间复用和共享逻辑代码，减少代码的冗余。
++ 缺点：
+	- 与Options API的兼容性：在迁移或混合使用两种API时可能会遇到一些挑战
+	- 可能过度使用：虽然组合式函数提供了灵活的代码组织方式，但过度使用可能会导致代码结构变得复杂和难以理解。
+
+### vue中的修饰符
+修饰符处理更多的dom细节，专注做逻辑方面操作
+
+1. 表单 v-model.lazy v-model.trim v-model.number(如果输入值无法被parseFloat解析则返回原值)
+2. 事件 @click.stop(等于event.stopPropagation) @submit.prevent(等于event.preventDefalut) @click.self(对当前元素自身触发函数) @click.capture(捕获方式) @scroll.passvie(lazy模式，减少触发频率) @click.native(让组件像html一样可以监听根元素的原生事件,加在原生标签不生效)
+3. 鼠标键盘：@keyup.keyCode @click.middle...
+4. v-bind修饰符：async props camel
+
+```html
+//
+<comp :myMessage.sync="bar"></comp>
+//
+this.$emit('update:myMessage',params);
+```
+相当于下面的简写
+```html
+//
+<comp :myMessage="bar" @update:myMessage="func"></comp>
+func(e){
+	this.bar = e;
+}
+// js
+func2(){
+ this.$emit('update:myMessage',params);
+}
+```
+
+#### 注意修饰符顺序
++ @click.prevent.self(阻止所有点击) 
++ @click.self.prevent(阻止当前元素的点击)
+
+### vue中的$nextTick
+在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM
+
+#### 为什么要有$nextTick
+
+```js
+{{num}}
+for(let i=0; i<100000; i++){
+ num = i
+}
+```
+如果没有nextTick，那么每次num变动，都会更新视图。有了nextTick，只需要更新一次，本质是一种性能优化策略。
+
+> 实现回调的机制分别可能是Promise.then>MutationObserver>setImmediate>setTimeout(降级操作)
+
+```js
+export let isUsingMicroTask = false
+if (typeof Promise !== 'undefined' && isNative(Promise)) {
+  //判断1：是否原生支持Promise
+  const p = Promise.resolve()
+  timerFunc = () => {
+    p.then(flushCallbacks)
+    if (isIOS) setTimeout(noop)
+  }
+  isUsingMicroTask = true
+} else if (!isIE && typeof MutationObserver !== 'undefined' && (
+  isNative(MutationObserver) ||
+  MutationObserver.toString() === '[object MutationObserverConstructor]'
+)) {
+  //判断2：是否原生支持MutationObserver
+  let counter = 1
+  const observer = new MutationObserver(flushCallbacks)
+  const textNode = document.createTextNode(String(counter))
+  observer.observe(textNode, {
+    characterData: true
+  })
+  timerFunc = () => {
+    counter = (counter + 1) % 2
+    textNode.data = String(counter)
+  }
+  isUsingMicroTask = true
+} else if (typeof setImmediate !== 'undefined' && isNative(setImmediate)) {
+  //判断3：是否原生支持setImmediate
+  timerFunc = () => {
+    setImmediate(flushCallbacks)
+  }
+} else {
+  //判断4：上面都不行，直接用setTimeout
+  timerFunc = () => {
+    setTimeout(flushCallbacks, 0)
+  }
+}
+```
+
+#### 使用场景
+
++ 想要获取最新的dom结构
+
+```js
+this.message = '修改值'
+console.log(this.$el.textContent) // => '原始值'
+this.$nextTick(function () {
+ console.log(this.$el.textContent) // => '最新值'
+})
+```
++ 回调：$nextTick返回一个promise对象，可以用async await完成相同的事
+
+```js
+this.message = '修改值'
+console.log(this.$el.textContent) // => '原始值'
+await this.$nextTick()
+console.log(this.$el.textContent) // => '最新值'
+```
+
+### diff算法
+diff 算法是一种通过同层的树节点进行比较的高效算法
+
+其有两个特点：
++ 比较只会在同层级进行, 不会跨层级比较(`深度优先，同层比较`)
++ 在diff比较的过程中，循环从两边向中间比较
+
+diff 算法在很多场景下都有应用，在 vue 中，作用于虚拟 dom 渲染成真实 dom 的新旧 VNode 节点比较
+
+
+
+### Vue中组件和插件有什么区别
+组件就是把图形、非图形的各种逻辑均抽象为一个统一的概念（组件）来实现开发的模式，在Vue中每一个.vue文件都可以视为一个组件.插件通常用来为 Vue 添加全局功能。
+
+1. 编写形式:组件可以.vue，可以看利用Vue.component编写，而插件需要调用install，注册使用use
+
+```js
+MyPlugin.install = function (Vue, options) {
+  // 1. 添加全局方法或 property
+  Vue.myGlobalMethod = function () {
+    // 逻辑...
+  }
+   // 2. 添加全局资源
+    Vue.directive('my-directive', {
+      bind (el, binding, vnode, oldVnode) {
+        // 逻辑...
+      }
+      ...
+    })
+  
+    // 3. 注入组件选项
+    Vue.mixin({
+      created: function () {
+        // 逻辑...
+      }
+      ...
+    })
+  
+    // 4. 添加实例方法
+    Vue.prototype.$myMethod = function (methodOptions) {
+      // 逻辑...
+    }
+}
+//安装
+Vue.use(插件名字,{ /* ... */} )
+```
+
+2. 应用场景
+	+ 组件 (Component) 是用来构成你的 App 的业务模块，它的目标是 App.vue
+	+ 插件 (Plugin) 是用来增强你的技术栈的功能模块，它的目标是 Vue 本身，简单来说，插件就是指对Vue的功能的增强或补充
+
+
+### 自定义指令的应用场景
+1. 按钮权限控制：通过后台返回的权限控制表，对需要控制的按钮进行匹配，v-xxx控制显示或者隐藏
+2. v-throttle： 防止重复表单提交
+```js
+// 1.设置v-throttle自定义指令
+Vue.directive('throttle', {
+  bind: (el, binding) => {
+    let throttleTime = binding.value; // 节流时间
+    if (!throttleTime) { // 用户若不设置节流时间，则默认2s
+      throttleTime = 2000;
+    }
+    let cbFun;
+    el.addEventListener('click', event => {
+      if (!cbFun) { // 第一次执行
+        cbFun = setTimeout(() => {
+          cbFun = null;
+        }, throttleTime);
+      } else {
+        event && event.stopImmediatePropagation();
+      }
+    }, true);
+  },
+});
+// 2.为button标签设置v-throttle自定义指令
+<button @click="sayHello" v-throttle>提交</button>
+```
+
+### vue过滤器
+vue3已废弃
+
+```js
+filters: {
+  capitalize: function (value) {
+    if (!value) return ''
+    value = value.toString()
+    return value.charAt(0).toUpperCase() + value.slice(1)
+  }
+}
+```
+
+注意：当全局过滤器和局部过滤器重名时，会采用局部过滤器
+
+过滤器可串联，可传参。filterA 被定义为接收单个参数的过滤器函数，表达式 message 的值将作为参数传入到函数中。然后继续调用同样被定义为接收单个参数的过滤器函数 filterB，将 filterA 的结果传递到 filterB 中。
+```html
+{{ message | filterA | filterB }}
+{{ message | filterA('arg1', arg2) }}
+```
+
+### vue插槽slot
+通过插槽可以让用户可以拓展组件，去更好地复用组件和对其做定制化处理
+
++ 默认插槽
+
+```html
+<!-- 子组件 -->
+<template>
+    <slot>
+      <p>插槽后备的内容</p>
+    </slot>
+</template>
+```
+```html
+<!-- 父组件 -->
+<Child>
+  <div>默认插槽</div>  
+</Child>
+```
+
++ 具名插槽:子组件用name属性来表示插槽的名字，不传为默认插槽
+
+```html
+<template>
+    <slot>插槽后备的内容</slot>
+    <slot name="content">插槽后备的内容</slot>
+</template>
+```
+```html
+<child>
+    <template v-slot:default>具名插槽</template>
+    <!-- 具名插槽 插槽名做参数 -->
+    <template v-slot:content>内容...</template>
+</child>
+```
+
++ 作用域插槽：子组件在**作用域上绑定属性**来将子组件的信息传给父组件使用，这些属性会被挂在**父组件v-slot**接受的对象上
+
+父组件中在使用时通过v-slot:（简写：#）获取子组件的信息，在内容中使用
+
+```html
+<template> 
+  <slot name="footer" testProps="子组件的值">
+          <h3>没传footer插槽</h3>
+    </slot>
+</template>
+```
+```html
+<child> 
+    <!-- 把v-slot的值指定为作用域上下文对象 -->
+    <template v-slot:default="slotProps">
+      来自子组件数据：{{slotProps.testProps}}
+    </template>
+    <template #default="slotProps">
+      来自子组件数据：{{slotProps.testProps}}
+    </template>
+</child>
+```
+
+### vue虚拟dom
+真实dom的一个映射，在Javascript对象中，虚拟DOM 表现为一个 Object对象。并且最少包含标签名 (tag)、属性 (attrs) 和子元素对象 (children) 三个属性，不同框架对这三个属性的名命可能会有差别。
+
+作用：可描述dom，同时适用于**跨平台开发**，vue可以对这颗抽象树进行创建节点,删除节点以及修改节点的操作， 经过`diff算法`得出一些需要修改的`最小单位`,再更新视图，减少了dom操作，提高了性能.
+
+
+用传统的原生api或jQuery去操作DOM时，浏览器会从构建DOM树开始从头到尾执行一遍流程
+
+当你在一次操作时，需要更新10个DOM节点，浏览器没这么智能，收到第一个更新DOM请求后，并不知道后续还有9次更新操作，因此会马上执行流程，最终执行10次流程
+
+而通过VNode，同样更新10个DOM节点，虚拟DOM不会立即操作DOM，而是将这10次更新的diff内容保存到本地的一个js对象中，最终将这个js对象一次性attach到DOM树上，避免大量的无谓计算.
+
+
+### Vue.observable
+Vue.observable 是 Vue 2.x 中的一个方法，它返回一个可以响应 Vue 组件中变化的对象。这个对象类似于 Vue 组件的 data 对象，但不是 Vue 实例的一部分。这可以用于在多个组件或实例之间共享状态。
+
+```js
+import Vue from 'vue';  
+  
+const state = Vue.observable({  
+  count: 0  
+});
+function increment() {  
+  state.count++;  
+}
+```
+在vue文件中使用
+```html
+<template>  
+  <div>  
+    <p>Count: {{ count }}</p>  
+    <button @click="incrementCount">Increment</button>  
+  </div>  
+</template>  
+  
+<script>  
+import { state, increment } from './wherever-you-stored-them';  
+  
+export default {  
+  computed: { 
+	// 用computed接收数据
+    count() {  
+      return state.count;  
+    }  
+  },  
+  methods: {  
+    incrementCount() {  
+      increment();  
+    }  
+	// 可以这样写incrementCount:increment
+  }  
+}  
+</script>
+```
+
+应用场景：在非父子组件通信时，可以使用通常的bus或者使用vuex，但是实现的功能不是太复杂，而使用上面两个又有点繁琐。
+
+> vue3中就不继续推荐了
+
+### vue处理错误
+在Vue 中，则是定义了一套对应的错误处理规则给到使用者，且在源代码级别，对部分必要的过程做了一定的错误处理。
++ 后端接口返回错误
++ 代码自身编写问题
+
+```js
+//axios拦截器
+apiClient.interceptors.response.use(
+  response => {
+    return response;
+  },
+  error => {
+    if (error.response.status == 401) {
+      router.push({ name: "Login" });
+    } else {
+      message.error("出错了");
+      return Promise.reject(error);
+    }
+  }
+);
+```
+
+#### vue前端代码错误处理
+
+```js
+//全局设置错误处理
+Vue.config.errorHandler = function (err, vm, info) {
+  // handle error
+  // `info` 是 Vue 特定的错误信息，比如错误所在的生命周期钩子
+  // 只在 2.2.0+ 可用
+}
+```
+```js
+Vue.component('cat', {
+    template:`
+        <div>
+			<h1>Cat: </h1>
+        	<slot></slot>
+        </div>`,
+    props:{
+        name:{
+            required:true,
+            type:String
+        }
+    },
+    errorCaptured(err,vm,info) {
+        console.log(`cat EC: ${err.toString()}\ninfo: ${info}`); 
+        return false;
+    }
+
+});
+
+//子组件 dontexist不存在时
+Vue.component('kitten', {
+    template:'<div><h1>Kitten: {{ dontexist() }}</h1></div>',
+    props:{
+        name:{
+            required:true,
+            type:String
+        }
+    }
+});
+
+// cat EC: TypeError: dontexist is not a function
+// info: render
+```
+
+### vue keep-alvie
+keep-alive是vue中的内置组件，能在组件切换过程中将状态保留在内存中，防止重复渲染DOM
+
+keep-alive 包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们
+
+```html
+<keep-alive include="a,b">
+  <component :is="view"></component>
+</keep-alive>
+
+<!-- 正则表达式 (使用 `v-bind`) -->
+<keep-alive :include="/a|b/">
+  <component :is="view"></component>
+</keep-alive>
+
+<!-- 数组 (使用 `v-bind`) -->
+<keep-alive :include="['a', 'b']">
+  <component :is="view"></component>
+</keep-alive>
+```
+设置了 keep-alive 缓存的组件，会多出两个生命周期钩子（activated与deactivated）：
+
+首次进入组件时：beforeRouteEnter > beforeCreate > created> mounted > `activated` > ... ... > beforeRouteLeave > `deactivated`
+
+再次进入组件时：beforeRouteEnter >`activated` > ... ... > beforeRouteLeave > `deactivated`
+
+keep-alive是vue中内置的一个组件,可以看到该组件没有template，而是用了render，在组件渲染的时候会自动执行render函数
+```js
+export default {
+  name: 'keep-alive',
+  abstract: true,
+
+  props: {
+    include: [String, RegExp, Array],
+    exclude: [String, RegExp, Array],
+    max: [String, Number]
+  },
+
+  created () {
+    this.cache = Object.create(null)
+    this.keys = []
+  },
+
+  destroyed () {
+    for (const key in this.cache) {
+      pruneCacheEntry(this.cache, key, this.keys)
+    }
+  },
+
+  mounted () {
+    this.$watch('include', val => {
+      pruneCache(this, name => matches(val, name))
+    })
+    this.$watch('exclude', val => {
+      pruneCache(this, name => !matches(val, name))
+    })
+  },
+
+  render() {
+    /* 获取默认插槽中的第一个组件节点 */
+    const slot = this.$slots.default
+    const vnode = getFirstComponentChild(slot)
+    /* 获取该组件节点的componentOptions */
+    const componentOptions = vnode && vnode.componentOptions
+
+    if (componentOptions) {
+      /* 获取该组件节点的名称，优先获取组件的name字段，如果name不存在则获取组件的tag */
+      const name = getComponentName(componentOptions)
+
+      const { include, exclude } = this
+      /* 如果name不在inlcude中或者存在于exlude中则表示不缓存，直接返回vnode */
+      if (
+        (include && (!name || !matches(include, name))) ||
+        // excluded
+        (exclude && name && matches(exclude, name))
+      ) {
+        return vnode
+      }
+
+      const { cache, keys } = this
+      /* 获取组件的key值 */
+      const key = vnode.key == null
+        // same constructor may get registered as different local components
+        // so cid alone is not enough (#3269)
+        ? componentOptions.Ctor.cid + (componentOptions.tag ? `::${componentOptions.tag}` : '')
+        : vnode.key
+     /*  拿到key值后去this.cache对象中去寻找是否有该值，如果有则表示该组件有缓存，即命中缓存 */
+      if (cache[key]) {
+        vnode.componentInstance = cache[key].componentInstance
+        // make current key freshest 移除这个组件当前位置，添加到最后位置
+        remove(keys, key)
+        keys.push(key)
+      }
+        /* 如果没有命中缓存，则将其设置进缓存 */
+        else {
+        cache[key] = vnode
+        keys.push(key)
+        // prune oldest entry
+        /* 如果配置了max并且缓存的长度超过了this.max，则从缓存中删除第一个 */
+        if (this.max && keys.length > parseInt(this.max)) {
+          pruneCacheEntry(cache, keys[0], keys, this._vnode)
+        }
+      }
+
+      vnode.data.keepAlive = true
+    }
+    return vnode || (slot && slot[0])
+  }
+}
+```
+```js
+// 组件销毁时函数
+function pruneCacheEntry (
+  cache: VNodeCache,
+  key: string,
+  keys: Array<string>,
+  current?: VNode
+) {
+  const cached = cache[key]
+  /* 判断当前没有处于被渲染状态的组件，将其销毁*/
+  if (cached && (!current || cached.tag !== current.tag)) {
+    cached.componentInstance.$destroy()
+  }
+  cache[key] = null
+  remove(keys, key)
+}
+```
+#### 缓存后如何获取数据
+1. 每次组件渲染的时候，都会执行beforeRouteEnter
+```js
+beforeRouteEnter(to, from, next){
+    next(vm=>{
+        console.log(vm)
+        // 每次进入路由执行
+        vm.getData()  // 获取数据
+    })
+}
+```
+2. 在keep-alive缓存的组件被激活的时候，都会执行actived钩子(服务端渲染期间不会被调用)
+```js
+activated(){
+   this.getData() // 获取数据
+},
+```
+
 
 
 ## DOM
