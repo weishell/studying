@@ -64,6 +64,7 @@
       - [substring slice字符串处理区别](#substring-slice字符串处理区别)
     - [数组常用的方法](#数组常用的方法)
       - [影响到原数组的方法](#影响到原数组的方法)
+      - [数组reduce方法应用场景](#数组reduce方法应用场景)
     - [函数缓存](#函数缓存)
     - [event loop](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
@@ -79,6 +80,7 @@
     - [正则表达式](#正则表达式)
       - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
+    - [new Object()和Object.cretate()以及Object.assign()区别](#new-object和objectcretate以及objectassign区别)
     - [关于对象的遍历方案](#关于对象的遍历方案)
       - [for...of 对象适配](#forof-对象适配)
     - [this指向](#this指向)
@@ -93,6 +95,7 @@
       - [IE事件模型](#ie事件模型)
       - [事件代理](#事件代理)
       - [阻止事件冒泡和默认事件](#阻止事件冒泡和默认事件)
+    - [event.target和event.currentTarget二者含义](#eventtarget和eventcurrenttarget二者含义)
     - [判断一个元素是否在可视区](#判断一个元素是否在可视区)
     - [监听一个div宽度变化](#监听一个div宽度变化)
     - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
@@ -105,6 +108,7 @@
     - [跨域](#跨域)
       - [解决方案](#解决方案)
     - [web端常见的攻击方式](#web端常见的攻击方式)
+    - [如何捕获js异常](#如何捕获js异常)
     - [js计算精度丢失问题](#js计算精度丢失问题)
     - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
   - [ES6](#es6)
@@ -116,6 +120,7 @@
     - [Decorator应用场景](#decorator应用场景)
     - [Proxy的应用场景](#proxy的应用场景)
     - [ES6中的Module](#es6中的module)
+    - [Map与Object和 Set与Array的区别](#map与object和-set与array的区别)
   - [Vue2](#vue2)
     - [Vue 生命周期](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
@@ -125,6 +130,7 @@
     - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
     - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
     - [v-if和v-for的优先级](#v-if和v-for的优先级)
+    - [计算属性computed和methods的区别](#计算属性computed和methods的区别)
     - [v-show v-if的应用场景](#v-show-v-if的应用场景)
     - [vue中key的原理](#vue中key的原理)
     - [Vue.extend 和 Vue.component](#vueextend-和-vuecomponent)
@@ -136,6 +142,9 @@
     - [vue中的$nextTick](#vue中的nexttick)
       - [为什么要有$nextTick](#为什么要有nexttick)
       - [使用场景](#使用场景)
+    - [v-model自定义组件实现](#v-model自定义组件实现)
+      - [v-bind:sync](#v-bindsync)
+      - [Vue3中的v-model不同之处](#vue3中的v-model不同之处)
     - [diff算法](#diff算法)
     - [Vue中组件和插件有什么区别](#vue中组件和插件有什么区别)
     - [自定义指令的应用场景](#自定义指令的应用场景)
@@ -147,6 +156,54 @@
       - [vue前端代码错误处理](#vue前端代码错误处理)
     - [vue keep-alvie](#vue-keep-alvie)
       - [缓存后如何获取数据](#缓存后如何获取数据)
+    - [SPA](#spa)
+      - [原理和SEO优化](#原理和seo优化)
+      - [SPA首屏加载优化](#spa首屏加载优化)
+      - [hisotory路由404](#hisotory路由404)
+  - [Vue3](#vue3)
+    - [与Vue2的不同](#与vue2的不同)
+      - [功能改变](#功能改变)
+    - [vue3的Composition Api的好处](#vue3的composition-api的好处)
+    - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
+    - [vue3proxy取代defineProperty API原因](#vue3proxy取代defineproperty-api原因)
+  - [React](#react)
+    - [说说React特性](#说说react特性)
+    - [state 和 props 区别](#state-和-props-区别)
+    - [super() 和 super(props) 区别](#super-和-superprops-区别)
+    - [类组件和函数组件的区别](#类组件和函数组件的区别)
+      - [类组件的this绑定](#类组件的this绑定)
+    - [react受控组件和非受控组件](#react受控组件和非受控组件)
+    - [react事件机制](#react事件机制)
+    - [react构建组件方式](#react构建组件方式)
+    - [react生命周期](#react生命周期)
+    - [react组件间通信](#react组件间通信)
+      - [context类组件和函数组件的使用](#context类组件和函数组件的使用)
+    - [react高阶组件的理解和应用](#react高阶组件的理解和应用)
+      - [高阶函数](#高阶函数)
+      - [高阶组件](#高阶组件)
+      - [高阶组件的应用场景](#高阶组件的应用场景)
+    - [react过渡动画](#react过渡动画)
+      - [react-transition-group](#react-transition-group)
+    - [react捕获错误](#react捕获错误)
+    - [对React refs 的理解，应用场景](#对react-refs-的理解应用场景)
+      - [应用场景](#应用场景-1)
+    - [setState执行机制](#setstate执行机制)
+      - [setState更新类型](#setstate更新类型)
+      - [批量更新](#批量更新)
+    - [react render理解](#react-render理解)
+      - [render的触发时机](#render的触发时机)
+    - [react中怎样避免子组件无效渲染和减少计算渲染](#react中怎样避免子组件无效渲染和减少计算渲染)
+    - [React Jsx转换成真实DOM过程](#react-jsx转换成真实dom过程)
+    - [Fiber架构的理解](#fiber架构的理解)
+      - [React Fiber](#react-fiber)
+    - [react中key的作用](#react中key的作用)
+    - [react diff算法](#react-diff算法)
+      - [原理](#原理)
+      - [简单类型加key和不加key的性能](#简单类型加key和不加key的性能)
+    - [react hooks的理解](#react-hooks的理解)
+      - [常见的hooks](#常见的hooks)
+      - [hooks作用](#hooks作用)
+      - [自定义hooks](#自定义hooks)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -156,8 +213,9 @@
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
-      - [location](#location)
-      - [history](#history)
+    - [location](#location)
+    - [history](#history)
+    - [获取当前页面URL参数](#获取当前页面url参数)
   - [移动端](#移动端)
     - [上拉加载下拉刷新实现](#上拉加载下拉刷新实现)
     - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
@@ -1952,6 +2010,50 @@ arr.copyWithin(-2,0,2)
 console.log(arr)//[1, 3, 5, 1, 3]
 ```
 
+#### 数组reduce方法应用场景
+求和
+```js
+const arr = [10, 20, 30, 40, 50]
+// const res = arr.reduce((sum, curVal, index, arr) => {
+//     // console.log('reduce function ....')
+//     // console.log('sum', sum)
+//     // console.log('curVal', curVal)
+//     // console.log('index', index)
+//     // console.log('arr', arr)
+
+//     return sum + curVal // 返回值，会作为下一次执行时的第一个参数 sum 的值
+// }, 0)
+const res = arr.reduce((sum, curVal) => sum + curVal, 0)
+console.log('res', res)
+```
+计数
+```js
+ // 计数
+const arr = [10, 20, 30, 40, 50, 10, 20, 30, 20]
+const n = 30
+const count = arr.reduce((count, val) => {
+    return val === n ? count + 1 : count
+}, 0)
+console.log('count', count)
+```
+ 
+输出字符串
+```js
+// 输出字符串
+const arr = [
+    { name: '张三', age: '20' },
+    { name: '李四', age: '21' },
+    { name: '小明', age: '22' },
+]
+const str = arr.reduce((s, item) => {
+    return `${s}${item.name} - ${item.age}\n`
+}, '')
+console.log(str)
+```
+去重等等……
+
+
+
 ### 函数缓存
 
 场景：[昂贵的函数调用执行复杂计算的函数][纯函数][重复输入的递归函数]
@@ -2412,6 +2514,30 @@ console.warn(Object.fromEntries([
  ['foo', 'bar'],
  ['baz', 42]
 ]))
+```
+
+### new Object()和Object.cretate()以及Object.assign()区别
+{}就是new Object的简单写法
+
+Object.create() 静态方法以一个**现有对象作为原型**，创建一个新对象。
+```
+Object.create(proto, propertiesObject)
+```
+Object.assign() 静态方法将一个或者多个源对象中所有`可枚举`的`自有属性`复制到目标对象，并返回修改后的目标对象。
+```
+Object.assign(target, ...sources)
+```
+```js
+const target = { a: 1, b: 2 };
+const source = { b: 4, c: 5 };
+
+const returnedTarget = Object.assign(target, source);
+
+console.log(target);
+// Expected output: Object { a: 1, b: 4, c: 5 }
+
+console.log(returnedTarget === target);
+// Expected output: true
 ```
 
 ### 关于对象的遍历方案
@@ -2881,6 +3007,27 @@ div.addEventListener('click', function(event) {
 // 当 div 被点击时，控制台仅输出 "处理程序 1"，因为 stopImmediatePropagation() 阻止了冒泡和其他处理程序
 ```
 
+### event.target和event.currentTarget二者含义
+Event 接口的只读属性 currentTarget 表示的，标识是当事件沿着 DOM 触发时事件的`当前目标`。它总是指向事件绑定的元素，而 Event.target 则是`事件触发`的元素。
+```js
+<!DOCTYPE html>
+<html>
+  <body>
+    <div id='k1'>22
+      <div id='b1'>11111</div>
+    </div>
+  </body>
+</html>
+<script type="text/javascript">
+  let b1 =document.getElementById('k1')
+  b1.onclick =function (e){
+    console.log(e.target)
+    // 当点击在22上指向k1，点击11111上指向b1
+    console.warn(e.currentTarget)
+    // 一直都执行id=k1的div
+  }
+</script>
+```
 
 ### 判断一个元素是否在可视区
 对应的应用场景：【图片懒加载/列表的无限滚动/可点击链接的预加载】
@@ -3292,6 +3439,11 @@ XSRF流程
 + 避免在URL中传递敏感信息：敏感信息应该通过POST请求传递，而不是通过URL的查询参数。
 + 实施安全的Cookie策略：设置HttpOnly属性，防止JavaScript访问Cookie；设置Secure属性，确保Cookie只能通过HTTPS传输。
 
+### 如何捕获js异常
+重点代码try…catch…
+
+全局还可以使用window.onerror进行检测，压缩后的代码需要配合sourceMap找出对应的行列（对第三方库的定位不会太准确）
+
 ### js计算精度丢失问题
 ```js
 0.1+0.2=== 0.3 false 
@@ -3482,7 +3634,7 @@ let difference = new Set([...a].filter(x => !b.has(x)));
 
 #### weakSet weakMap
 + weakSet的成员只能使用引用对象
-+ weakMap的key也只能是引用对象，二者都没size属性，无法遍历
++ weakMap的key也只能是引用对象，二者都没size属性和forEach，无法遍历
 + 外面的引用消失，二者里面的引用也会自动消失
 
 ```js
@@ -3679,6 +3831,44 @@ let exists = _fs.exists;
 let readfile = _fs.readfile;
 ```
 
+### Map与Object和 Set与Array的区别
+相对于对象，Map的key不仅是字符串，也可以使其他的，Map数据结构是有序的且Map的查询速度也是非常快的。
+
+Set是无序的，且不能重复，如果不考虑顺序的场景，可以优选替代Array。
+
+unshift速度很慢，需要调整位置
+```js
+// arr 有多慢？
+const arr = []
+for (let i  = 0; i < 100 * 10000; i++) {
+    arr.push(i)
+}
+console.time('arr unshift')
+arr.unshift('a')
+console.timeEnd('arr unshift')
+console.time('arr push')
+arr.push('b')
+console.timeEnd('arr push')
+console.time('arr find')
+arr.includes(500000)
+console.timeEnd('arr find')
+
+// set 有多快？
+const set = new Set()
+for (let i  = 0; i < 100 * 10000; i++) {
+    set.add(i)
+}
+console.time('set add')
+set.add('a')
+console.timeEnd('set add')
+console.time('set find')
+set.has(500000)
+console.timeEnd('set find')
+```
+
+![arr](book_files/71.jpg)
+
+
 ## Vue2
 
 ### Vue 生命周期
@@ -3858,6 +4048,10 @@ computed: {
  }
 }
 ```
+
+### 计算属性computed和methods的区别
+![1](book_files/82.jpg)
+计算属性会基于它们的依赖关系进行**缓存**，提高性能；只有依赖的数据发生变化，计算属性才会重新进行计算。
 
 ### v-show v-if的应用场景
 1. 都是从页面移除元素，v-show的原理是display:none，成为游离页面还可再用，v-if则是直接删除。
@@ -4104,6 +4298,53 @@ await this.$nextTick()
 console.log(this.$el.textContent) // => '最新值'
 ```
 
+### v-model自定义组件实现
+1. v-model是语法糖，可以用在自定义组件中，会被解析为value和@input事件
+2. 如果子组件中完全没用到input，select，textarea，checkbox也是可以用v-model，如例myinput.vue
+3. 默认子组件接受value，触发事件input，但是可以通过子组件中的model修改props中的名字和事件触发的名字，如myinput2.vue
+4. (如果不是用model，那么参数仍然是value，触发条件仍然是input事件)
+5. 注意checkbox修改的值是e.target.checked,不是e.target.value
+
+使用 v-model好处是无需记特定的 prop 字段名，即可绑定到组件中的值，降低组件的使用成本。其次，应该尽量将「重复的逻辑处理」放在子组件中，这样子才会让组件的封装更有意义。
+
+应用场景：**子组件想要使用父组件的值,又想去改父组件的值**
+
+#### v-bind:sync
+vue3已废弃，vue3可以同时给一个组件加多个v-model，不需要再用sync
+```html
+<!--语法糖.sync-->
+<my-component :value.sync="value" />
+<!--编译后的写法-->
+<my-component 
+  :value="msg" 
+  @update:value="(val) => value = val"
+```
+与v-model 编译不同之处
+```html
+<!--v-model写法-->
+<my-component type="text" v-model="value">
+<!--编译后的写法-->
+<my-component type="text"
+  :value="value"
+  @input="value = $event.target.value"
+>
+```
+#### Vue3中的v-model不同之处
+![v-model](book_files/83.jpg)
+
+```html
+<ChildComponent v-model:title="pageTitle" v-model:content="pageContent" />
+
+<!-- 是以下的简写： -->
+
+<ChildComponent
+  :title="pageTitle"
+  @update:title="pageTitle = $event"
+  :content="pageContent"
+  @update:content="pageContent = $event"/>
+
+```
+
 ### diff算法
 diff 算法是一种通过同层的树节点进行比较的高效算法
 
@@ -4112,8 +4353,6 @@ diff 算法是一种通过同层的树节点进行比较的高效算法
 + 在diff比较的过程中，循环从两边向中间比较
 
 diff 算法在很多场景下都有应用，在 vue 中，作用于虚拟 dom 渲染成真实 dom 的新旧 VNode 节点比较
-
-
 
 ### Vue中组件和插件有什么区别
 组件就是把图形、非图形的各种逻辑均抽象为一个统一的概念（组件）来实现开发的模式，在Vue中每一个.vue文件都可以视为一个组件.插件通常用来为 Vue 添加全局功能。
@@ -4535,6 +4774,1985 @@ activated(){
 ```
 
 
+### SPA
+单页应用，它通过动态重写当前页面来与用户交互，这种方法避免了页面之间切换打断用户体验在单页应用中
+
+![SPA](book_files/85.jpg)
+
+#### 原理和SEO优化
+![原理](book_files/86.jpg)
+
+1. 服务端渲染 nuxt.js
+2. 静态化
+	 + 通过程序将动态页面抓取成静态页面
+	 + WEB服务的 URL Rewrite
+3. 使用phantom.js针对爬虫处理
+
+![爬虫](book_files/84.jpg)
+
+#### SPA首屏加载优化
+首屏时间（First Contentful Paint），指的是浏览器从响应用户输入网址地址，到首屏内容渲染完成的时间，此时整个网页不一定要全部渲染完成，但需要展示当前视窗需要的内容
+
+```js
+// 方案一：
+document.addEventListener('DOMContentLoaded', (event) => {
+    console.log('first contentful painting');
+});
+// 方案二：
+performance.getEntriesByName("first-contentful-paint")[0].startTime
+
+// performance.getEntriesByName("first-contentful-paint")[0]
+// 会返回一个 PerformancePaintTiming的实例，结构如下：
+{
+  name: "first-contentful-paint",
+  entryType: "paint",
+  startTime: 507.80000002123415,
+  duration: 0,
+};
+```
+
+1. 加载慢可能的原因
+	+ 网络延时问题
+	+ 资源文件体积是否过大
+	+ 资源是否重复发送请求去加载了
+	+ 加载脚本的时候，渲染内容堵塞了
+
+2. 解决方案
+	+ 减小入口文件积：懒加载 分包
+	+ 静态资源本地缓存：浏览器缓存 service-worker localstorage
+	+ UI框架按需加载
+	+ 图片资源的压缩
+	+ 组件重复打包:假设A.js文件是一个常用的库，现在有多个路由使用了A.js文件，这就造成了重复下载,需要构建工具提取，如在webpack的config文件中，修改CommonsChunkPlugin的配置，minChunks为3表示会把使用3次及以上的包抽离出来，放进公共依赖文件，避免了重复加载组件(在 Webpack 4 及以上版本中,CommonsChunkPlugin 已经被废弃，取而代之的是 optimization.splitChunks 配置。splitChunks 配置允许你更加灵活和细致地控制代码拆分和公共依赖的提取。)[CommonsChunkPlugin 的主要作用就是将公共的代码模块提取出来，生成一个新的 chunk 文件，这样浏览器在加载页面时就可以缓存这个公共的 chunk 文件，后续加载其他页面时就可以复用已经缓存的公共代码，避免重复下载。]
+	+ 开启GZip压缩
+	+ 使用SSR
+
+#### hisotory路由404
+nginx需要额外配置：只需要配置将任意页面都重定向到 index.html，把路由交由前端处理
+```bash
+server {
+  listen  80;
+  server_name  www.xxx.com;
+
+  location / {
+    index  /data/dist/index.html;
+    try_files $uri $uri/ /index.html;
+  }
+}
+```
+
+> hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 website.com/#/login 只有 website.com 会被包含在请求中 ，因此对于服务端来说，即使没有配置location，也不会返回404错误
+
+## Vue3
+vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
+
+![vue3](book_files/68.jpg)
+
+monorepo（单体仓库）`是一种将多个项目或包存储在同一个代码仓库中的管理方式`。在 monorepo 中，所有的项目或包共享相同的依赖和配置，这使得跨项目或跨包的代码共享、重构和测试变得更加容易。
+
+Monorepo 的主要优势包括：
+
++ 代码共享：不同项目之间可以更容易地共享代码，减少重复劳动和代码冗余。
++ 依赖管理：所有项目或包使用相同的依赖版本，减少了版本冲突和兼容性问题。
++ 统一构建和测试：可以对整个 monorepo 进行统一的构建和测试，提高开发效率。
+
+### 与Vue2的不同
+1. 速度更快
+	+ 重写了虚拟Dom实现
+	+ 编译模板的优化
+	+ 更高效的组件初始化
+	+ update性能提高1.3~2倍
+	+ SSR速度提高了2~3倍
+2. 体积更小
+	+ 通过webpack的tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的
+3. 更易维护：compositon Api + options Api
+4. 更好的Typescript支持
+5. 编译器重写
+
+#### 功能改变
++ fragments： 支持多根节点
++ Teleport：传送门
++ composition Api
++ createRenderer:能够构建自定义渲染器，能够将 vue 的开发模型扩展到其他平台
+
+```html
+<button @click="showToast" class="btn">打开 toast</button>
+<!-- to 属性就是目标位置 -->
+<teleport to="#teleport-target">
+    <div v-if="visible" class="toast-wrap">
+        <div class="toast-msg">我是一个 Toast 文案</div>
+    </div>
+</teleport>
+```
+
++ 组件上 v-model 用法已更改
++ `<template v-for>`和 非 v-for节点上key用法已更改
++ 在同一元素上使用的 v-if 和 v-for 优先级已更改
++ v-bind="object" 现在排序敏感
++ v-for 中的 ref 不再注册 ref 数组
++ 自定义指令 API 已更改为与组件生命周期一致
++ data 应始终声明为函数
++ 来自 mixin 的 data 选项现在可简单地合并
++ attribute 强制策略已更改
++ 移除$on，$off和$once 实例方法
++ 移除过滤filter
++ 移除内联模板 attribute
++ 移除$destroy 实例方法。用户不应再手动管理单个Vue 组件的生命周期。在 Vue 3 中，$destroy 方法已经被完全移除，进一步强调了开发者应该依赖 Vue 的自动生命周期管理，而不是手动去销毁组件或实例。
+
+### vue3的Composition Api的好处
+1. 不需要像options API一个功能代码跳转很多地方
+2. 当混入时，不会像mixins存在数据来源不清晰，和多个混入容易冲突的情况
+
+```js
+import { onMounted, onUnmounted, reactive } from "vue";
+export function useMove() {
+  const position = reactive({
+    x: 0,
+    y: 0,
+  });
+
+  const handleKeyup = (e) => {
+    console.log(e.code);
+    // 上下左右 x y
+    switch (e.code) {
+      case "ArrowUp":
+        // y.value--;
+        position.y--;
+        break;
+      case "ArrowDown":
+        // y.value++;
+        position.y++;
+        break;
+      case "ArrowLeft":
+        // x.value--;
+        position.x--;
+        break;
+      case "ArrowRight":
+        // x.value++;
+        position.x++;
+        break;
+    }
+  };
+
+  onMounted(() => {
+    window.addEventListener("keyup", handleKeyup);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener("keyup", handleKeyup);
+  });
+
+  return { position };
+}
+```
+
+```html
+<template>
+  <div>
+    Mouse position: x {{ x }} / y {{ y }}
+  </div>
+</template>
+
+<script>
+import { useMove } from "./useMove";
+import { toRefs } from "vue";
+export default {
+  setup() {
+    const { position } = useMove();
+    const { x, y } = toRefs(position);
+    return {
+      x,
+      y,
+    };
+
+  },
+};
+</script>
+```
+可以看到，整个数据来源清晰了，即使去编写更多的 hook 函数，也不会出现命名冲突的问题
+
+
+### vue3性能提升主要体现在哪几个方面
+回顾Vue2，每个组件实例都对应一个 watcher 实例，它会在组件渲染的过程中把用到的数据property记录为依赖，当依赖发生改变，触发setter，则会通知watcher，从而使关联的组件重新渲染
+
+![vue2](book_files/69.jpg)
+
+```html
+<template>
+    <div id="content">
+        <p class="text">静态文本</p>
+        <p class="text">静态文本</p>
+        <p class="text">{{ message }}</p>
+        <p class="text">静态文本</p>
+        ...
+        <p class="text">静态文本</p>
+    </div>
+</template>
+```
+可以看到，组件内部只有一个动态节点，剩余一堆都是静态节点，所以这里很多 `diff 和遍历`其实都是不需要的，造成`性能浪费`
+
+因此，Vue3在编译阶段，做了进一步优化。主要有如下：
++ diff算法优化:vue3在diff算法中相比vue2增加了静态标记,已经标记静态节点的p标签在diff过程中则不会比较，把性能进一步提高
+
+![静态节点](book_files/70.jpg)
+
++ 静态提升：对不参与更新的元素，会做静态提升，只会被创建一次，在渲染时直接复用
+
+```html
+<span>你好</span>
+
+<div>{{ message }}</div>
+```
+
+```js
+// 没做静态提升
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock(_Fragment, null, [
+    _createVNode("span", null, "你好"),
+    _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+```
+```js
+// 做了静态提升
+const _hoisted_1 = /*#__PURE__*/_createVNode("span", null, "你好", -1 /* HOISTED */)
+
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock(_Fragment, null, [
+    _hoisted_1,
+    _createVNode("div", null, _toDisplayString(_ctx.message), 1 /* TEXT */)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+
+```
+静态内容_hoisted_1被放置在render 函数外，每次渲染的时候只要取 _hoisted_1 即可
+
+同时 _hoisted_1 被打上了 PatchFlag ，静态标记值为 -1 ，特殊标志是负整数表示永远不会用于 Diff
+
++ 事件监听缓存
+
+```js
+export const render = /*#__PURE__*/_withId(function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock("div", null, [
+    _createVNode("button", { onClick: _ctx.onClick }, "点我", 8 /* PROPS */, ["onClick"])
+                                             // PROPS=1<<3,// 8 //动态属性，但不包含类名和样式
+  ]))
+})
+```
+```js
+// 开启了缓存后，没有了静态标记。也就是说下次diff算法的时候直接使用
+export function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (_openBlock(), _createBlock("div", null, [
+    _createVNode("button", {
+      onClick: _cache[1] || (_cache[1] = (...args) => (_ctx.onClick(...args)))
+    }, "点我")
+  ]))
+}
+```
+
++ SSR优化:当静态内容大到一定量级时候，会用createStaticVNode方法在客户端去生成一个static node，这些静态node，会被直接innerHtml，就不需要创建对象，然后根据对象渲染
+
++ 源码体积：相比Vue2，Vue3整体体积变小了，除了移出一些不常用的API，再重要的是Tree shanking。任何一个函数，如ref、reavtived、computed等，仅仅在用到的时候才打包，没用到的模块都被摇掉，打包的整体体积变小
+
++ 响应式系统：vue3采用proxy重写了响应式系统，因为proxy可以对整个对象进行监听，所以不需要深度遍历。
+
+### vue3proxy取代defineProperty API原因
++ 检测不到对象属性的添加和删除
++ 数组API方法无法监听到
++ 需要对每个属性进行遍历监听，如果`嵌套对象`，需要`深层监听`，造成性能问题
++ Object.defineProperty只能遍历对象属性进行劫持
+
++ Proxy直接可以劫持整个对象，并返回一个新对象，我们可以只操作新的对象达到响应式目的
++ Proxy可以直接监听数组的变化（push、shift、splice）
++ Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等，这是Object.defineProperty不具备的
++ **Proxy 不兼容IE，也没有 polyfill**
+
+## React
+
+React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、声明式编程范式和函数式编程概念，以使前端应用程序更高效
+
+使用虚拟 DOM 来有效地操作 DOM，遵循从高阶组件到低阶组件的`单向数据流`
+
+### 说说React特性
++ JSX 语法
++ 单向数据绑定:单向数据流比双向绑定更安全，速度更快
++ 虚拟 DOM
++ 声明式编程:声明式编程是一种编程范式，它关注的是你要做什么，而不是如何做
++ Component：可组合可复用可重用
+
+### state 和 props 区别
+1. state
+
+一个组件的显示形态可以由`数据状态和外部参数`所决定，而数据状态就是 state，一般在 constructor 中**初始化**
+
+当需要修改里面的值的状态需要通过调用 setState 来改变，从而达到更新组件内部数据的作用，并且重新调用组件 render 方法：
+
+```js
+class Button extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      count: 0,
+    };
+  }
+
+  updateCount() {
+    this.setState((prevState, props) => {
+      return { count: prevState.count + 1 };
+    });
+  }
+
+  render() {
+    return (
+      <button onClick={() => this.updateCount()}>
+        Clicked {this.state.count} times
+      </button>
+    );
+  }
+}
+```
+
+setState 还可以接受第二个参数，它是一个函数，会在 setState 调用完成并且组件开始重新渲染时被调用，可以用来监听渲染是否完成
+```js
+this.setState(
+  {
+    name: "JS每日一题",
+  },
+  () => console.log("setState finished")
+);
+```
+
+2. props
+
+组件从概念上看就是一个函数，可以接受一个参数作为输入值，这个参数就是 props，所以可以把 props 理解为`从外部传入组件内部的数据`
+
+react 具有单向数据流的特性，所以他的主要作用是从父组件向子组件中传递数据
+
+props 除了可以传字符串，数字，还可以传递**对象，数组甚至是回调函数**
+
+```js
+class Welcome extends React.Component {
+  render() {
+    return <h1>Hello {this.props.name}</h1>;
+  }
+}
+
+const element = <Welcome name="Sara" onNameChanged={this.handleName} />;
+```
+上述 name 属性与 onNameChanged 方法都能在子组件的 props 变量中访问
+
+在子组件中，props 在内部不可变的，如果想要改变它看，只能通过外部组件传入新的 props 来重新渲染子组件，否则子组件的 props 和展示形式不会改变
+
+### super() 和 super(props) 区别
+在 React 中，类组件基于 ES6，所以在 constructor 中必须使用 super
+
+在调用 super 过程，无论是否传入 props，React 内部都会将 porps 赋值给组件实例 porps 属性中
+
+如果只调用了 super()，那么 **this.props** 在 super() 和构造函数结束之间仍是 undefined
+
+### 类组件和函数组件的区别
+1. 两者最明显的区别在于编写形式的不同，同一种功能的实现可以分别对应类组件和函数组件的编写形式
+
+```js
+// 函数组件
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+
+//类组件
+class Welcome extends React.Component {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return <h1>Hello, {this.props.name}</h1>
+  }
+}
+```
+
+2. 状态管理：在hooks出来之前，函数组件就是无状态组件，不能保管组件的状态，不像类组件中调用setState，如果想要管理state状态，可以使用useState
+
+```js
+const FunctionalComponent = () => {
+    const [count, setCount] = React.useState(0);
+    return (
+        <div>
+            <p>count: {count}</p >
+            <button onClick={() => setCount(count + 1)}>Click</button>
+        </div>
+    );
+};
+```
+
+3. 生命周期：函数组件无生命周期，不过 useEffect Hook 看做 componentDidMount ， componentDidUpdate 和 componentWillUnmount 这三个函数的组合
+
+```js
+useEffect(() => {
+	 console.log(2) //useEffect第二个参数设为空数组，那么就没有依赖，就只改变一次，否则会一直重复设置timer
+	 // 而实际上timer只要自己执行一次，后面就每隔一秒自动setDate就好了，如果没有设置好依赖项，
+	 //每隔一秒都会执行一次console.log(2)，然后再执行生成一个timer，这是完全没有必要的
+	 const timer = setInterval(() => {
+	 setDate(new Date());
+	 }, 1000);
+	 return () => clearInterval(timer);//组件卸载的时候执行，这个return函数相当于 componentWillUnmount
+	 }, []);// 第二个参数是依赖更新项，相当于 componentDidUpdate
+```
+
+#### 类组件的this绑定
+```js
+class IndexPage extends React.Component{
+  constructor(props) {
+    super(props)
+
+    this.event1 = this.event1.bind(this, 1);
+  }
+
+  event1(a, e) {
+    console.log('event1', a, e);    // 1 {}
+  }
+  event2(a, e) {
+    console.log('event2', a, e);    // 2 {}
+  }
+  event3(a, e) {
+    console.log('event3', a, e);    // 3 {}
+  }
+  event4 = (e) => {
+    console.log('event4', e);       // {}
+  }
+  // fun = this.event1 => fun() => this隐式丢失指向window
+  render() {
+    return (
+      <div>
+        <button onClick={ this.event1 }>event1</button>
+        <button onClick={ (e) => { this.event2(2, e) } }>event2</button>
+        <button onClick={ this.event3.bind(this, 3) }>event3</button>
+        <button onClick={ this.event4 }>event4</button>
+      </div>
+    );
+  }
+}
+```
+
+### react受控组件和非受控组件
++ 受控组件，简单来讲，就是受控制的组件，组件的状态**全程响应外部数据**
+
+```js
+class TestComponent extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = { username: 'lindaidai' };
+  }
+  render () {
+    return <input name="username" value={this.state.username} />
+  }
+}
+```
+
+在输入框输入内容的时候，会发现输入的内容并无法显示出来，也就是input标签是一个可读的状态
+
+这是因为value被`this.state.username`所控制住。当用户输入新的内容时，this.state.username并不会自动更新，这样的话input内的内容也就不会变了
+
+如果想要解除被控制，可以为input标签设置`onChange`事件，输入的时候触发事件函数，在函数内部实现state的更新，从而导致input框的内容页发现改变
+
+因此，受控组件一般需要**初始状态**和一个**状态更新事件**函数
+
++ 非受控组件，简单来讲，就是不受我们控制的组件，一般情况是在初始化的时候接受`外部数据`，然后自己在`内部存储其自身状态`，当需要时，可以使用 ref 查询 DOM并查找其当前值：
+
+```js
+import React, { Component } from 'react';
+
+export class UnControll extends Component {
+  constructor (props) {
+    super(props);
+    this.inputRef = React.createRef();
+  }
+  handleSubmit = (e) => {
+    console.log('我们可以获得input内的值为', this.inputRef.current.value);
+    e.preventDefault();
+  }
+  render () {
+    return (
+      <form onSubmit={e => this.handleSubmit(e)}>
+        <input defaultValue="lindaidai" ref={this.inputRef} />
+        <input type="submit" value="提交" />
+      </form>
+    )
+  }
+}
+```
+
+大部分时候推荐使用受控组件来实现表单，因为在受控组件中，表单数据由React组件负责处理
+
+如果选择非受控组件的话，控制能力较弱，表单数据就由DOM本身处理，但更加方便快捷，代码量少
+
+![受控](book_files/72.jpg)
+
+### react事件机制
+React基于浏览器的事件机制自身实现了一套事件机制，包括事件注册、事件的合成、事件冒泡、事件派发等
+
+在React中这套事件机制被称之为`合成事件`
+
+合成事件是 React模拟原生 DOM事件所有能力的一个事件对象，即浏览器原生事件的跨浏览器包装器
+
+根据 W3C规范来定义合成事件，兼容所有浏览器，拥有与浏览器原生事件相同的接口，例如：
+
+```js
+const button = <button onClick={handleClick}>按钮</button>
+```
+
+如果想要获得原生DOM事件，可以通过**e.nativeEvent**属性获取
+
+```js
+const handleClick = (e) => console.log(e.nativeEvent);;
+const button = <button onClick={handleClick}>按钮</button>
+```
+
+虽然onclick看似绑定到DOM元素上，但实际并不会把事件代理函数直接绑定到真实的节点上，而是把所有的事件绑定到结构的最外层，使用一个统一的事件去监听
+
+这个事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
+
+当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。这样做简化了事件处理和回收机制，效率也有很大提升
+
+
+关于React合成事件与原生事件执行顺序，可以看看下面一个例子
+```js
+import  React  from 'react';
+class App extends React.Component{
+
+  constructor(props) {
+    super(props);
+    this.parentRef = React.createRef();
+    this.childRef = React.createRef();
+  }
+  componentDidMount() {
+    console.log("React componentDidMount！");
+    this.parentRef.current?.addEventListener("click", () => {
+      console.log("原生事件：父元素 DOM 事件监听！");
+    });
+    this.childRef.current?.addEventListener("click", () => {
+      console.log("原生事件：子元素 DOM 事件监听！");
+    });
+    document.addEventListener("click", (e) => {
+      console.log("原生事件：document DOM 事件监听！");
+    });
+  }
+  parentClickFun = () => {
+    console.log("React 事件：父元素事件监听！");
+  };
+  childClickFun = () => {
+    console.log("React 事件：子元素事件监听！");
+  };
+  render() {
+    return (
+      <div ref={this.parentRef} onClick={this.parentClickFun}>
+        <div ref={this.childRef} onClick={this.childClickFun}>
+          分析事件执行顺序
+        </div>
+      </div>
+    );
+  }
+}
+export default App;
+```
+
+```
+原生事件：子元素 DOM 事件监听！ 
+原生事件：父元素 DOM 事件监听！ 
+React 事件：子元素事件监听！ 
+React 事件：父元素事件监听！ 
+原生事件：document DOM 事件监听！ 
+```
+
+```
+React 所有事件都挂载在 document 对象上
+当真实 DOM 元素触发事件，会冒泡到 document 对象后，再处理 React 事件
+所以会先执行原生事件，然后处理 React 事件
+最后真正执行 document 上挂载的事件
+```
+
+![react事件](book_files/73.jpg)
+
+所以想要阻止不同时间段的冒泡行为，对应使用不同的方法，对应如下：
+
+阻止合成事件间的冒泡，用e.stopPropagation()
+
+阻止合成事件与最外层 document 上的事件间的冒泡，用e.nativeEvent.stopImmediatePropagation()
+
+阻止合成事件与除最外层document上的原生事件上的冒泡，通过判断e.target来避免
+
+```js
+document.body.addEventListener('click', e => {   
+    if (e.target && e.target.matches('div.code')) {  
+        return;    
+    }    
+    this.setState({   active: false,    });   }); 
+}
+```
+
+### react构建组件方式
++ 函数式创建
++ 通过 React.createClass 方法创建
++ 继承 React.Component 创建
+
+```js
+// 已不推荐
+function HelloComponent(props) /* context */{
+  return React.createElement(
+    "div",
+    null,
+    "Hello ",
+    props.name
+  );
+}
+```
+
+### react生命周期
+React整个组件生命周期包括从创建、初始化数据、编译模板、挂载Dom→渲染、更新→渲染、卸载等一系列过程
+
+react16.4之后
+
++ 创建阶段
+	- constructor
+	- getDerivedStateFromProps：该方法是新增的生命周期方法，是一个`静态方法`，因此不能访问到组件的实例；执行时机：`组件创建和更新阶段`，不论是props变化还是state变化，也会调用。在每次render方法前调用，第一个参数为即将更新的props，第二个参数为上一个状态的state，可以比较props 和 state来加一些限制条件，防止无用的state更新。该方法需要返回一个新的对象作为`新的state`或者`返回null表示state状态不需要更新`
+	- render
+	- componentDidMount：组件挂载到真实DOM节点后执行，其在render方法之后执行
++ 更新阶段
+	- getDerivedStateFromProps
+	- shouldComponentUpdate:用于告知组件本身基于当前的props和state是否需要重新渲染组件，默认情况返回true.执行时机：到新的props或者state时都会调用，通过返回true或者false告知组件更新与否,一般情况，不建议在该周期方法中进行深层比较，会影响效率,同时也不能调用setState，否则会导致无限循环调用更新
+	- render
+	- getSnapshotBeforeUpdate:该周期函数在render后执行，执行之时DOM元素还没有被更新,此方法的目的在于获取组件更新前的一些信息，比如组件的滚动位置之类的，在组件更新后可以根据这些信息恢复一些UI视觉上的状态
+	- componentDidUpdate
++ 卸载阶段
+	- componentWillUnmount
+
+![生命周期](book_files/74.jpg)
+
+旧版生命周期
+
+![旧版](book_files/75.jpg)
+
+```js
+class MyComponent extends React.Component {  
+  static getDerivedStateFromProps(nextProps, prevState) {  
+    // 不能使用 this.state 或 this.props  
+    // 只能使用 nextProps 和 prevState  
+    if (nextProps.someProp !== prevState.someProp) {  
+      return { someProp: nextProps.someProp };  
+    }  
+    return null;  
+  }  
+  
+  constructor(props) {  
+    super(props);  
+    this.state = { someProp: props.someProp };  
+  }  
+  
+  render() {  
+    // ...  
+  }  
+}
+```
+
+### react组件间通信
++ 父组件向子组件传递
++ 子组件向父组件传递
++ 兄弟组件之间的通信
++ 父组件向后代组件传递: React.createContext() || useContext ,Context 提供了一种在组件之间共享值而无需显式地通过每一层组件传递 props 的方式
++ 非关系组件传递：redux
+
+```js
+// 兄弟组件借助父组件为中间层
+class Parent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {count: 0}
+  }
+  setCount = () => {
+    this.setState({count: this.state.count + 1})
+  }
+  render() {
+    return (
+      <div>
+        <SiblingA
+          count={this.state.count}
+        />
+        <SiblingB
+          onClick={this.setCount}
+        />
+      </div>
+    );
+  }
+}
+```
+
+#### context类组件和函数组件的使用
++ React.createContext
++ xxx.Provider
++ xxx.Consumer
+
+```js
+import React,{Component} from 'react'
+import P1 from './P1.js'
+export const MyContext = React.createContext();
+  
+export default class G1 extends Component{
+    constructor(props){
+        super(props)
+        this.state ={val:10}
+    }
+    componentDidMount(){
+        setTimeout(() => {
+            this.setState({val:this.state.val+1})
+        }, 2000);
+    }
+    render(){
+        return (<div>
+            <MyContext.Provider value={this.state.val}>
+                <P1/>
+            </MyContext.Provider>
+        </div>)
+    }
+}
+```
+```js
+import React,{Component} from 'react'
+import C1 from './C1.js'
+import C2 from './C2.js'
+export default class P1 extends Component{
+    render(){
+        return (<div>
+            <C1 />
+            <C2/>
+        </div>)
+    }
+ 
+}
+```
+```js
+import React,{Component} from 'react'
+import { MyContext } from './G1'
+export default class C1 extends Component{
+    render(){
+        return (<div>
+            <MyContext.Consumer>  
+                {value => <div>{value}222</div>}
+            </MyContext.Consumer>  
+        </div>)
+    }
+
+}
+```
+```js
+import React, { useContext } from 'react';  
+import { MyContext } from './G1'
+  
+export default function C2() {  
+  const value = useContext(MyContext);  
+  // 使用 value 来渲染组件  
+  return value;  
+}
+```
+
+### react高阶组件的理解和应用
+在React中，高阶组件即接受一个或多个组件作为参数并且返回一个组件，本质也就是一个函数，并不是一个组件
+```js
+const EnhancedComponent = highOrderComponent(WrappedComponent);
+```
+上述代码中，该函数接受一个组件WrappedComponent作为参数，返回加工过的新组件EnhancedComponent
+
+高阶组件的这种实现方式，本质上是一个**装饰者设计模式**
+#### 高阶函数
+JavaScript中的高阶函数是指那些操作其他函数的函数。换句话说，**高阶函数可以接受函数作为参数，或者返回一个函数作为结果。**
+
+高阶函数在JavaScript编程中非常有用，因为它们允许我们创建更加通用和可重用的代码。通过高阶函数，我们可以将函数作为参数传递给其他函数，从而在不同的上下文中执行相同的操作。同时，高阶函数也可以返回新的函数，这些函数可以根据需要定制行为。
+
+常见的JavaScript高阶函数包括map()、filter()、reduce()等数组方法，以及setTimeout()、setInterval()等异步操作函数。这些函数都接受一个或多个函数作为参数，并在内部执行这些函数。
+
+#### 高阶组件
+```js
+//最基本的高阶组件的编写模板
+import React, { Component } from 'react';
+
+export default (WrappedComponent) => {
+  return class EnhancedComponent extends Component {
+    // do something
+    render() {
+      return <WrappedComponent />;
+    }
+  }
+}
+```
+通过对传入的原始组件 WrappedComponent 做一些你想要的操作（比如操作 props，提取 state，给原始组件包裹其他元素等），从而加工出想要的组件 EnhancedComponent
+
+把通用的逻辑放在高阶组件中，对组件实现一致的处理，从而实现代码的复用
+
+所以，高阶组件的主要功能是**封装并分离组件的通用逻辑**，让通用逻辑在组件间更好地被复用
+
+#### 高阶组件的应用场景
+高阶组件能够提高代码的复用性和灵活性，在实际应用中，常常用于与核心业务无关但又在多个模块使用的功能，如权限控制、日志记录、数据校验、异常处理、统计上报等
+
+```js
+import React, { Component } from 'react'
+
+function withPersistentData(WrappedComponent) {
+  return class extends Component {
+    componentWillMount() {
+      let data = localStorage.getItem('data');
+        this.setState({data});
+    }
+    
+    render() {
+      // 通过{...this.props} 把传递给当前组件的属性继续传递给被包装的组件WrappedComponent
+      return <WrappedComponent data={this.state.data} {...this.props} />
+    }
+  }
+}
+
+class MyComponent2 extends Component {  
+  render() {
+    return <div>{this.props.data}</div>
+  }
+}
+
+const MyComponentWithPersistentData = withPersistentData(MyComponent2)
+```
+
+### react过渡动画
+在react中实现过渡动画效果会有很多种选择，如react-transition-group，react-motion，Animated，以及原生的CSS都能完成切换动画
+
+#### react-transition-group
+在react中，react-transition-group是一种很好的解决方案，其为元素添加`enter，enter-active，exit，exit-active`这一系列勾子
+
+可以帮助我们方便的实现组件的入场和离场动画
+
+其主要提供了三个主要的组件：
+
++ CSSTransition：在前端开发中，结合 CSS 来完成过渡动画效果
++ SwitchTransition：两个组件显示和隐藏切换时，使用该组件
++ TransitionGroup：将多个动画组件包裹在其中，一般用于列表中元素的动画
+
+1. CSSTransition
+
+其实现动画的原理在于，当CSSTransition的in属性置为true时，CSSTransition首先会给其子组件加上xxx-enter、xxx-enter-active的class执行动画
+
+当动画执行结束后，会移除两个class，并且添加-enter-done的class
+
+所以可以利用这一点，通过css的transition属性，让元素在两个状态之间平滑过渡，从而得到相应的动画效果
+
+当in属性置为false时，CSSTransition会给子组件加上xxx-exit和xxx-exit-active的class，然后开始执行动画，当动画结束后，移除两个class，然后添加-enter-done的class
+
+```js
+import React from 'react'
+import './test.css'
+import { CSSTransition } from 'react-transition-group';
+export default class App2 extends React.PureComponent {
+
+  state = {show: true};
+
+  onToggle = () => this.setState({show: !this.state.show});
+
+  render() {
+    const {show} = this.state;
+    return (
+      <div className={'container'}>
+        <div className={'square-wrapper'}>
+          <CSSTransition
+            in={show}
+            timeout={500}
+            classNames={'fade'}
+            unmountOnExit={true}
+          >
+            <div>12345</div>
+          </CSSTransition>
+        </div>
+        <Button onClick={this.onToggle}>toggle</Button>
+      </div>
+    );
+  }
+}
+```
+```css
+.fade-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 500ms;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: all 500ms;
+}
+```
+
+2. SwitchTransition可以完成两个组件之间切换的炫酷动画
+
+比如有一个按钮需要在on和off之间切换，我们希望看到on先从左侧退出，off再从右侧进入
+
+SwitchTransition中主要有一个属性mode，对应两个值：
+
++ in-out：表示新组件先进入，旧组件再移除；
++ out-in：表示就组件先移除，新组建再进入
++ SwitchTransition组件里面要有CSSTransition，不能直接包裹想要切换的组件
++ 里面的CSSTransition组件不再像以前那样接受in属性来判断元素是何种状态，取而代之的是key属性
+
+```js
+import React from 'react'
+import './test.css'
+
+import { SwitchTransition, CSSTransition } from "react-transition-group";
+
+export default class SwitchAnimation extends React.PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isOn: true
+    }
+  }
+
+  render() {
+    const {isOn} = this.state;
+
+    return (
+      <SwitchTransition mode="in-out">
+        <CSSTransition classNames="btn"
+                       timeout={500}
+                       key={isOn ? "on1" : "off1"}>
+          {
+          <button onClick={this.btnClick.bind(this)}>
+            {isOn ? "on1": "off1"}
+          </button>
+        }
+        </CSSTransition>
+      </SwitchTransition>
+    )
+  }
+
+  btnClick() {
+    this.setState({isOn: !this.state.isOn})
+  }
+}
+```
+```css
+.btn-enter {
+  transform: translate(100%, 0);
+  opacity: 0;
+}
+
+.btn-enter-active {
+  transform: translate(0, 0);
+  opacity: 1;
+  transition: all 500ms;
+}
+
+.btn-exit {
+  transform: translate(0, 0);
+  opacity: 1;
+}
+
+.btn-exit-active {
+  transform: translate(-100%, 0);
+  opacity: 0;
+  transition: all 500ms;
+}
+```
+
+3. TransitionGroup
+
+当有一组动画的时候，就可将这些CSSTransition放入到一个TransitionGroup中来完成动画
+
+同样CSSTransition里面没有in属性，用到了key属性
+
+TransitionGroup在感知children发生变化的时候，先保存移除的节点，当动画结束后才真正移除
+
+其处理方式如下：
+
++ 插入的节点，先渲染dom，然后再做动画
++ 删除的节点，先做动画，然后再删除dom
+
+```js
+import './test.css'
+
+import React, { PureComponent } from 'react'
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+
+export default class GroupAnimation extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      friends: []
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <TransitionGroup>
+          {
+            this.state.friends.map((item, index) => {
+              return (
+                <CSSTransition classNames="friend" timeout={300} key={index}>
+                  <div>{item}</div>
+                </CSSTransition>
+              )
+            })
+          }
+        </TransitionGroup>
+        <button onClick={e => this.addFriend()}>+friend</button>
+      </div>
+    )
+  }
+
+  addFriend() {
+    this.setState({
+      friends: [...this.state.friends, "coderwhy"]
+    })
+  }
+}
+```
+```css
+.friend-enter {
+    transform: translate(100%, 0);
+    opacity: 0;
+}
+
+.friend-enter-active {
+    transform: translate(0, 0);
+    opacity: 1;
+    transition: all 500ms;
+}
+
+.friend-exit {
+    transform: translate(0, 0);
+    opacity: 1;
+}
+
+.friend-exit-active {
+    transform: translate(-100%, 0);
+    opacity: 0;
+    transition: all 500ms;
+}
+```
+
+
+### react捕获错误
+
+```js
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // 更新 state 使下一次渲染能够显示降级后的 UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // 你同样可以将错误日志上报给服务器
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // 你可以自定义降级后的 UI 并渲染
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children; 
+  }
+}
+```
+
+下面这些情况无法捕获到异常：
+
++ 事件处理
++ 异步代码
++ 服务端渲染
++ 自身抛出来的错误
+
+在react 16版本之后，会把渲染期间发生的所有错误打印到控制台.
+
+可以利用trycatch或者window.addEventListener('error', function(event) { ... })去处理
+
+### 对React refs 的理解，应用场景
+React 中的 Refs提供了一种方式，允许我们访问 DOM节点或在 render方法中创建的 React元素
+
+本质为`ReactDOM.render()返回的组件实例`，如果是渲染组件则返回的是组件实例，如果渲染dom则返回的是具体的dom节点
+
++ ~~传入字符串，使用时通过 this.refs.传入的字符串的格式获取对应的元素(弃用)~~
++ 传入对象，对象是通过 React.createRef() 方式创建出来，使用时获取到创建的对象中存在 **current** 属性就是对应的元素
++ 传入函数，该函数会在 DOM 被挂载时进行回调，这个函数会传入一个 元素对象，可以自己保存，使用时，直接拿到之前保存的元素对象即可
++ 传入hook，hook是通过 useRef() 方式创建，使用时通过生成hook对象的 current 属性就是对应的元素
+
+```html
+<input	ref='k'/>
+<!-- 废弃 -->
+```
+```js
+import React, { Component, createRef } from 'react';  
+  
+// 类组件  
+class MyClassComponent extends Component {  
+  myMethod() {  
+    console.log('My method was called!');  
+    // 这里可以执行其他逻辑  
+  }  
+  render() {  
+    return <div>This is a class component</div>;  
+  }  
+}  
+  
+// 父组件  
+class ParentComponent extends Component {  
+  constructor(props) {  
+    super(props);  
+    // 创建一个 ref  
+    this.myClassComponentRef = createRef();  
+  }  
+  
+  componentDidMount() {  
+    // 通过 ref 访问类组件实例，并调用其方法  
+    this.myClassComponentRef.current.myMethod();  
+  }  
+  render() {  
+    return (  
+      <div>  
+        <MyClassComponent ref={this.myClassComponentRef} />  
+      </div>  
+    );  
+  }  
+}  
+export default ParentComponent;
+```
+```js
+import React, { PureComponent } from 'react';
+class App extends PureComponent {
+    constructor(props) {
+        super(props)
+        this.titleRef = null     // 定义一个初始值
+    }
+    render() {
+        return (
+            <div>
+                <h1 ref={arg => this.titleRef = arg}>Hello,React</h1>
+                <button onClick={e => this.changeText()}>函数改变文本</button>
+            </div>
+        );
+    }
+    changeText() {
+        console.log(this.titleRef)
+        this.titleRef.innerHTML = "Hello"
+    }
+}
+export default App;
+```
+```js
+function App(props) {
+  const myref = useRef()
+  return (
+    <>
+      <div ref={myref}></div>
+    </>
+  )
+}
+```
+#### 应用场景
+过多使用refs，会使组件的实例或者是DOM结构暴露，违反组件封装的原则
+
+例如，避免在 Dialog 组件里暴露 open() 和 close() 方法，最好传递 isOpen 属性
+
+但下面的场景使用refs非常有用：
+
++ 对Dom元素的焦点控制、内容选择、控制
++ 对Dom元素的内容设置及媒体播放
++ 对Dom元素的操作和对组件实例的操作
++ 集成第三方 DOM 库
+
+### setState执行机制
+一个组件的显示形态可以由数据状态和外部参数所决定，而数据状态就是state
+
+当需要修改里面的值的状态需要通过调用setState来改变，从而达到更新组件内部数据的作用
+
+
+```js
+changeText() {
+    this.state.message = "你好啊,李银河";
+}// 无作用
+```
+会发现页面并不会有任何反应，但是state的状态是已经发生了改变，这是因为React并不像vue2中调用Object.defineProperty数据响应式或者Vue3调用Proxy监听数据的变化
+
+必须通过**setState**方法来告知react组件state已经发生了改变
+
+```js
+Component.prototype.setState = function(partialState, callback) {
+  invariant(
+    typeof partialState === 'object' ||
+      typeof partialState === 'function' ||
+      partialState == null,
+    'setState(...): takes an object of state variables to update or a ' +
+      'function which returns an object of state variables.',
+  );
+  this.updater.enqueueSetState(this, partialState, callback, 'setState');
+};
+```
+可以看到setState第一个参数可以是一个对象，或者是一个函数，而第二个参数是一个回调函数，用于可以实时的获取到更新之后的数据
+
+#### setState更新类型
++ 异步更新
+
+```js
+changeText() {
+  this.setState({
+    message: "你好啊"
+  })
+  console.log(this.state.message); // Hello World
+}
+//最终打印结果为Hello world，并不能在执行完setState之后立马拿到最新的state的结果
+```
+
+如果想要立刻获取更新后的值，在第二个参数的回调中更新后会执行
+```js
+changeText() {
+  this.setState({
+    message: "你好啊"
+  }, () => {
+    console.log(this.state.message); // 你好啊
+  });
+}
+```
+
++ 同步更新
+
+```js
+changeText() {
+  setTimeout(() => {
+    this.setState({
+      message: "你好啊
+    });
+    console.log(this.state.message); // 你好啊
+  }, 0);
+}
+```
+```js
+componentDidMount() {
+  const btnEl = document.getElementById("btn");
+  btnEl.addEventListener('click', () => {
+    this.setState({
+      message: "你好啊,李银河"
+    });
+    console.log(this.state.message); // 你好啊,李银河
+  })
+}
+```
+
++ 在**组件生命周期或React合成事件**中，setState是异步
++ 在**setTimeout或者原生dom事件**中，setState是同步
+
+#### 批量更新
+
+```js
+handleClick = () => {
+    this.setState({
+        count: this.state.count + 1,
+    })
+    console.log(this.state.count) // 1
+
+    this.setState({
+        count: this.state.count + 1,
+    })
+    console.log(this.state.count) // 1
+
+    this.setState({
+        count: this.state.count + 1,
+    })
+    console.log(this.state.count) // 1
+}
+```
+点击按钮触发事件，打印的都是 1，页面显示 count 的值为 2
+
+对同一个值进行多次 setState， setState 的批量更新策略会对其进行覆盖，取最后一次的执行结果,上述的例子，实际等价于如下：
+
+```js
+Object.assign(
+  previousState,
+  {index: state.count+ 1},
+  {index: state.count+ 1},
+  ...
+)
+```
+如果是下一个state依赖前一个state的话，推荐给setState一个参数传入一个function
+```js
+onClick = () => {
+    this.setState((prevState, props) => {
+      return {count: prevState.count + 1};
+    });
+    this.setState((prevState, props) => {
+      return {count: prevState.count + 1};
+    });
+}
+```
+
+> 而在setTimeout或者原生dom事件中，由于是同步的操作，所以并不会进行覆盖现象
+
+### react render理解
+render函数在react中有两种形式
+```js
+class Foo extends React.Component {
+    render() {
+        return <h1> Foo </h1>;
+    }
+}
+```
+在函数组件中，指的是函数组件本身
+```js
+function Foo() {
+    return <h1> Foo </h1>;
+}
+```
+在render中，我们会编写jsx，jsx通过babel编译后就会转化成我们熟悉的js格式
+```js
+return (
+  <div className='cn'>
+    <Header> hello </Header>
+    <div> start </div>
+    Right Reserve
+  </div>
+)
+```
+```js
+return (
+  React.createElement(
+    'div',
+    {
+      className : 'cn'
+    },
+    React.createElement(
+      Header,
+      null,
+      'hello'
+    ),
+    React.createElement(
+      'div',
+      null,
+      'start'
+    ),
+    'Right Reserve'
+  )
+)
+```
+
+在react中，这个元素就是虚拟DOM树的节点，接收三个参数：
+
++ type：标签
++ attributes：标签属性，若无则为null
++ children：标签的子节点
+
+这些虚拟DOM树最终会渲染成真实DOM
+
+在render过程中，React 将新调用的 render函数返回的树与旧版本的树进行比较，这一步是决定如何更新 DOM 的必要步骤，然后进行 diff 比较，更新 DOM树
+
+#### render的触发时机
+render的执行时机主要分成了两部分：
+1. 类组件调用 setState 修改状态
+```js
+class Foo extends React.Component {
+  state = { count: 0 };
+
+  increment = () => {
+    const { count } = this.state;
+    const newCount = count < 10 ? count + 1 : count;
+    this.setState({ count: newCount });
+  };
+
+  render() {
+    const { count } = this.state;
+    console.log("Foo render");
+    return (
+      <div>
+        <h1> {count} </h1>
+        <button onClick={this.increment}>Increment</button>
+      </div>
+    );
+  }
+}
+```
+点击按钮，则调用setState方法，无论count是否发生变化，控制台都会输出Foo render，证明render执行了
+
+2. 函数组件通过useState hook修改状态
+```js
+function Foo() {
+  const [count, setCount] = useState(0);
+
+  function increment() {
+    const newCount = count < 10 ? count + 1 : count;
+    setCount(newCount);
+  }
+  console.log("Foo render");
+  return (
+    <div>
+      <h1> {count} </h1>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+函数组件通过useState这种形式更新数据，当数组的值不发生改变了，就不会触发render
+
+总结：render函数里面可以编写JSX，转化成createElement这种形式，用于生成虚拟DOM，最终转化成真实DOM；一旦执行了setState就会执行render方法，useState 会判断当前值有无发生改变确定是否执行render方法，***一旦父组件发生渲染，子组件也会渲染***
+
+
+### react中怎样避免子组件无效渲染和减少计算渲染
++ shouldComponentUpdate，当父组件的更新导致所有子组件都重新渲染，但某些子组件的 props 并未实际改变时；不过不要滥用，会影响性能
++ 16.3引入React.PureComponent(跟shouldComponentUpdate原理基本一致，通过对 props 和 state的浅比较结果来实现)
++ 函数组件中React.memo 是一个高阶组件，它会对组件的 props 进行浅比较，如果 props 没有变化，则不会重新渲染组件。
++ useMemo:当依赖项变化时采取执行
++ useCallback
+
+```js
+import React from 'react';  
+
+export default class C2 extends React.Component{
+  constructor(props){
+    super(props)
+    console.log(this.props)
+    this.state ={foo:this.props.foo}
+  }
+  shouldComponentUpdate(v1,v2){
+    console.log(v1,v2)
+    if(v1.foo === v2.foo) return false
+    return true
+  }
+  render(){
+    console.log('c2')
+    return <div>--{this.props.foo}--</div>
+  }
+}
+```
+
+```js
+import React from 'react';  
+
+let MyComponent = React.memo(function MyComponent({ foo }) {  
+  console.log('MyComponent rendered');  
+  return <div>{foo}</div>;  
+});  
+export default MyComponent
+
+  
+// 当 foo 属性变化时，组件会重新渲染  
+// 当 foo 属性没有变化时，组件不会重新渲染
+```
+
+```js
+import React, { useMemo } from 'react';  
+
+export default  function ExpensiveComputationComponent({ numbers }) {  
+  // 使用 useMemo 来缓存计算结果  
+  const computedNumbers = useMemo(() => {  
+    console.log('c2usememo') //父组件变化影响numbers才执行
+
+    // 假设这是一个昂贵的计算过程  
+    return numbers.map(num => num * 2);  
+  }, [numbers]); // 只有在 numbers 数组变化时才会重新计算  
+  console.log('c2') //父组件变化会执行
+  return (  
+    <div>  
+      {computedNumbers.map((num, index) => (  
+        <p key={index}>{num}</p>  
+      ))}  
+    </div>  
+  );  
+}
+```
+使用 useCallback 来记忆 handleClick 函数，这样，即使 ParentComponent 重新渲染，handleClick 的引用也不会改变  
+```js
+ const handleClick = useCallback(() => {  
+	console.log(111) // 点击会持续打印
+    setCount(count + 1); //在handleClick的闭包环境中，count的值始终是useCallback首次执行时的count值
+  }, []); 
+  
+  // 初始化触发一次
+  <ChildComponent onClick={handleClick} />  
+```
+
+
+### React Jsx转换成真实DOM过程
++ 使用React.createElement或JSX编写React组件，实际上所有的 JSX 代码最后都会转换成React.createElement(...) ，Babel帮助完成了这个转换的过程。
++ createElement函数对key和ref等特殊的props进行处理，并获取defaultProps对默认props进行赋值，并且对传入的孩子节点进行处理，最终构造成一个虚拟DOM对象
++ ReactDOM.render将生成好的虚拟DOM渲染到指定容器上，其中采用了批处理、事务等机制并且对特定浏览器进行了性能优化，最终转换为真实DOM
+
+jsx
+```html
+<div>
+  < img src="avatar.png" className="profile" />
+  <Hello />
+</div>
+```
+babel编译
+```js
+React.createElement(
+  "div",
+  null,
+  React.createElement("img", {
+    src: "avatar.png",
+    className: "profile"
+  }),
+  React.createElement(Hello, null)
+);
+```
+React.createElement其被调用时会传入标签类型type，标签属性props及若干子元素children，作用是生成一个虚拟Dom对象
+
+```js
+function createElement(type, config, ...children) {
+    if (config) {
+        delete config.__self;
+        delete config.__source;
+    }
+    // ! 源码中做了详细处理，⽐如过滤掉key、ref等
+    const props = {
+        ...config,
+        children: children.map(child =>
+   typeof child === "object" ? child : createTextNode(child)
+  )
+    };
+    return {
+        type,
+        props
+    };
+}
+function createTextNode(text) {
+    return {
+        type: TEXT,
+        props: {
+            children: [],
+            nodeValue: text
+        }
+    };
+}
+export default {
+    createElement
+};
+```
+render
+
+```js
+function render(vnode, container) {
+    console.log("vnode", vnode); // 虚拟DOM对象
+    // vnode _> node
+    const node = createNode(vnode, container);
+    container.appendChild(node);
+}
+
+// 创建真实DOM节点
+function createNode(vnode, parentNode) {
+    let node = null;
+    const {type, props} = vnode;
+    if (type === TEXT) {
+        node = document.createTextNode("");
+    } else if (typeof type === "string") {
+        node = document.createElement(type);
+    } else if (typeof type === "function") {
+        node = type.isReactComponent
+            ? updateClassComponent(vnode, parentNode)
+        : updateFunctionComponent(vnode, parentNode);
+    } else {
+        node = document.createDocumentFragment();
+    }
+    reconcileChildren(props.children, node);
+    updateNode(node, props);
+    return node;
+}
+
+// 遍历下子vnode，然后把子vnode->真实DOM节点，再插入父node中
+function reconcileChildren(children, node) {
+    for (let i = 0; i < children.length; i++) {
+        let child = children[i];
+        if (Array.isArray(child)) {
+            for (let j = 0; j < child.length; j++) {
+                render(child[j], node);
+            }
+        } else {
+            render(child, node);
+        }
+    }
+}
+function updateNode(node, nextVal) {
+    Object.keys(nextVal)
+        .filter(k => k !== "children")
+        .forEach(k => {
+        if (k.slice(0, 2) === "on") {
+            let eventName = k.slice(2).toLocaleLowerCase();
+            node.addEventListener(eventName, nextVal[k]);
+        } else {
+            node[k] = nextVal[k];
+        }
+    });
+}
+
+// 返回真实dom节点
+// 执行函数
+function updateFunctionComponent(vnode, parentNode) {
+    const {type, props} = vnode;
+    let vvnode = type(props);
+    const node = createNode(vvnode, parentNode);
+    return node;
+}
+
+// 返回真实dom节点
+// 先实例化，再执行render函数
+function updateClassComponent(vnode, parentNode) {
+    const {type, props} = vnode;
+    let cmp = new type(props);
+    const vvnode = cmp.render();
+    const node = createNode(vvnode, parentNode);
+    return node;
+}
+export default {
+    render
+};
+```
+
+![render之后流程](book_files/76.jpg)
+
+### Fiber架构的理解
+JavaScript引擎和页面渲染引擎两个线程是互斥的，当其中一个线程执行时，另一个线程只能挂起等待
+
+如果 JavaScript 线程长时间地占用了主线程，那么渲染层面的更新就不得不长时间地等待，界面长时间不更新，会导致页面响应度变差，用户可能会感觉到卡顿
+
+而这也正是 React 15 的 `Stack Reconciler`所面临的问题，当 React在渲染组件时，从开始到渲染完成整个过程是一气呵成的，无法中断
+
+如果组件较大，那么js线程会一直执行，然后等到整棵VDOM树计算完成后，才会交给渲染的线程
+
+这就会导致一些用户交互、动画等任务无法立即得到处理，导致卡顿的情况
+	
+#### React Fiber
++ 为每个增加了优先级，优先级高的任务可以中断低优先级的任务。然后再重新，注意是重新执行优先级低的任务
++ 增加了异步任务，调用requestIdleCallback api，浏览器空闲的时候执行
++ dom diff树变成了链表，一个dom对应两个fiber（一个链表），对应两个队列，这都是为找到被中断的任务，重新执行
+
+从架构角度来看，Fiber 是对 React核心算法（即调和过程）的重写
+
+从编码角度来看，Fiber是 React内部所定义的一种数据结构，它是 Fiber树结构的节点单位，也就是 React 16 新架构下的虚拟DOM
+
+一个 fiber就是一个 JavaScript对象，包含了元素的信息、该元素的更新操作队列、类型，其数据结构如下：
+```js
+type Fiber = {
+  // 用于标记fiber的WorkTag类型，主要表示当前fiber代表的组件类型如FunctionComponent、ClassComponent等
+  tag: WorkTag,
+  // ReactElement里面的key
+  key: null | string,
+  // ReactElement.type，调用`createElement`的第一个参数
+  elementType: any,
+  // The resolved function/class/ associated with this fiber.
+  // 表示当前代表的节点类型
+  type: any,
+  // 表示当前FiberNode对应的element组件实例
+  stateNode: any,
+
+  // 指向他在Fiber节点树中的`parent`，用来在处理完这个节点之后向上返回
+  return: Fiber | null,
+  // 指向自己的第一个子节点
+  child: Fiber | null,
+  // 指向自己的兄弟结构，兄弟节点的return指向同一个父节点
+  sibling: Fiber | null,
+  index: number,
+
+  ref: null | (((handle: mixed) => void) & { _stringRef: ?string }) | RefObject,
+
+  // 当前处理过程中的组件props对象
+  pendingProps: any,
+  // 上一次渲染完成之后的props
+  memoizedProps: any,
+
+  // 该Fiber对应的组件产生的Update会存放在这个队列里面
+  updateQueue: UpdateQueue<any> | null,
+
+  // 上一次渲染的时候的state
+  memoizedState: any,
+
+  // 一个列表，存放这个Fiber依赖的context
+  firstContextDependency: ContextDependency<mixed> | null,
+
+  mode: TypeOfMode,
+
+  // Effect
+  // 用来记录Side Effect
+  effectTag: SideEffectTag,
+
+  // 单链表用来快速查找下一个side effect
+  nextEffect: Fiber | null,
+
+  // 子树中第一个side effect
+  firstEffect: Fiber | null,
+  // 子树中最后一个side effect
+  lastEffect: Fiber | null,
+
+  // 代表任务在未来的哪个时间点应该被完成，之后版本改名为 lanes
+  expirationTime: ExpirationTime,
+
+  // 快速确定子树中是否有不在等待的变化
+  childExpirationTime: ExpirationTime,
+
+  // fiber的版本池，即记录fiber更新过程，便于恢复
+  alternate: Fiber | null,
+}
+```
+
+Fiber把渲染更新过程拆分成多个子任务，每次只做一小部分，做完看是否还有剩余时间，如果有继续下一个任务；如果没有，挂起当前任务，将时间控制权交给主线程，等主线程不忙的时候在继续执行
+
+即可以中断与恢复，恢复后也可以复用之前的中间状态，并给不同的任务赋予不同的优先级，其中每个任务更新单元为 React Element 对应的 Fiber节点
+
+实现的上述方式的是requestIdleCallback方法
+
+window.requestIdleCallback()方法将在浏览器的空闲时段内调用的函数排队。这使开发者能够在主事件循环上执行后台和低优先级工作，而不会影响延迟关键事件，如动画和输入响应
+
+首先 React 中任务切割为多个步骤，分批完成。在完成一部分任务之后，将控制权交回给浏览器，让浏览器有时间再进行页面的渲染。等浏览器忙完之后有剩余时间，再继续之前 React 未完成的任务，是一种合作式调度。
+
+该实现过程是基于 Fiber节点实现，作为静态的数据结构来说，每个 Fiber 节点对应一个 React element，保存了该组件的类型（函数组件/类组件/原生组件等等）、对应的 DOM 节点等信息。
+
+作为动态的工作单元来说，每个 Fiber 节点保存了本次更新中该组件改变的状态、要执行的工作。
+
+每个 Fiber 节点有个对应的 React element，多个 Fiber节点根据如下三个属性构建一颗树：
+```js
+// 指向父级Fiber节点
+this.return = null
+// 指向子Fiber节点
+this.child = null
+// 指向右边第一个兄弟Fiber节点
+this.sibling = null
+```
+通过这些属性就能找到下一个执行目标
+
+### react中key的作用
+跟Vue一样，React 也存在 Diff算法，而元素key属性的作用是用于判断元素是新创建的还是被移动的元素，从而减少不必要的元素渲染
+
+因此key的值需要为每一个元素赋予一个确定的标识
+
+如果列表数据渲染中，在数据后面插入一条数据，key作用并不大，如下：
+```js
+this.state = {
+    numbers:[111,222,333]
+}
+
+insertMovie() {
+  const newMovies = [...this.state.numbers, 444];
+  this.setState({
+    movies: newMovies
+  })
+}
+
+<ul>
+    {
+        this.state.movies.map((item, index) => {
+            return <li>{item}</li>
+        })
+    }
+</ul>
+```
+前面的元素在diff算法中，前面的元素由于是完全相同的，并不会产生删除创建操作，在最后一个比较的时候，则需要插入到新的DOM树中
+
+因此，在这种情况下，元素有无key属性意义并不大
+
+下面再来看看在前面插入数据时，使用key与不使用key的区别：
+```js
+insertMovie() {
+  const newMovies = [000 ,...this.state.numbers];
+  this.setState({
+    movies: newMovies
+  })
+}
+```
+当拥有key的时候，react根据key属性匹配原有树上的子元素以及最新树上的子元素，像上述情况只需要将000元素插入到最前面位置
+
+当没有key的时候，所有的li标签都需要进行修改
+
+同样，并不是拥有key值代表性能越高，如果说只是文本内容改变了，不写key反而性能和效率更高
+
+主要是因为不写key是将所有的文本内容替换一下，节点不会发生变化
+
+而写key则涉及到了节点的增和删，发现旧key不存在了，则将其删除，新key在之前没有，则插入，这就增加性能的开销
+
+### react diff算法
+跟Vue一致，React通过引入Virtual DOM的概念，极大地避免无效的Dom操作，使我们的页面的构建效率提到了极大的提升
+
+传统diff算法通过循环递归对节点进行依次对比，效率低下，算法复杂度达到 O(n^3)，react将算法进行一个优化，复杂度降维O(n)
+
+#### 原理
+react中diff算法主要遵循三个层级的策略：
++ tree层级(对整个组件树进行遍历和比较的过程)
+	- DOM节点跨层级的操作不做优化，只会对相同层级的节点进行比较
+	- 只有删除、创建操作，没有移动操作
++ conponent 层级
+	- 如果是同一个类的组件，则会继续往下diff运算，如果不是一个类的组件，那么直接删除这个组件下的所有子节点，创建新的
++ element 层级:对于比较同一层级的节点们，每个节点在对应的层级用唯一的key作为标识;提供了 3 种节点操作，分别为 **INSERT_MARKUP(插入)、MOVE_EXISTING (移动)和 REMOVE_NODE (删除)**
+
+![tree](book_files/77.jpg)
+![tree](book_files/78.jpg)
+react发现新树中，R节点下没有了A，那么直接删除A，在D节点下创建A以及下属节点，上述操作中，只有删除和创建操作
+
+![component](book_files/79.jpg)
+当component D换成了component G 后，即使两者的结构非常类似，也会将D删除再重新创建G
+
+![element](book_files/80.jpg)
+通过key可以准确地发现新旧集合中的节点都是相同的节点，因此无需进行节点删除和创建，只需要将旧集合中节点的位置进行移动，更新为新集合中节点的位置
+![index](book_files/81.jpg)
+
++ index： 新集合的遍历下标。
++ oldIndex：当前节点在老集合中的下标
++ maxIndex：在新集合访问过的节点中，其在老集合的最大下标
+
+如果当前节点在新集合中的位置比老集合中的位置靠前的话，是不会影响后续节点操作的，这里这时候被动字节不用动
+
+操作过程中只比较oldIndex和maxIndex，规则如下：
++ 当oldIndex>maxIndex时，将oldIndex的值赋值给maxIndex
++ 当oldIndex=maxIndex时，不操作
++ `当oldIndex<maxIndex时，将当前节点移动到index的位置`
+
+diff过程如下：
++ 节点B：此时 maxIndex=0，oldIndex=1；满足 maxIndex< oldIndex，因此B节点不动，此时maxIndex= Math.max(oldIndex, maxIndex)，就是1
++ 节点A：此时maxIndex=1，oldIndex=0；不满足maxIndex< oldIndex，因此A节点进行移动操作，此时maxIndex= Math.max(oldIndex, maxIndex)，还是1
++ 节点D：此时maxIndex=1, oldIndex=3；满足maxIndex< oldIndex，因此D节点不动，此时maxIndex= Math.max(oldIndex, maxIndex)，就是3
++ 节点C：此时maxIndex=3，oldIndex=2；不满足maxIndex< oldIndex，因此C节点进行移动操作，当前已经比较完了
+
+当ABCD节点比较完成后，diff过程还没完，还会整体遍历老集合中节点，看有没有没用到的节点，有的话，就删除
+
+> old>max,max更新为新值，元素不懂，`当old<max`，则移动元素到对应的max标记的位置
+
+#### 简单类型加key和不加key的性能
+
+由于dom节点的移动操作开销是比较昂贵的，没有key的情况下要比有key的性能更好
+```js
+1.加key
+<div key='1'>1</div>             <div key='1'>1</div>     
+<div key='2'>2</div>             <div key='3'>3</div>  
+<div key='3'>3</div>  ========>  <div key='2'>2</div>  
+<div key='4'>4</div>             <div key='5'>5</div>  
+<div key='5'>5</div>             <div key='6'>6</div>  
+操作：节点2移动至下标为2的位置，新增节点6至下标为4的位置，删除节点4。
+
+2.不加key
+<div>1</div>             <div>1</div>     
+<div>2</div>             <div>3</div>  
+<div>3</div>  ========>  <div>2</div>  
+<div>4</div>             <div>5</div>  
+<div>5</div>             <div>6</div> 
+操作：修改第1个到第5个节点的innerText
+```
+
+### react hooks的理解
+Hook 是 React 16.8 的新增特性。它可以在不编写 class 的情况下使用 state 以及其他的 React 特性，其本质是一系列特殊的函数。
+
+#### 常见的hooks
++ useState
++ useEffect
++ useCallback
++ useMemo
++ useRef
++ useReducer:React中用于管理组件内部状态的一个强大工具，它使得状态管理更加灵活和可维护
++ useContext:获取上下文数据
+
+```js
+import React, { useState, useEffect } from 'react';
+function Example() {
+  const [count, setCount] = useState(0);
+ 
+  useEffect(() => {    document.title = `You clicked ${count} times`;  });
+  return (
+    <div>
+      <p>You clicked {count} times</p >
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+```
+
+
+在组件中调用useReducer：在组件函数内部，调用useReducer并传入reducer函数和状态的初始值。useReducer返回一个数组，第一个元素是当前的状态，第二个元素是一个dispatch函数，用于分发动作。
+```js
+  
+import React, { useReducer } from 'react';  
+
+function reducer(state, action) {  
+  switch (action.type) {  
+    case 'increment':  
+      return { count: state.count + 1 };  
+    case 'decrement':  
+      return { count: state.count - 1 };  
+    default:  
+      throw new Error();  
+  }  
+}
+
+export default function Counter() {  
+  const [state, dispatch] = useReducer(reducer, { count: 0 });  
+  return (  
+    <div>  
+      <p>Count: {state.count}</p>  
+      <button onClick={() => dispatch({ type: 'increment' })}>Increment</button>  
+      <button onClick={() => dispatch({ type: 'decrement' })}>Decrement</button>  
+    </div>  
+  );  
+}
+```
+
+#### hooks作用
+hooks能够更容易解决状态相关的重用的问题：
++ 每调用useHook一次都会生成一份独立的状态
++ 通过自定义hook能够更好的封装我们的功能
+
+编写hooks为函数式编程，每个功能都包裹在函数中，整体风格更清爽，更优雅
+
+
+#### 自定义hooks
+
+```js
+import { useState } from 'react';  
+  
+// 自定义Hook: useCounter  
+function useCounter() {  
+  // 使用useState初始化计数值为0  
+  const [count, setCount] = useState(0);  
+  
+  // 定义一个增加计数的函数  
+  const increment = () => {  
+    setCount(count + 1);  
+  };  
+  
+  // 返回计数状态和增加计数的函数  
+  return [count, increment];  
+}  
+  
+// 使用自定义Hook的组件  
+function CounterComponent() {  
+  // 使用自定义Hook获取计数状态和增加计数的函数  
+  const [count, increment] = useCounter();  
+  
+  return (  
+    <div>  
+      <p>Count: {count}</p>  
+      <button onClick={increment}>Increment</button>  
+    </div>  
+  );  
+}  
+  
+export default CounterComponent;
+```
+
 
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
@@ -4830,7 +7048,7 @@ window.moveTo(0, 0); // 将窗口左上角移动到屏幕左上角
 window.moveBy(50, 100); // 将窗口向右移动50像素，向下移动100像素  
 ```
 
-#### location
+### location
 
 它提供了关于当前窗口或标签页中显示的URL的信息，并允许你解析URL的各个部分，以及重定向浏览器到新的URL
 
@@ -4839,7 +7057,7 @@ window.moveBy(50, 100); // 将窗口向右移动50像素，向下移动100像素
 + hash改变，不会发送请求，因为 hash 部分（即URL中 # 符号及其后面的部分）通常用于表示页面内的某个位置或状态
 + 而路由history模式，由于使用了History API【`history.pushState()` 和 `history.replaceState()`（在不重新加载页面的情况下修改历史记录）】，它们不会导致页面重新加载或发送HTTP请求到服务器。相反，前端js代码会监听这些URL变化，并相应地更新页面内容或组件，从而实现SPA中的无刷新页面导航。
 
-#### history
+### history
 History 对象是 window 对象的一部分，可通过 window.history 属性对其进行访问。
 
 属性	|描述
@@ -4855,6 +7073,39 @@ go()	|可加载历史列表中的某个具体的页面。
 go() 方法。
 ```js
 history.go(number) //-1上一个页面，1前进一个页面
+```
+
+### 获取当前页面URL参数
+```js
+// // 传统方式
+function query(name) {
+    const search = location.search.substr(1) // 类似 array.slice(1)
+     //a=30&b=40&c=50&d=60
+    const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`, 'i')
+    const res = search.match(reg)
+    console.warn(res)
+    if (res === null) {
+        return null
+    }
+    return res[2]
+}
+// 第一位匹配到的全局，后面依次是每个小括号对应的
+// ([^&]*)：非&符号的内容
+console.warn(query('a'))
+//  ['&c=50&', '&', '50', '&', index: 9, input: 'a=30&b=40&c=50&d=60', groups: undefined]
+console.warn(query('c'))
+// ['a=30&', '', '30', '&', index: 0, input: 'a=30&b=40&c=50&d=60', groups: undefined]
+```
+也可以不使用正则，利用&符合=号拆分两次获取。
+
+利用URLSearchParams这个API，注意兼容性
+```js
+function query(name) {
+        const search = location.search
+        const p = new URLSearchParams(search)
+        return p.get(name)
+    }
+console.log( query('b') )
 ```
 
 ## 移动端
