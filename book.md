@@ -156,6 +156,8 @@
       - [vue前端代码错误处理](#vue前端代码错误处理)
     - [vue keep-alvie](#vue-keep-alvie)
       - [缓存后如何获取数据](#缓存后如何获取数据)
+    - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
+    - [Vue动态组件和异步组件](#vue动态组件和异步组件)
     - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
       - [SPA首屏加载优化](#spa首屏加载优化)
@@ -204,6 +206,10 @@
       - [常见的hooks](#常见的hooks)
       - [hooks作用](#hooks作用)
       - [自定义hooks](#自定义hooks)
+    - [react 性能优化](#react-性能优化)
+    - [react-router理解](#react-router理解)
+      - [useSearchParams的应用](#usesearchparams的应用)
+      - [react路由传参的形式](#react路由传参的形式)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -229,6 +235,15 @@
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
+    - [手写instanceOf](#手写instanceof)
+    - [手写new操作符](#手写new操作符)
+    - [手写call apply bind](#手写call-apply-bind)
+    - [手写防抖节流](#手写防抖节流)
+    - [手写深拷贝](#手写深拷贝)
+    - [手写Object.create](#手写objectcreate)
+    - [手写简单axios](#手写简单axios)
+    - [手写router](#手写router)
+  - [webpack](#webpack)
 
 
 ## html
@@ -4479,6 +4494,8 @@ filters: {
 </child>
 ```
 
+![插槽](book_files/90.jpg)
+
 + 作用域插槽：子组件在**作用域上绑定属性**来将子组件的信息传给父组件使用，这些属性会被挂在**父组件v-slot**接受的对象上
 
 父组件中在使用时通过v-slot:（简写：#）获取子组件的信息，在内容中使用
@@ -4772,6 +4789,45 @@ activated(){
    this.getData() // 获取数据
 },
 ```
+
+### Keep-alive和v-if一起使用情况
+```html
+<keep-alive>
+   <myCom v-if="keyVal" />
+<otherCom v-else />
+</keep-alive>
+```
+在切换keyVal的值为false和true时，当第一次切换到两个组件的时候，myCom 与 otherCom 的mounted、activated生命周期都会被触发（先mounted后activated），等再次切换回来的时候，只会触发activated，注意此处也可以用component is的代替，代码规范上也更合适一些。
+```html
+<keep-alive>
+      <component :is="keyVal?'myCom':'otherCom '"></component>
+</keep-alive>
+```
+注意点：正常理解v-if会删除dom重新创建，但是组件外套keep-alive之后，虽然确实会移除dom（可以打开控制台发现dom确实被移除了），但是dom结构会保存在缓存中，当被v-if为true时候直接搬回来，并不会再重新绘制dom，就**不会激发mounted生命周期**。
+
+
+### Vue动态组件和异步组件
+```html
+<!-- 使用场景：tab切换，常配合keep-alive使用
+使用关键：内置组件 + is属性 -->
+ 
+<!-- 内置组件： <component></component>
+is属性：绑定一个变量，其值为组件名称字符串，eg:     -->
+<component :is="com"></component>
+<script>
+import Left from './LeftComponent.vue'
+import Right from './RightComponent.vue'
+data(){
+    com: 'Left'
+}
+```
+Vue.js中的异步组件可以通过使用import()方法来实现。import()方法是ES2015中的一个语法，用于动态地加载JavaScript模块。在Vue.js中，可以使用import()方法来动态地加载和渲染组件。
+
+### Vuex的使用
+Mutations：处理原子操作
+
+Actions：可以处理多个Mutations和异步操作
+![vuex](book_files/91.jpg)
 
 
 ### SPA
@@ -6664,6 +6720,11 @@ Hook 是 React 16.8 的新增特性。它可以在不编写 class 的情况下�
 + useReducer:React中用于管理组件内部状态的一个强大工具，它使得状态管理更加灵活和可维护
 + useContext:获取上下文数据
 
++ useNavigate
++ useLocation
++ useParams
++ useSearchParams
+
 ```js
 import React, { useState, useEffect } from 'react';
 function Example() {
@@ -6753,6 +6814,268 @@ function CounterComponent() {
 export default CounterComponent;
 ```
 
+### react 性能优化
+当我们想要更新一个子组件的时候，如下图绿色部分：
+
+![1](book_files/87.jpg)
+
+理想状态只调用该路径下的组件render：
+
+![2](book_files/88.jpg)
+
+但是react的默认做法是调用所有组件的render，再对生成的虚拟DOM进行对比（黄色部分），如不变则不进行更新
+
+![3](book_files/89.jpg)
+
+从上图可见，黄色部分diff算法对比是明显的性能浪费的情况
+
+主要手段是通过shouldComponentUpdate、PureComponent、React.memo
+
+除此之外， 常见性能优化常见的手段有如下：
++ 避免使用内联函数
++ 使用 React Fragments 避免额外标记
++ 使用 Immutable
++ 懒加载组件
++ 事件绑定方式
++ 服务端渲染
++ 组件拆分、合理使用hooks等性能优化手段
+
+如果使用内联函数，则每次调用render函数时都会创建一个新的函数实例
+```js
+import React from "react";
+
+export default class InlineFunctionComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={(e) => { this.setState({inputValue: e.target.value}) }} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+```
+应该在组件内部创建一个函数，并将事件绑定到该函数本身。这样每次调用 render 时就不会创建单独的函数实例
+```js
+import React from "react";
+
+export default class InlineFunctionComponent extends React.Component {
+  
+  setNewStateData = (event) => {
+    this.setState({
+      inputValue: e.target.value
+    })
+  }
+  
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={this.setNewStateData} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+```
+
+### react-router理解
+react-router主要分成了几个不同的包：
+1. react-router: 实现了路由的核心功能
+2. react-router-dom： 基于 react-router，加入了在浏览器运行环境下的一些功能
+3. react-router-native：基于 react-router，加入了 react-native 运行环境下的一些功能
+4. react-router-config: 用于配置静态路由的工具库
+
+react-router-dom v6版本修改了很多属性
+```
+默认即精确匹配
+移除了子组件的props中默认带着的histroy等属性，现在需要借助useHistory hooks去获取
+移除了redirect，用<Navigate to="/" replace />取代
+移除了switch，用routes取代
+```
+
++ NavLink:封装的a，加持了activeStyle【活跃时（匹配时）的样式】和activeClassName（添加className用）
++ useSearchParams 是 React Router DOM 库中用于处理 URL 查询参数（query parameters）的 React Hook。
++ useLocation 是 react-router-dom 库中的一个钩子（hook），它主要用于获取当前路由的位置信息。通过 useLocation，可以访问到当前 URL 的详细信息，包括 pathname（路径名）、search（查询字符串）以及 hash（哈希部分）等。
+```js
+import { BrowserRouter as Router, Route, Routes,NavLink } from "react-router-dom";  
+import Contact from "./component/Contact";
+import About  from "./component/About";
+import Detail from "./component/Detail";
+export default function App() {  
+  return (  
+    <Router>  
+      <main>  
+        <nav>  
+          <ul>  
+            <li>  
+              <a href="/">Home</a>  
+            </li>  
+            <li>  
+              <a href="/about">About</a>  
+            </li>  
+            <li>  
+              <a href="/contact">Contact</a>  
+            </li>  
+           
+          </ul>  
+          <NavLink to="/" exact activeStyle={{color: "red"}}>首页</NavLink>
+
+          {/* {userName && (  
+          <NavLink to={`/about/${userName}`}>About</NavLink>  
+        )}   */}
+          <NavLink to="/about/tom" activeStyle={{color: "red"}}>关于</NavLink>
+          <NavLink to="/contact" activeStyle={{color: "red"}}>链接</NavLink>
+          //   传参
+		  <NavLink to={{
+              pathname: "/detail2", 
+              query: {name: "kobe", age: 30},
+              state: {height: 1.98, address: "洛杉矶"},
+              search: "?apikey=123"
+            }}>
+            详情2
+        </NavLink>
+        </nav>  
+        <Routes>  
+          <Route path="/" element={<h1>Welcome to Home!</h1>} /> 
+		   // 传参
+          <Route path="/about/:name" element={<About/>} />  
+          <Route path="/contact" element={ <Contact/> } />  
+          <Route path="/detail2" element={ <Detail/> } />  
+
+        </Routes>  
+      </main>  
+    </Router>  
+  );  
+}
+```
+
+```js
+import {Fragment} from 'react'
+import { useNavigate } from 'react-router-dom';  
+const Contact = () =>{
+   const navigate = useNavigate();  
+   return <Fragment>
+      <h1>Contact</h1>
+      <button onClick={() => navigate("/")}>Go to home</button>
+    </Fragment>
+};
+
+  export default Contact
+```
+```js
+import { Fragment, useEffect } from "react";
+import { Navigate, useLocation,useParams } from "react-router-dom";
+const About = () => {
+  const { name } = useParams();  
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log(name);
+  }, [name, location]);
+
+  // 如果 name 不是 "tom"，则重定向到根路径
+  if (name !== "tom") {
+    return <Navigate to="/" replace />; // 使用 Navigate 组件进行重定向
+  }
+  return (
+    <Fragment>
+      <h1>About {name}</h1>
+    </Fragment>
+  );
+};
+
+export default About;
+```
+```js
+import { Fragment, useEffect } from "react";
+// import {Redirect} from 'react-router-dom'
+import { Navigate, useLocation,useParams, useSearchParams } from "react-router-dom";
+const Detail = (props) => {
+   
+    const val = useLocation()// {pathname: '/detail2', search: '?apikey=123', hash: '', state: null, key: 'gv3sr6yo'}
+    const [search] = useSearchParams() //123
+
+    console.log(search.get('apikey'))
+
+    // console.log(val1)
+  return (
+    <Fragment>
+      <h1> Detail </h1>
+    </Fragment>
+  );
+};
+
+export default  Detail ;
+
+```
+
+#### useSearchParams的应用
+
+```js
+import { useSearchParams } from 'react-router-dom';  
+  
+function MyComponent() {  
+  // 使用 useSearchParams 获取当前的查询参数对象  
+  let [searchParams] = useSearchParams();  
+  
+  // 读取查询参数  
+  let param1 = searchParams.get('param1');  
+  let param2 = searchParams.get('param2');  
+  
+  // 修改查询参数  
+  function handleUpdateParam1(event) {  
+    searchParams.set('param1', event.target.value);  
+    // 注意：调用 searchParams 的方法并不会自动更新 URL，你需要使用下面的方式触发更新  
+  }  
+  
+  // 触发 URL 更新  
+  function handleSubmit(event) {  
+    event.preventDefault();  
+    // 使用 replace 或 push 来导航到新 URL  
+    window.history.replaceState({}, '', `${window.location.pathname}?${searchParams}`);  
+  }  
+  
+  return (  
+    <form onSubmit={handleSubmit}>  
+      <label>  
+        Param 1:  
+        <input  
+          type="text"  
+          value={param1 || ''}  
+          onChange={handleUpdateParam1}  
+        />  
+      </label>  
+      {/* 其他表单字段和提交按钮 */}  
+    </form>  
+  );  
+}  
+  
+export default MyComponent;
+```
+
+#### react路由传参的形式
+动态路由
+```html
+<NavLink to="/detail/abc123">详情</NavLink>
+<Route path="/detail/:id" component={Detail}/>
+```
+search传递参数
+```js
+<NavLink to="/detail2?name=why&age=18">详情2</NavLink>
+<Route path="/detail2" component={Detail2}/>
+```
+to传入对象或字符串
+```js
+<NavLink to={{
+    pathname: "/detail2", 
+    query: {name: "kobe", age: 30},
+    state: {height: 1.98, address: "洛杉矶"},
+    search: "?apikey=123"
+  }}>
+  详情2
+</NavLink>
+<Route path="/detail2" component={Detail2}/>
+```
 
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
@@ -7379,3 +7702,350 @@ ajax(url)
 .then(res => console.log(res))
 .catch(err => console.error(err))
 ```
+
+### 手写instanceOf
+原理：查找原型链
+```js
+function myInstanceOf(current, fun) {  
+	// 检查 current 是否为 null 或 undefined  
+	if (current === null || current === undefined) {  
+		return false;  
+	}  
+	  
+	// 检查 fun 是否是函数并且拥有 prototype 属性  
+	if (typeof fun !== 'function' || fun.prototype === undefined) {  
+		return false;  
+	}  
+	  
+	// 遍历原型链  
+	while (true) {  
+		// 如果找到匹配的原型，则返回 true  
+		if (Object.getPrototypeOf(current) === fun.prototype) {  
+			return true;  
+		}  
+		  
+		// 如果到达原型链的顶端（null），则返回 false  
+		current = Object.getPrototypeOf(current);  
+		if (current === null) {  
+			return false;  
+		}  
+	}  
+}
+console.warn(myInstanceOf([],Array))//true
+console.warn(myInstanceOf([],Object))//true
+console.warn(myInstanceOf([],null))//false
+console.warn(myInstanceOf('',String))//true 可考虑再增加current是否是对象的判断
+
+console.warn('' instanceof String)//false
+```
+
+### 手写new操作符
+原理：绑定原型链 + 显式绑定this + 返回判断
+```js
+function mynew(func, ...args) {
+ const obj = {}
+ obj.__proto__ = func.prototype
+ let result = func.apply(obj, args)
+ return result instanceof Object ? result : obj
+}
+function Person(name, age) {
+ this.name = name;
+ this.age = age;
+}
+Person.prototype.say = function () {
+ console.log(this.name)
+}
+let p = mynew(Person, "huihui", 123)
+console.log(p) // Person {name: "huihui", age: 123}
+p.say() // huihui
+```
+
+### 手写call apply bind
+原理：借，对目标对象添加上函数方法，再删除
+```js
+Function.prototype.myCall = function(context) {
+		  console.log(this) //fn a()
+		  if (typeof this !== 'function') {
+			throw new TypeError('Error')
+		  }
+		  context = context || window
+		  console.log(context)//obj
+		  context.fn = this
+		  console.log(typeof context.fn)//function
+		  
+		  const args = [...arguments].slice(1)
+		  console.log(args)
+		  //通过隐式绑定的方式调用函数
+		  const result = context.fn(...args)
+		   //删除添加的属性
+		  delete context.fn
+		   //返回函数调用的返回值
+		  return result
+}
+
+let obj ={
+	name:333
+}
+
+function a(){
+	console.log(this.name)
+}
+a.myCall(obj)
+
+```
+
+注意bind的用法，bind可以`分批添加参数`，所以需要拼接，而且bind返回的是函数，考虑`兼容new`的情形。
+```js
+Function.prototype.myBind = function(context, ...args) {  
+	  const originalFunction = this;  
+	  
+	  // 返回一个新函数  
+	  return function F(...boundArgs) {  
+	    // 如果通过 new 调用，则忽略 context，使用新创建的实例  
+	    if (this instanceof F) {  
+	      // 相当于执行 new originalFunction(...args, ...boundArgs)  
+	      return new originalFunction(...args, ...boundArgs);  
+	    }  
+	  
+	    // 否则，使用提供的 context 和合并的参数调用原函数  
+	    return originalFunction.apply(context, args.concat(boundArgs));  
+	  };  
+	};  
+	  
+	// 使用示例  
+	function MyConstructor(a, b) {  
+	  this.a = a;  
+	  this.b = b;  
+	}  
+	  
+	MyConstructor.prototype.getValue = function() {  
+	  return this.a + this.b;  
+	};  
+	  
+	const boundConstructor = MyConstructor.myBind(null, 1);  
+	  
+	// 使用 new 调用 boundConstructor  
+	const instance = new boundConstructor(2);  
+	console.log(instance.getValue()); // 输出 3  
+	  
+	// 普通函数调用  
+	const result = boundConstructor(3);  
+	console.log(result); // 输出 MyConstructor 的返回值，如果没有显式返回，则为 undefined
+```
+
+### 手写防抖节流
+原理：借助`闭包`或者全局变量对时间的把握
+```html
+<html>
+<style>
+	#test{
+		width:400px;
+		height:400px;
+		border:1px solid red
+	}
+</style>
+<body class="m-2">
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+	<div id="test">1111</div>
+  <script>
+		function throttle(fn, delay) {
+		  // last为上一次触发回调的时间, timer是定时器
+		  let last = 0, timer = null
+		  return function () { 
+		    // 保留调用时的this上下文
+		    let context = this
+		    // 保留调用时传入的参数
+		    let args = arguments
+		    // 记录本次触发回调的时间
+		    let now = +new Date()
+		
+		    // 判断上次触发的时间和本次触发的时间差是否小于时间间隔的阈值
+		    if (now - last < delay) {
+		    // 如果时间间隔小于我们设定的时间间隔阈值，则为本次触发操作设立一个新的定时器
+		       clearTimeout(timer)
+		       timer = setTimeout(function () {
+		          last = now
+		          fn.apply(context, args)
+		        }, delay)
+		    } else {
+		        // 如果时间间隔超出了我们设定的时间间隔阈值，那就不等了，无论如何要反馈给用户一次响应
+		        last = now
+		        fn.apply(context, args)
+		    }
+		  }
+		}
+		// 用新的throttle包装scroll的回调
+		const better_scroll = throttle(() => console.log('触发了滚动事件'), 1000)
+		
+		document.addEventListener('scroll', better_scroll)
+  </script>
+</body>
+
+</html>
+```
+
+### 手写深拷贝
+原理：遍历属性，遇到对象数组`递归`
+```js
+//定义检测数据类型的功能函数
+function checkedType(target) {
+  return Object.prototype.toString.call(target).slice(8, -1)
+}
+//实现深度克隆---对象/数组
+function clone(target) {
+  //判断拷贝的数据类型
+  //初始化变量result 成为最终克隆的数据
+  let result,
+    targetType = checkedType(target)
+  if (targetType === 'Object') {
+    result = {}
+  } else if (targetType === 'Array') {
+    result = []
+  } else {
+    return target
+  }
+  //遍历目标数据
+  for (let i in target) {
+    //获取遍历数据结构的每一项值。
+    let value = target[i]
+    //判断目标结构里的每一值是否存在对象/数组
+    if (checkedType(value) === 'Object' || checkedType(value) === 'Array') {
+      //对象/数组里嵌套了对象/数组
+      //继续遍历获取到value值
+      result[i] = clone(value)
+    } else {
+      //获取到value值是基本的数据类型或者是函数。
+      result[i] = value
+    }
+  }
+  return result
+}
+```
+
+
+### 手写Object.create
+```js
+function object(o) {
+　　function F() {}
+　　F.prototype = o;
+　　return new F();
+}
+```
+
+### 手写简单axios
+```js
+class Axios {
+    constructor() {
+
+    }
+
+    request(config) {
+        return new Promise(resolve => {
+            const {url = '', method = 'get', data = {}} = config;
+            // 发送ajax请求
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            xhr.onload = function() {
+                console.log(xhr.responseText)
+                resolve(xhr.responseText);
+            }
+            xhr.send(data);
+        })
+    }
+}
+```
+```js
+// 最终导出axios的方法，即实例的request方法
+function CreateAxiosFn() {
+    let axios = new Axios();
+    let req = axios.request.bind(axios);
+    return req;
+}
+
+// 得到最后的全局变量axios
+let axios = CreateAxiosFn();
+```
+
+### 手写router
+
+```js
+// 定义 Router   hash路由
+class Router {  
+    constructor () {  
+        this.routes = {}; // 存放路由path及callback  
+        this.currentUrl = '';  
+          
+        // 监听路由change调用相对应的路由回调  
+        window.addEventListener('load', this.refresh, false);  
+        window.addEventListener('hashchange', this.refresh, false);  
+    }  
+      
+    route(path, callback){  
+        this.routes[path] = callback;  
+    }  
+      
+    push(path) {  
+        this.routes[path] && this.routes[path]()  
+    }  
+}  
+  
+// 使用 router  
+window.miniRouter = new Router();  
+miniRouter.route('/', () => console.log('page1'))  
+miniRouter.route('/page2', () => console.log('page2'))  
+  
+miniRouter.push('/') // page1  
+miniRouter.push('/page2') // page2  
+```
+
++ history.pushState 浏览器历史纪录添加记录
++ history.replaceState修改浏览器历史纪录中当前纪录
++ history.popState 当 history 发生变化时触发
+
+```js
+// 定义 Router  
+class Router {  
+    constructor () {  
+        this.routes = {};  
+        this.listerPopState()  
+    }  
+      
+    init(path) {  
+        history.replaceState({path: path}, null, path);  
+        this.routes[path] && this.routes[path]();  
+    }  
+      
+    route(path, callback){  
+        this.routes[path] = callback;  
+    }  
+      
+    push(path) {  
+        history.pushState({path: path}, null, path);  
+        this.routes[path] && this.routes[path]();  
+    }  
+      
+    listerPopState () {  
+        window.addEventListener('popstate' , e => {  
+            const path = e.state && e.state.path;  
+            this.routers[path] && this.routers[path]()  
+        })  
+    }  
+}  
+  
+// 使用 Router  
+  
+window.miniRouter = new Router();  
+miniRouter.route('/', ()=> console.log('page1'))  
+miniRouter.route('/page2', ()=> console.log('page2'))  
+  
+// 跳转  
+miniRouter.push('/page2')  // page2  
+```
+
+## webpack
