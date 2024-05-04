@@ -158,6 +158,7 @@
       - [缓存后如何获取数据](#缓存后如何获取数据)
     - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
     - [Vue动态组件和异步组件](#vue动态组件和异步组件)
+    - [Vuex的使用](#vuex的使用)
     - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
       - [SPA首屏加载优化](#spa首屏加载优化)
@@ -244,6 +245,11 @@
     - [手写简单axios](#手写简单axios)
     - [手写router](#手写router)
   - [webpack](#webpack)
+    - [webpack五个核心概念](#webpack五个核心概念)
+    - [谈谈webpack升级变化](#谈谈webpack升级变化)
+    - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
+      - [loader和plugin](#loader和plugin)
+    - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
 
 
 ## html
@@ -4369,6 +4375,19 @@ diff 算法是一种通过同层的树节点进行比较的高效算法
 
 diff 算法在很多场景下都有应用，在 vue 中，作用于虚拟 dom 渲染成真实 dom 的新旧 VNode 节点比较
 
+#### Vue中diff算法怎样降低时间复杂度
+当页面进行渲染后，会生成一个虚拟DOM保存在内存中，节点发生变化时又生成新的虚拟DOM，传统的Diff算法是通过遍历循环对比新的虚拟DOM与之前保存的旧的虚拟DOM之间的变化（两层嵌套时间复杂度为O（n^2） ），如果每个节点都有变化则需要更新的操作，所以传统的Diff算法的时间复杂度是O(n ^3)。如果DOM的节点非常多，显然这个代价也是非常高的。
+优化后的diff算法O(n)：
+1. 只同级比较，不跨级比较
+2. tag不同，直接删除重建，不再深度比较
+3. tag和key两者新旧相同，则认为是相同节点，不再深度比较
+
+![key](book_files/94.jpg)
+
+如同Snabbdom中，调用patch(elem,vnode)和patch(vnode,newVnode);
+
+在updateChildren中，可以快速利用key和tag去判断是否是同一个元素。如果是，借助patchVode进行对比，判断到底该怎么去操作它的新旧值，是removeVnodes还是addVnodes内容，是children还是text等。
+
 ### Vue中组件和插件有什么区别
 组件就是把图形、非图形的各种逻辑均抽象为一个统一的概念（组件）来实现开发的模式，在Vue中每一个.vue文件都可以视为一个组件.插件通常用来为 Vue 添加全局功能。
 
@@ -8049,3 +8068,72 @@ miniRouter.push('/page2')  // page2
 ```
 
 ## webpack
+webpack是一个`打包模块化js工具`，在webpack里一切文件皆模块，通过loader转换文件，通过plugin注入钩子，最后输出由多个模块组合成的文件，webpack专注构建模块化项目。
+![webpack](book_files/93.jpg)
+
+### webpack五个核心概念
+1. Entry
+2. Output
+3. Loader:可以用于对模块的源代码进行转换(主要职责：转成webpack可识别的文件)
+4. Plugins:插件，可在打包优化、资源管理、环境变量注入
+5. Mode
+
+### 谈谈webpack升级变化
+
+1. 从v3到v4
+	+ 提出零配置概念 - 简化配置
+	+ 区分开发和编译态
+		- mode
+		- 提升了开发编译效率，让生成环境更加专注编译产品
+	+ 配置差异
+		- 分chunk=> commonTrunkPlugin => optimization.splitChunks
+2. v4=>v5
+	+ 持久化缓存=> cache => 直接利用缓存结果反向跳过构建部分
+	+ 资源模块的优化 => asset/resource
+	+ 打包优化
+
+```js
+splitChunks:{
+	chunks:'all',
+	minSize:{
+		javascript:30000
+	}
+}
+```
+
+### 说出几个常见的loader和plugin
+
+1. 几个常见的webpack-loader
+	+ file-loader：把文件识别后打包（w4）
+	+ url-loader：和 file-loader 类似，但能在文件很小的情况下以 base64 的方式把文件内容注入到代码中去（w4）
+	+ image-loader：加载并且压缩图片文件
+	+ css-loader：加载 CSS，支持模块化、压缩、文件导入等特性，负责将 Css 文件编译成 Webpack 能识别的模块
+	+ style-loader：把 CSS 代码注入到 打包的JavaScript 中，通过 DOM 操作去加载 CSS；会动态创建一个 Style 标签，里面放置 Webpack 中 Css 模块内容
+	+ less-loader：负责将 Less 文件编译成 Css 文件
+	+ asset：Webpack5 已经将url-loader/file-loader 功能内置到 Webpack 里了，称为asset module type(资源模块类型)
+2. 几个常见的webpack-plugin
+	+ define-plugin：内置定义环境变量
+	+ html-webpack-plugin： 为html文件中引入的外部资源，可以生成创建html入口文件
+	+ mini-css-extract-plugin：分离css文件
+	+ optimize-css-assets-webpack-plugin：处理css文件，W5中更推荐css-minimizer-webpack-plugin
+	+ css-minimizer-webpack-plugin: css压缩
+	+ clean-webpack-plugin：删除打包文件（w4）【ouput中配置选项clean:true:webpack5中可以不需要再手动安装clean-webpack-plugin，配置clean后，会在打包时自动删除output下的path对应的文件夹内容】
+	+ webpack.HotModuleReplacementPlugin (webpack内置热更新组件，新版webpack-dev-server根据devserver中hot值为true会自动调用)
+	+ terser-webpack-plugin： w5内置，w4需要安装，处理多进程打包，可以配置在plugins中，也可以在optimization中配置(如果配置了css压缩，这个就算不需要配置多进程打包也最好要配置)
+
+#### loader和plugin
++ loader：模块转换器，用于特定的模块类型进行转换，原内容按照需要转成想要的内容
++ plugin：可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等，在webpack构建流程中的特定时机注入扩展逻辑，来改变构建结果，是用来自定义webpack打包过程的方式，一个插件是含有apply方法的一个对象，通过这个方法可以参与到整个webpack打包的各个流程(生命周期)。
+
+### bundle，chunk，module是什么
++ bundle：是由webpack打包出来的文件。
++ chunk：代码块，一个chunk由多个模块组合而成，用于代码的合并和分割。
++ module：是开发中的单个模块，在webpack的世界，一切皆模块，一个模块对应一个文件，webpack会从配置的entry中递归开始找出所有依赖的模块。
+
+简单的说：直接写出来的是 module，webpack 处理时是 chunk，最后生成浏览器可以直接运行的 bundle。
+
+![chunk](book_files/92.jpg)
+
+在webpack的打包配置entry中有两个入口：index和utils。分别对应index.js和utils.js。其中indexjs文件引用了common.js和index.css。那么打包的时候三个文件看成一个chunk，utilsjs文件作为一个chunk。
+
+但是webpack配置用MiniCssExtractPlugin插件抽离出css文件，所以产生了.css和.js两个bundle文件。
