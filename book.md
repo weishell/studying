@@ -240,10 +240,18 @@
     - [浏览器缓存](#浏览器缓存)
       - [强缓存](#强缓存)
       - [协商缓存](#协商缓存)
+    - [http头部字段](#http头部字段)
+      - [if-match的用法](#if-match的用法)
   - [性能优化](#性能优化)
     - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
     - [浅谈前端性能优化](#浅谈前端性能优化)
     - [长列表虚拟列表](#长列表虚拟列表)
+  - [数据结构](#数据结构-1)
+    - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
+    - [堆和二叉树的关系](#堆和二叉树的关系)
+  - [算法](#算法)
+    - [递归](#递归)
+      - [递归和尾递归](#递归和尾递归)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -271,6 +279,9 @@
     - [webpack对css处理](#webpack对css处理)
       - [抽离单独css文件](#抽离单独css文件)
       - [importLoaders 配置](#importloaders-配置)
+    - [babel-loader](#babel-loader)
+      - [babel不能处理的es语法](#babel不能处理的es语法)
+      - [单独使用](#单独使用)
     - [webpack 实现生产和测试环境](#webpack-实现生产和测试环境)
 
 
@@ -5186,6 +5197,15 @@ export function render(_ctx, _cache, $props, $setup, $data, $options) {
 + Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等，这是Object.defineProperty不具备的
 + **Proxy 不兼容IE，也没有 polyfill**
 
+### 如何理解ref reactive toRef toRefs
+
+#### ref
+1. 生成 **值类型** 的 **响应式** 数据
+2. 可用于模板和reactive
+3. 通过.value修改值
+4. 可获取dom元素
+
+
 ## React
 
 React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、声明式编程范式和函数式编程概念，以使前端应用程序更高效
@@ -7738,7 +7758,7 @@ __401__	| __Unauthorized__	|请求要求用户的身份认证
 404	|Not Found	|服务器无法根据客户端的请求找到资源（网页）。通过此代码，网站设计人员可设置"您所请求的资源无法找到"的个性页面
 405|	Method Not Allowed	|客户端请求中的方法被禁止，可能是请求方法错误
 412|-|先决条件错误
-__413__	|Request Entity Too Large	|由于请求的实体过大，服务器无法处理，因此拒绝请求。为防止客户端的连续请求，服务器可能会关闭连接。如果只是服务器暂时无法处理，则会包含一个Retry-After的响应信息
+__413__	|Request Entity Too Large	|由于请求的实体过大，服务器无法处理，因此拒绝请求。为防止客户端的连续请求，服务器可能会关闭连接。如果只是服务器暂时无法处理，则会包含一个Retry-After的响应信息【后端可配置放大实体】
 415	|Unsupported Media Type	|服务器无法处理请求附带的媒体格式
 500	|Internal Server Error	|服务器内部错误，无法完成请求
 501	|Not Implemented	|服务器不支持请求的功能，无法完成请求
@@ -7842,6 +7862,81 @@ const server = http.createServer((req, res) => {
 });  
   
 server.listen(3000);
+```
+
+### http头部字段
+有 4 种类型的首部字段：通用首部字段、请求首部字段、响应首部字段和实体首部字段。
+
++ 通用首部字段
+![1](book_files/102.jpg)
++ 请求首部字段
+![2](book_files/103.jpg)
+![3](book_files/104.jpg)
++ 响应首部字段
+![4](book_files/105.jpg)
++ 实体首部字段
+![5](book_files/106.jpg)
+
+
+#### if-match的用法
+
++ If-None-Match 通常用于 GET 请求，以验证客户端缓存的资源是否仍然有效。如果有效，服务器返回 304 状态码，客户端继续使用缓存资源；否则，服务器返回新的资源内容和新的 ETag。
++ If-Match 通常用于 PUT、DELETE 或其他可能修改资源的请求，以确保客户端请求的资源版本与服务器上的版本一致。这有助于防止在并发修改时发生数据冲突。
+
+If-Match 和其他与预条件相关的头部字段在以下场景中特别有用：
+
++ 防止丢失更新：当多个客户端尝试同时修改同一个资源时，使用 If-Match 可以确保一个客户端不会覆盖另一个客户端的更改。
++ 条件性请求：在某些情况下，客户端可能只想在特定条件下执行请求。例如，只有当资源自上次检索以来未被修改时，才获取该资源的新表示形式。
+
+通过适当使用这些预条件头部字段和处理 412 Precondition Failed 状态码，客户端和服务器可以协同工作，以确保数据的一致性和完整性。
+
+与强缓存和协商缓存不同（浏览器默认操作，前端不需要做操作），这里前端需要主动传递If-Match的值，这个值是某次交互后从后端的response中去获取的。
+```js
+const axios = require('axios');  
+  
+// 假设你有一个资源的 URL 和它的当前 ETag  
+const resourceUrl = 'http://example.com/some-resource';  
+
+// // 假设你从服务器的响应头中获取了 ETag  
+// const etag = response.headers.get('ETag');  
+  
+// // 将 ETag 保存到 localStorage  
+// localStorage.setItem('resource-etag', etag); 
+
+const currentETag = '"current-etag-value"';  
+  
+// 准备 PUT 请求的数据  
+const updateData = {  
+  updatedField: 'newValue'  
+};  
+  
+// 发送 PUT 请求，包含 If-Match 头部  
+axios({  
+  method: 'put',  
+  url: resourceUrl,  
+  data: updateData,  
+  headers: {  
+    'Content-Type': 'application/json',  
+    'If-Match': currentETag // 设置 If-Match 头部字段  
+  }  
+})  
+.then(response => {  
+  // 请求成功，处理响应数据  
+  console.log('Resource updated successfully', response.data);  
+})  
+.catch(error => {  
+  if (error.response && error.response.status === 412) {  
+    // 收到 412 Precondition Failed 状态码  
+    console.error('Precondition Failed: The resource has been modified since last retrieved. Fetch the latest version and try again.');  
+      
+    // 在这里，你可以重新获取资源的当前状态，并重新尝试更新  
+    // 例如，发送一个 GET 请求来获取新的 ETag 和资源状态  
+    // 然后根据新的信息重新构造并发送 PUT 请求  
+  } else {  
+    // 处理其他类型的错误  
+    console.error('An error occurred:', error);  
+  }  
+});
 ```
 
 
@@ -7967,6 +8062,61 @@ li {
 ```
 
 2.  IntersectionObserver API 交叉视口器
+
+## 数据结构
+
+### 把一个数组改成一个单向链表
+```js
+export function createLinkList(arr: number[]): ILinkListNode {
+    const length = arr.length
+    if (length === 0) throw new Error('arr is empty')
+
+    let curNode: ILinkListNode = {
+        value: arr[length - 1]
+    }
+    if (length === 1) return curNode
+
+    for (let i = length - 2; i >= 0; i--) {
+        curNode = {
+            value: arr[i],
+            next: curNode
+        }
+    }
+    return curNode
+}
+```
+
+### 堆和二叉树的关系
+堆是一个完全二叉树，堆在逻辑结构上是一颗二叉树，在物理结构上是个数组
+![1](book_files/107.jpg)
+![2](book_files/108.jpg)
+堆的使用场景：堆的数据，都是在栈中引用的，不需想BST要从root遍历，堆恰巧是数组形式，根据栈的地址，可用O(1)找到目标。
+
+
+## 算法
+
+### 递归
+递归（Recursion）是计算机科学中的一个重要概念，它指的是一个函数或过程直接或间接地调用自身来解决问题。递归算法通过将问题分解为更小的子问题，并递归地解决这些子问题，最终将子问题的解组合起来形成原问题的解。
+
+#### 递归和尾递归
+尾递归：在尾部调用的是函数自身，可通过优化，使得计算仅占用常量栈空间
+```js
+// 复杂度：O(n) 在递归调用的过程当中系统为每一层的返回点，局部量等开辟栈来存储
+// 递归次数多了容易栈溢出
+function factorial(n) {
+ if (n === 1) return 1;
+ return n * factorial(n - 1);
+}
+factorial(5) // 120
+```
+```js
+// 复杂度：O(1)
+function factorial(n, total) {
+ if (n === 1) return total;
+ return factorial(n - 1, n * total);
+}
+factorial(5, 1) // 120
+```
 
 
 ## write
@@ -8803,6 +8953,136 @@ module.exports = {
 }
 ```
 
+### babel-loader
+Babel：JavaScript 编译器。
+
+主要用于将 ES6 语法编写的代码转换为向后兼容的 JavaScript 语法，以便能够运行在当前和旧版本的浏览器或其他环境中。
+
+它的工作原理主要基于**抽象语法树（AST）的转换**。具体来说，Babel首先将源代码解析为AST，然后通过一系列的插件对这个AST进行转换，最后再将转换后的AST生成新的代码。
+
+```bash
+# 安装babel babel-loader 和babel预设
+npm i babel-loader @babel/core @babel/preset-env -D
+```
+
+```js
+const path = require("path");
+
+module.exports = {
+  module: {
+      {
+        test: /\.js$/,
+        exclude: /node_modules/, // 排除node_modules代码不编译
+        loader: "babel-loader",
+      },
+    ],
+  },
+};
+```
+```js
+module.exports = {
+  presets: ["@babel/preset-env"],
+};
+
+```
+
+#### babel不能处理的es语法
+core-js可以处理babel不能处理的更高版本的es语法
+```js
+{
+	test: /\.js$/,
+	exclude: /node_modules/, // 排除node_modules代码不编译
+	loader: "babel-loader",
+  }
+```
+
+```js
+在webpack项目中创建babel.config.js
+module.exports = {
+    // 智能预设：能够编译ES6语法
+    presets: [
+      [
+        "@babel/preset-env",
+        // 按需加载core-js的polyfill
+        {  
+            useBuiltIns: "usage", 
+            corejs: { version: "3", proposals: true },
+            targets:{
+                browsers: [  
+                    "ie >= 8",  
+                    "> 0.1%"
+                  ]  
+            }
+          
+        },
+         
+      ],
+    ],
+};
+```
+
+
+#### 单独使用
+不在webpack中使用，安装@babel/core，@babel/preset-env，core-js
+
+```js
+import babel from "@babel/core"
+import fs from 'node:fs'
+import presetEnv from "@babel/preset-env"
+
+const code = fs.readFileSync('./demo.js', 'utf-8') // 不加utf-8是字符串
+// console.log(code)
+
+// 同步转换 第二个参数是一个预设
+babel.transformAsync(code, {
+  presets: [[
+    presetEnv,
+    {
+      useBuiltIns: 'usage', // 新特性会按需引入 垫片
+      corejs: 3
+    }
+  ]]
+}).then((res) => {
+  console.log(res.code) // es6 => es5
+})
+```
+需要处理的demojs
+```js
+//demo.js
+const x = [1, 2, 3]
+const y = x.filter(item => item > 1)
+
+
+const promise = new Promise()
+```
+
+package.json中type修改成module
+```json
+{
+  "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "core-js": "^3.37.0"
+  },
+  "type": "module"
+}
+```
+
+打印出的结果
+```js
+"use strict";
+
+require("core-js/modules/es.array.filter.js");
+require("core-js/modules/es.object.to-string.js");
+require("core-js/modules/es.promise.js");
+var x = [1, 2, 3];
+var y = x.filter(function (item) {
+  return item > 1;
+});
+var promise = new Promise();
+```
+
+
 ### webpack 实现生产和测试环境
 process.env 是一个包含用户环境信息的对象，它提供了访问系统环境变量的接口。在 Node.js 中，process 是一个全局对象，
 
@@ -8859,3 +9139,4 @@ module.exports = (env, options) => {
 除了全局的.env文件，Vue CLI还支持创建其他类型的.env文件以定义特定环境的配置。例如：
 + .env.development 是开发环境下的配置文件，仅在开发环境加载。
 + .env.production 是生产环境下的配置文件（也就是正式环境），仅在生产环境加载。
+
