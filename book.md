@@ -146,6 +146,7 @@
       - [v-bind:sync](#v-bindsync)
       - [Vue3中的v-model不同之处](#vue3中的v-model不同之处)
     - [diff算法](#diff算法)
+      - [Vue中diff算法怎样降低时间复杂度](#vue中diff算法怎样降低时间复杂度)
     - [Vue中组件和插件有什么区别](#vue中组件和插件有什么区别)
     - [自定义指令的应用场景](#自定义指令的应用场景)
     - [vue过滤器](#vue过滤器)
@@ -159,6 +160,7 @@
     - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
     - [Vue动态组件和异步组件](#vue动态组件和异步组件)
     - [Vuex的使用](#vuex的使用)
+    - [介绍Vue的模板编译](#介绍vue的模板编译)
     - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
       - [SPA首屏加载优化](#spa首屏加载优化)
@@ -211,6 +213,8 @@
     - [react-router理解](#react-router理解)
       - [useSearchParams的应用](#usesearchparams的应用)
       - [react路由传参的形式](#react路由传参的形式)
+    - [项目中使用redux，结构划分](#项目中使用redux结构划分)
+      - [react-redux redux-thunk](#react-redux-redux-thunk)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -230,9 +234,16 @@
       - [移动端2X3X图](#移动端2x3x图)
   - [http](#http)
     - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
+    - [http状态码](#http状态码)
+    - [UDP TCP](#udp-tcp)
+    - [http1.1 和 http2](#http11-和-http2)
+    - [浏览器缓存](#浏览器缓存)
+      - [强缓存](#强缓存)
+      - [协商缓存](#协商缓存)
   - [性能优化](#性能优化)
     - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
     - [浅谈前端性能优化](#浅谈前端性能优化)
+    - [长列表虚拟列表](#长列表虚拟列表)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -250,6 +261,17 @@
     - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
       - [loader和plugin](#loader和plugin)
     - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
+    - [webpack调用和webpack-cli](#webpack调用和webpack-cli)
+    - [webpack loader](#webpack-loader)
+      - [loader写法](#loader写法)
+      - [loader的执行顺序](#loader的执行顺序)
+      - [手写一个loader](#手写一个loader)
+      - [合并loader](#合并loader)
+      - [webpack中的 asset module type](#webpack中的-asset-module-type)
+    - [webpack对css处理](#webpack对css处理)
+      - [抽离单独css文件](#抽离单独css文件)
+      - [importLoaders 配置](#importloaders-配置)
+    - [webpack 实现生产和测试环境](#webpack-实现生产和测试环境)
 
 
 ## html
@@ -4848,6 +4870,29 @@ Mutations：处理原子操作
 Actions：可以处理多个Mutations和异步操作
 ![vuex](book_files/91.jpg)
 
+### 介绍Vue的模板编译
+模版指的就是template属性。vue内部会将template字符串转化成render函数进行渲染。render函数返回虚拟节点，再将虚拟节点转化成真实DOM。（模版=>方法=>节点）
+而编译过程就是template转换render函数的过程。
+
+如何将template转换成render函数？
+1. 通过正则匹配字符串，将template模版转换成AST语法树 - parserHTML
+2. 对静态语法做静态标记 - markUP
+3. 重新生成代码 - codeGen
+
+⚠️注意：开发时尽量不要使用template
+
+因为将template转化成render方法需要在运行时进行编译操作，会有性能损耗。同时引用带有compiler包的vue体积也会变大。默认.vue文件中的template处理是通过vue-loader来进行处理的，并不是通过运行时的编译。（默认vue项目中引入的vue.js是不带有compiler模块的。）
+
+有些场景，可直接使用render代替template写法，template是静态的，不灵活。
+```js
+new Vue({
+  router,
+  store,
+  render: h => h(App)
+}).$mount('#app')
+```
+
+![vue](book_files/96.jpg)
 
 ### SPA
 单页应用，它通过动态重写当前页面来与用户交互，这种方法避免了页面之间切换打断用户体验在单页应用中
@@ -7096,6 +7141,68 @@ to传入对象或字符串
 <Route path="/detail2" component={Detail2}/>
 ```
 
+### 项目中使用redux，结构划分
+Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redux遵循三大基本原则：
+
++ 单一数据源
++ state 是只读的
++ 使用纯函数来执行修改
+
+![1](book_files/97.jpg)
+![2](book_files/98.jpg)
+
+#### react-redux redux-thunk
++ react-redux 减少手动订阅解除订阅和组件导入store的繁琐问题
+![3](book_files/99.jpg)
++ reudx-thunk action 通常被设计为包含 type 属性（可能还有其他属性）的纯对象。如果试图派发一个函数，Redux 本身不会知道如何处理它，需要借助中间件
+
+```js
+//store/index.js
+ import {createStore,compose,applyMiddleware} from 'redux'
+ import reducer from './reducer.js'
+ import thunk from 'redux-thunk'
+ 
+ const composeEnhancers =window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?   
+     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
+ 	
+ const enhancer = composeEnhancers(
+   applyMiddleware(thunk),
+ );
+ //如果不需要使用多个中间件，如不使用window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__，
+ //createStore第二个参数可以直接写成applyMiddleware(thunk)
+ const store =createStore(
+ reducer,
+ enhancer
+ ); 
+ 
+ export default store; 
+```
+```js
+//actionCreators.js
+ export const getInputValue=(value)=>({
+     type:'change_input_value',
+     value
+ })
+ export const orgin=(value)=>({
+ 	type:"orgin",
+ 	value
+ })
+ 
+ // 如果没有配置react-thunk，那么在actionCreator中使用返回的是函数会报错
+ // Actions must be plain objects. Use custom middleware for async actions.
+ // 还可以进行异步操作，比如像后台发起请求等候反馈结果
+ export const getorgin= ()=>{
+ 	return (dispatch) => {
+ 		setTimeout(()=>{
+ 			const res=[1,2,3,4,5,6];
+ 			const action=orgin(res)
+ 			dispatch(action)
+ 		},3000)
+ 	}
+ }
+```
+
+
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
 
@@ -7616,7 +7723,130 @@ window.onresize = setAppropriateImageSrc;
 7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
 8. 直至整个Render 渲染完成
 
+
+### http状态码
+
+状态码 |	状态码英文名称|	中文描述
+-|-|-
+100	|Continue|	继续。客户端应继续其请求
+200	|OK	|请求成功。一般用于GET与POST请求
+204	|No Content	|无内容。服务器成功处理，但未返回内容。在未更新网页的情况下，可确保浏览器继续显示当前文档
+__304__	|Not Modified	| __未修改__ 。所请求的资源未修改，服务器返回此状态码时，不会返回任何资源。客户端通常会缓存访问过的资源，通过提供一个头信息指出客户端希望只返回在指定日期之后修改的资源
+__400__|	__Bad Request__	| __客户端请求的语法错误，服务器无法理解__
+__401__	| __Unauthorized__	|请求要求用户的身份认证
+403	| __Forbidden__	|服务器理解请求客户端的请求，但是拒绝执行此请求
+404	|Not Found	|服务器无法根据客户端的请求找到资源（网页）。通过此代码，网站设计人员可设置"您所请求的资源无法找到"的个性页面
+405|	Method Not Allowed	|客户端请求中的方法被禁止，可能是请求方法错误
+412|-|先决条件错误
+__413__	|Request Entity Too Large	|由于请求的实体过大，服务器无法处理，因此拒绝请求。为防止客户端的连续请求，服务器可能会关闭连接。如果只是服务器暂时无法处理，则会包含一个Retry-After的响应信息
+415	|Unsupported Media Type	|服务器无法处理请求附带的媒体格式
+500	|Internal Server Error	|服务器内部错误，无法完成请求
+501	|Not Implemented	|服务器不支持请求的功能，无法完成请求
+502|	Bad Gateway|	作为网关或者代理工作的服务器尝试执行请求时，从远程服务器接收到了一个无效的响应
+504|	Gateway Time-out|	充当网关或代理的服务器，未及时从远端服务器获取请求
+
+### UDP TCP
+UDP（`User Datagram Protocol，用户数据报协议`）和TCP（`Transmission Control Protocol，传输控制协议`）是两种在计算机网络中广泛使用的传输层协议，它们各自具有不同的特点和适用场景。
+
++ UDP 协议是面向无连接的，也就是说不需要在正式传递数据之前先连接起双方。特点：不可靠性但高效，如航空信息应用、直播和视频会议等
++ TCP 一种面向连接的、可靠的、基于字节流的传输层通信协议，为了保证可靠性，速度较慢。TCP适用于那些需要确保数据完整性和顺序性的场景，如文件传输和电子邮件等。
+
+### http1.1 和 http2
+
+从传输方式和效率上看，HTTP/1.1采用报文形式传输，而HTTP/2则采用**二进制格式传输数据**。这种二进制传输方式使得HTTP/2具有更高的解析效率和更少的传输开销。此外，**HTTP/1.1如果想并发多个请求，必须使用多个TCP链接**，这会导致一定的延时和内存消耗。而在HTTP/2中，由于采用了**二进制分帧技术**，同域名下所有通信都在单个连接上完成，单个连接可以承载任意数量的双向数据流。这使得HTTP/2能够**并行交错**地发送多个请求和响应，提高了网络吞吐量和效率。
+
+其次，在协议细节上，HTTP/2使用了HPACK算法对HTTP**头部进行压缩**，减少了头部传输的数据量，从而进一步减少了网络延迟。同时，HTTP/2还支持**服务器推送**，允许服务器在客户端请求之前推送资源，提高了性能。
+
+最后，HTTP/2与HTTP/1.1的兼容性也是两者之间的一个重要区别。HTTP/2可以与HTTP/1.1共存，服务器可以同时支持HTTP/1.1和HTTP/2。如果客户端不支持HTTP/2，服务器可以回退到HTTP/1.1。
+
+总的来说，HTTP/2在多个方面对HTTP/1.1进行了改进和优化，提供了更高的效率、更低的延迟和更好的兼容性。这使得HTTP/2成为现代Web应用中更受欢迎的选择。
+
+
+### 浏览器缓存
+浏览器缓存（Browser Caching）是为了节约网络资源、加速浏览而设计的一种机制。
+
+![缓存](book_files/100.jpg)
+
+#### 强缓存
+可以造成强制缓存的字段是 `Cache-control`（推荐） 和 `Expires`(不推荐)。
+```js
+const express = require('express');  
+const app = express();  
+const path = require('path');  
+const fs = require('fs');  
+  
+// 设置静态文件目录  
+app.use(express.static('public'));  
+  
+// 为特定路由设置强缓存  
+app.get('/cached-resource', (req, res) => {  
+  const filePath = path.join(__dirname, 'public', 'cached-resource.txt');  
+  const stats = fs.statSync(filePath);  
+  const lastModified = stats.mtime.toUTCString(); // 获取文件最后修改时间  
+  const maxAge = 60 * 60 * 24 * 7; // 设置缓存有效期为7天  
+  
+  // 设置强缓存响应头  
+  res.setHeader('Cache-Control', `public, max-age=${maxAge}`);  
+  res.setHeader('Last-Modified', lastModified);  
+  res.sendFile(filePath);  
+});  
+  
+app.listen(3000, () => {  
+  console.log('Server is running on port 3000');  
+});
+```
+
+#### 协商缓存
+etag优先级大于lastModified，lastModified最多只能处理秒级的缓存。
+
++ if-modified-since lastModified 
++ if-none-match etag(更推荐)
+
+```js
+const fs = require('fs');  
+const crypto = require('crypto');  
+const path = require('path');  
+const http = require('http');  
+  
+const server = http.createServer((req, res) => {  
+  const filePath = path.join(__dirname, 'path/to/your/file');  
+  const stats = fs.statSync(filePath);  
+  const lastModified = stats.mtime.toUTCString(); // 获取文件的最后修改时间  
+  const fileContent = fs.readFileSync(filePath);  
+  const etag = crypto.createHash('md5').update(fileContent).digest('hex'); // 计算文件的ETag  
+  
+  // 检查If-None-Match请求头  
+  if (req.headers['if-none-match'] && req.headers['if-none-match'] === etag) {  
+    // 如果ETag匹配，返回304 Not Modified  
+    res.writeHead(304, {  
+      'ETag': etag,  
+      'Last-Modified': lastModified  
+    });  
+    res.end();  
+  } else if (req.headers['if-modified-since'] && req.headers['if-modified-since'] === lastModified) {  
+    // 如果Last-Modified匹配，也返回304 Not Modified  
+    res.writeHead(304, {  
+      'ETag': etag,  
+      'Last-Modified': lastModified  
+    });  
+    res.end();  
+  } else {  
+    // 如果都不匹配，发送新文件内容，并设置Last-Modified和ETag头  
+    res.writeHead(200, {  
+      'Content-Type': 'text/plain',  
+      'ETag': etag,  
+      'Last-Modified': lastModified  
+    });  
+    res.end(fileContent);  
+  }  
+});  
+  
+server.listen(3000);
+```
+
+
 ## 性能优化
+![性能优化](book_files/101.jpg)
 
 ### 为什么css在页面head，js在body尾部
 CSS在加载过程中，不影响HTML的解析。但影响HTML渲染。
@@ -7650,6 +7880,93 @@ defer和async都是异步加载JS的方法：
 9. 节流（拖拽） 防抖（输入框）
 10. 根据项目需要，按需加载
 11. 动画帧代替定时器动画或者结合动画帧优化定时器动画（使用动画帧切屏浏览器会帮助自动停止动画渲染）
+
+### 长列表虚拟列表
+
+1. 方案1：借助scrollTop + slice + 设置好高度 + startIndex + endIndex 
+```html
+<template>
+  <div>
+    <input type="text" v-model.number="dataLength">条
+    <div class="virtual-scroller" @scroll="onScroll" :style="{ height: 600 + 'px' }">
+      <div class="phantom" :style="{ height: this.dataLength * itemHeight + 'px' }">
+        <ul :style="{ 'margin-top': `${scrollTop}px` }">
+          <li v-for="item in visibleList" :key="item.brandId"
+            :style="{ height: `${itemHeight}px`, 'line-height': `${itemHeight}px` }">
+            <div>
+              <div>{{ item.name }}</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "vue-virtual-scroller",
+  data() {
+    return {
+      itemHeight: 60,
+      dataLength: 500000, // 总数量
+      startIndex: 0,
+      endIndex: 10,
+      scrollTop: 0
+    }
+  },
+  computed: {
+    dataList() {
+      const newDataList = [...Array(this.dataLength || 0).keys()].map((v, i) => ({
+        brandId: i + 1,
+        name: `第${i + 1}项`,
+        height: this.itemHeight
+      }));
+      return newDataList
+    },
+    visibleList() {
+      console.log(this.startIndex)
+      return this.dataList.slice(this.startIndex, this.endIndex)
+    }
+  },
+  methods: {
+    onScroll(e) {
+      const scrollTop = e.target.scrollTop
+      this.scrollTop = scrollTop
+      console.log('scrollTop', scrollTop)
+      this.startIndex = Math.floor(scrollTop / this.itemHeight)
+      this.endIndex = this.startIndex + 10
+    }
+  }
+}
+</script>
+
+<style scoped>
+.virtual-scroller {
+  border: solid 1px #eee;
+  margin-top: 10px;
+  height: 600px;
+  overflow: auto
+}
+
+.phantom {
+  overflow: hidden
+}
+
+ul {
+  background: #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  outline: solid 1px #fff;
+}
+</style>
+```
+
+2.  IntersectionObserver API 交叉视口器
 
 
 ## write
@@ -8089,7 +8406,7 @@ webpack是一个`打包模块化js工具`，在webpack里一切文件皆模块�
 		- 分chunk=> commonTrunkPlugin => optimization.splitChunks
 2. v4=>v5
 	+ 持久化缓存=> cache => 直接利用缓存结果反向跳过构建部分
-	+ 资源模块的优化 => asset/resource
+	+ 资源模块的优化 => asset/resource(file-loader url-lodaer raw-loader被内置取代)
 	+ 打包优化
 
 ```js
@@ -8125,6 +8442,8 @@ splitChunks:{
 + loader：模块转换器，用于特定的模块类型进行转换，原内容按照需要转成想要的内容
 + plugin：可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等，在webpack构建流程中的特定时机注入扩展逻辑，来改变构建结果，是用来自定义webpack打包过程的方式，一个插件是含有apply方法的一个对象，通过这个方法可以参与到整个webpack打包的各个流程(生命周期)。
 
+![图解](book_files/95.jpg)
+
 ### bundle，chunk，module是什么
 + bundle：是由webpack打包出来的文件。
 + chunk：代码块，一个chunk由多个模块组合而成，用于代码的合并和分割。
@@ -8137,3 +8456,406 @@ splitChunks:{
 在webpack的打包配置entry中有两个入口：index和utils。分别对应index.js和utils.js。其中indexjs文件引用了common.js和index.css。那么打包的时候三个文件看成一个chunk，utilsjs文件作为一个chunk。
 
 但是webpack配置用MiniCssExtractPlugin插件抽离出css文件，所以产生了.css和.js两个bundle文件。
+
+### webpack调用和webpack-cli
+webpack-cli:webpack-cli 是用来处理命令行参数，并通过参数构建 compiler 对象，然后才是对代码进行打包的过程。
+
+1. 命令行调用：在cmd控制台中，如果直接使用webpack命令，其实不管项目中有没有安装局部的webpack，都不会被调用，会直接使用全局的webpack；如果要使用项目的webpack，需要加前缀npx webpack。
+
+```bash
+ npx webpack --entry ./src/main.js --output-path ./build
+```
+2. package.json中
+
+```json
+ "scripts": {
+      "start": "webpack serve",//发现有serve，会自动寻找webpack-dev-serve
+      "build": "webpack"// 不需要加npx，它会先找当前目录的webpack
+}
+```
+如果需要传入process.env.NODE_ENV，windows系统需要这样配置安装cross-env
+```json
+"scripts": {
+      "start": "cross-env NODE_ENV=development webpack serve",
+      "build": "cross-env NODE_ENV=production webpack"
+    },
+```
+
+### webpack loader
+loader 本身仅仅只是一个函数，接收模块代码的内容，然后返回代码内容转化后的结果。
+#### loader写法
+loader可以单独写在rules里，也可以用use包裹，如果是使用到多个loader，use应该为数组的形式
+```js
+{
+  test: /\.js$/,
+  loader: "loader1",//单个loader
+}
+
+
+{
+  test:/\.jpg$/,
+  use:{
+    loader:'file-loader'//可以用use包裹loader
+  }
+}
+
+{
+    test: /\.css$/,
+    // 多个loader可以写成数组，如果有配置项，对应的loader可写成对象形式
+    use: [
+      'style-loader',
+      {
+        loader: 'css-loader',
+        options: {
+          modules:true,//开启css模块化打包
+          importLoaders: 2, 
+        },
+      },
+      'postcss-loader',
+      'sass-loader'
+    ]
+}
+```
+
+#### loader的执行顺序
+执行顺序:4 类 loader 的执行优级为：pre > normal > inline > post 。
+
+相同优先级的 loader 执行顺序为：从右到左，从下到上。
+
+```js
+// 此时loader执行顺序：loader1 - loader2 - loader3
+module: {
+  rules: [
+    {
+      enforce: "pre",
+      test: /\.js$/,
+      loader: "loader1",
+    },
+    {
+      // 没有enforce就是normal
+      test: /\.js$/,
+      loader: "loader2",
+    },
+    {
+      enforce: "post",
+      test: /\.js$/,
+      loader: "loader3",
+    },
+  ],
+},
+```
+
+#### 手写一个loader
+有同步loader和异步loader，这里举个简单的同步loader
+
+```js
+const loaderUtils = require('loader-utils');
+module.exports = function(source) {
+	return source.replace('lee', 'world');
+}
+```
+
+#### 合并loader
+
+```js
+// 获取处理样式的Loaders
+const getStyleLoaders = (preProcessor) => {
+  return [
+    MiniCssExtractPlugin.loader,
+    "css-loader",
+    {
+      loader: "postcss-loader",
+      options: {
+        postcssOptions: {
+          plugins: [
+            "postcss-preset-env", // 能解决大多数样式兼容性问题
+          ],
+        },
+      },
+    },
+    preProcessor,
+  ].filter(Boolean);
+};
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        // 用来匹配 .css 结尾的文件
+        test: /\.css$/,
+        // use 数组里面 Loader 执行顺序是从右到左
+        use: getStyleLoaders(),
+      },
+      {
+        test: /\.less$/,
+        use: getStyleLoaders("less-loader"),
+      },
+      {
+        test: /\.s[ac]ss$/,
+        use: getStyleLoaders("sass-loader"),
+      },
+      {
+        test: /\.styl$/,
+        use: getStyleLoaders("stylus-loader"),
+      },
+    ],
+  },
+
+};
+```
+
+#### webpack中的 asset module type
+在webpack5中，可以直接使用资源模块类型（asset module type），可替代raw-loader 、url-loader、file-loader
+
++ asset/resource 发送一个单独的文件并导出 URL。相当于file-loader
++ asset/inline 导出一个资源的 data URI。之前通过使用 url-loader 实现；
++ asset/source 导出资源的源代码。之前通过使用 raw-loader 实现；
++ asset 在导出一个 data URI 和发送一个单独的文件之间自动选择。相当于url-loader, 将文件转化成 Webpack 能识别的资源，同时小于某个大小的资源会处理成 data URI 形式
+
+```js
+const path = require("path");
+
+module.exports = {
+  entry: "./src/main.js",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "static/js/main.js", // 将 js 文件输出到 static/js 目录中
+    clean: true, // 自动将上次打包目录资源清空
+  },
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.(png|jpe?g|gif|webp)$/,
+        type: "asset",
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024, // 小于10kb的图片会被base64处理
+          },
+        },
+        generator: {
+          // 将图片文件输出到 static/imgs 目录中
+          // 将图片文件命名 [hash:8][ext][query]
+          // [hash:8]: hash值取8位
+          // [ext]: 使用之前的文件扩展名
+          // [query]: 添加之前的query参数
+          filename: "static/imgs/[hash:8][ext][query]",
+        },
+      },
+      {
+        test: /\.(ttf|woff2?|map4|map3|avi)$/,
+        type: "asset/resource",
+        generator: {
+          filename: "static/media/[hash:8][ext][query]",
+        },
+      },
+    ],
+  },
+  mode: "development",
+};
+```
+
+### webpack对css处理 
++ style-loader:添加style标签，把css添加到页面中
++ css-loader：解析css
++ postcss-loader：解决css兼容代码
++ sass-loader：预编译语言处理loader
++ MiniCssExtractPlugin
+```js
+//webpack.config.js
+const path = require('path') 
+module.exports={
+	mode:'production',
+	entry:'./index.js',
+	module:{
+		{
+			test:/\.scss$/,
+			use: [
+				{loader:'style-loader'},
+				{loader:'css-loader',
+				options:{
+					 modules:true,
+					importLoaders:1	   
+					}
+				},
+				{loader:'postcss-loader'}
+				{loader:'sass-loader'},
+			  ]
+		}
+		]
+	},
+	output:{
+		filename:'bundle.js',
+		path:path.resolve(__dirname,'zip')
+	}
+}
+```
+
+对于兼容css可以创建一个postcss.config.js去配置
+```js
+module.exports = {  
+  plugins: [  
+    require('postcss-preset-env')({  
+      // 可以在这里配置选项，例如stage、browsers、features等  
+      // 默认情况下，它会使用package.json中的browserslist配置或默认的browserslist配置  
+    }),  
+  ],  
+};
+```
+也可以在webpack中的loader之中配置
+```js
+ {  
+   loader: 'postcss-loader',  
+	options: {  
+	  postcssOptions: {  
+		plugins: [  
+		  require('postcss-preset-env')({  
+			// 配置选项  
+		  }),  
+		],  
+	  },  
+	},  
+  }
+```
+package.json中配置的browserlist，可以使对象，也可以是数组形式
+```json
+"browserslist": {
+      "production": [
+        "defaults",
+        "last 3 versions"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+```
+
+#### 抽离单独css文件
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.styl$/,
+        use: [
+          MiniCssExtractPlugin.loader,// 需要引入插件
+          {
+			 loader: 'css-loader',
+			 options: {
+			  modules:true,//开启css模块化打包，避免全局污染
+			   importLoaders: 2, 
+			  // 0 => no loaders (default);
+			  //1 => postcss-loader; 
+			 // 2 => postcss-loader, sass-loader
+			 },
+		   },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  "postcss-preset-env", // 能解决大多数样式兼容性问题
+                ],
+              },
+            },
+          },
+          "stylus-loader",
+        ],
+      },
+    ],
+  },
+};
+```
+
+#### importLoaders 配置
+当遇到 @import 语法，CSS modules and ICSS imports 时，默认会用 css-loader 处理，在 css-loader 前执行的 loader 就不会再回头执行了，如果配置了 importLoaders number类型，例如配置了 n，就会用 css-loader 前的 n 个 loader 去处理，然后再用 css-loader 处理。
+
+```js
+{  
+	test: /\.css$/,  
+	use: [  
+	  'style-loader',  
+	  {
+		loader:'css-loader',
+		options:{
+		  importLoaders: 1, 
+		}
+	  },
+	  'postcss-loader'
+	],  
+  },  
+```
+如果不配置importLoaders，那么默认为0，则next.css没有被postcsss-loader处理，会有兼容性问题
+```css
+@import url('./next.css');
+.k1{
+    color:red
+}
+
+.k2{
+    color:green
+}
+```
+
+### webpack 实现生产和测试环境
+process.env 是一个包含用户环境信息的对象，它提供了访问系统环境变量的接口。在 Node.js 中，process 是一个全局对象，
+
+1. 使用不同的配置文件
+
+```json
+"scripts": {  
+  "dev": "webpack --config webpack.dev.js",  
+  "build": "webpack --config webpack.prod.js"  
+}
+```
+
+2. 使用环境变量:可以通过 **process.env** 访问环境变量。你可以在构建之前设置这些环境变量，然后在配置文件中根据这些变量来决定使用哪些配置
+
+```bash
+# 在命令行中设置环境变量  （windows不支持这个写法)
+export NODE_ENV=development  
+npm run dev
+```
+然后在 webpack.config.js 中：
+```js
+const isDev = process.env.NODE_ENV === 'development';  
+const isProd = process.env.NODE_ENV === 'production';  
+  
+module.exports = {  
+  mode: isProd ? 'production' : 'development',  
+  // 其他配置...  
+};
+```
+
+3. 使用 webpack-merge
+4. 在 webpack.config.js 中判断环境
+
+```js
+module.exports = (env, options) => {  
+  const isProduction = options.mode === 'production';  
+    
+  return {  
+    mode: isProduction ? 'production' : 'development',  
+    // 根据环境设置不同的配置...  
+  };  
+};
+```
+```json
+"scripts": {  
+  "dev": "webpack --mode development",  
+  "build": "webpack --mode production"  
+}
+```
+
+5. 在vue脚手架中，.env文件用于存储项目的环境配置信息。这个文件是全局默认配置文件，无论什么环境都会加载并合并。
+如果你在.env文件中定义了一个名为VUE_APP_TITLE的属性，那么你可以在项目的其他文件中通过process.env.VUE_APP_TITLE来访问这个属性的值。
+
+除了全局的.env文件，Vue CLI还支持创建其他类型的.env文件以定义特定环境的配置。例如：
++ .env.development 是开发环境下的配置文件，仅在开发环境加载。
++ .env.production 是生产环境下的配置文件（也就是正式环境），仅在生产环境加载。
