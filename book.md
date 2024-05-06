@@ -171,6 +171,13 @@
     - [vue3的Composition Api的好处](#vue3的composition-api的好处)
     - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
     - [vue3proxy取代defineProperty API原因](#vue3proxy取代defineproperty-api原因)
+    - [如何理解ref reactive toRef toRefs](#如何理解ref-reactive-toref-torefs)
+      - [ref](#ref)
+      - [reactive](#reactive)
+      - [toRef](#toref)
+      - [toRefs](#torefs)
+      - [为何需要ref](#为何需要ref)
+      - [为何需要.vuale](#为何需要vuale)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [state 和 props 区别](#state-和-props-区别)
@@ -5002,6 +5009,7 @@ Monorepo 的主要优势包括：
 #### 功能改变
 + fragments： 支持多根节点
 + Teleport：传送门
++ suspense：加载一步组件loading
 + composition Api
 + createRenderer:能够构建自定义渲染器，能够将 vue 的开发模型扩展到其他平台
 
@@ -5027,7 +5035,31 @@ Monorepo 的主要优势包括：
 + 移除$on，$off和$once 实例方法
 + 移除过滤filter
 + 移除内联模板 attribute
++ 移除.sync
 + 移除$destroy 实例方法。用户不应再手动管理单个Vue 组件的生命周期。在 Vue 3 中，$destroy 方法已经被完全移除，进一步强调了开发者应该依赖 Vue 的自动生命周期管理，而不是手动去销毁组件或实例。
++ CreateAPP
++ emit
++ 生命周期
++ 多事件
++ 异步组件的写法
+
+![createapp](book_files/111.jpg)
+
+![emit](book_files/112.jpg)
+
+![多事件](book_files/113.jpg)
+
+![Fragment](book_files/114.jpg)
+
+![sync](book_files/115.jpg)
+
+![异步组件](book_files/116.jpg)
+
+![filter](book_files/117.jpg)
+
+![teleport](book_files/118.jpg)
+
+![suspense](book_files/119.jpg)
 
 ### vue3的Composition Api的好处
 1. 不需要像options API一个功能代码跳转很多地方
@@ -5205,6 +5237,167 @@ export function render(_ctx, _cache, $props, $setup, $data, $options) {
 3. 通过.value修改值
 4. 可获取dom元素
 
+```html
+<template>
+    <p>ref demo {{ageRef}} {{state.name}}</p>
+</template>
+
+<script>
+import { ref, reactive } from 'vue'
+
+export default {
+    name: 'Ref',
+    setup() {
+        const ageRef = ref(20) // 值类型 响应式
+        const nameRef = ref('双越')
+		  // ref可以直接用在reactive里
+        const state = reactive({
+            name: nameRef
+        })
+
+        setTimeout(() => {
+            console.log('ageRef', ageRef.value)
+
+            ageRef.value = 25 // .value 修改值
+            nameRef.value = '双越A'
+        }, 1500);
+
+        return {
+            ageRef,
+            state
+        }
+    }
+}
+</script>
+```
+
+```html
+<template>
+    <p ref="elemRef">我是一行文字</p>
+</template>
+<script>
+import { ref, onMounted } from 'vue'
+export default {
+    name: 'RefTemplate',
+	setup() {
+	 // 和模板里的ref同名
+        const elemRef = ref(null)
+	//在mounted之后才可以获取dom元素
+        onMounted(() => {
+            console.log('ref template', elemRef.value.innerHTML, elemRef.value)
+        })
+        return {
+            elemRef
+        }
+    }
+}
+</script>
+```
+
+#### reactive
+reactive一般用来定义响应式对象。不可直接解构，会丢失响应式的效果，想要属性具有响应式可借助toRef或者toRefs
+
+#### toRef
+1. 针对一个响应式对象（reactive封装）的prop
+2. 创建一个ref，具有响应式
+3. 两者保持引用关系
+
+```html
+<template>
+   <p>toRef demo - {{ageRef}} - {{state.name}} {{state.age}}</p>
+</template>
+
+<script>
+import { ref, toRef, reactive } from 'vue'
+
+export default {
+    name: 'ToRef',
+    setup() {
+        const state = reactive({
+            age: 20,
+            name: '双越'
+        })
+
+        const age1 = computed(() => {
+            return state.age + 1
+        })
+
+        // // toRef 如果用于普通对象（非响应式对象）,
+        //产出的结果不具备响应式,可在界面上显示
+        // const state = {
+        //     age: 20,
+        //     name: '双越'
+        // }
+
+        const ageRef = toRef(state, 'age')
+        setTimeout(() => {
+            state.age = 25
+        }, 1500)
+        setTimeout(() => {
+            ageRef.value = 30 // .value 修改值
+        }, 3000)
+
+        return {
+            state,
+            ageRef
+        }
+    }
+}
+```
+
+#### toRefs
+1. 将一个响应式对象（reactive封装）转为普通对象
+2. 普通对象的每个属性都是ref，具有响应式
+3. 两者保持引用关系
+
+```html
+<template>
+    <p>toRefs demo {{age}} {{name}}</p>
+</template>
+<script>
+import { ref, toRef, toRefs, reactive } from 'vue'
+export default {
+    name: 'ToRefs',
+    setup() {
+        const state = reactive({
+            age: 20,
+            name: '双越'
+        })
+        const stateAsRefs = toRefs(state) // 将响应式对象，变成普通对象
+        // const { age: ageRef, name: nameRef } = stateAsRefs // 每个属性，都是 ref 对象
+        // return {
+        //     ageRef,
+        //     nameRef
+        // }
+        setTimeout(() => {
+            state.age = 25
+        }, 1500)
+
+       return stateAsRefs
+       // return toRefs(state) √√√√
+       // return {...stateAsRefs} //当如果有其他属性时适用 √√√√
+       // return {...state}//xxxx错误 不再具有响应式
+       // return {state} √√√√ 但是模板中{{state.age}} {{state.name}} 不方便
+    }
+}
+</script>
+```
+使用toRefs，合成函数返回响应式对象，可方便解构
+
+![ref](book_files/109.jpg)
+
+#### 为何需要ref
+1. 直接返回值类型，会丢失响应式
+2. 在setup、computed、合成函数中都有可能返回值类型
+
+#### 为何需要.vuale
+1. Ref是一个响应式对象，value存储值
+2. 通过.value属性的get set实现响应式
+3. 用于模板、reactive中【vue编译自己控制】，不需要加.value，其他情况需要【js自己获取】
+
+举个例子，如果是有.value，那么改变的是对象中属性，对象因为引用关系，也会变化，而错误的写法，是值类型的变化，改变了值，就没关联了。
+
+![value](book_files/110.jpg)
 
 ## React
 
