@@ -178,6 +178,11 @@
       - [toRefs](#torefs)
       - [为何需要ref](#为何需要ref)
       - [为何需要.vuale](#为何需要vuale)
+    - [Vue3中watch和watchEffect的区别](#vue3中watch和watcheffect的区别)
+      - [监听ref](#监听ref)
+      - [监听reactive](#监听reactive)
+      - [Watch监听多个](#watch监听多个)
+    - [Setup中如何获取组件实例](#setup中如何获取组件实例)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [state 和 props 区别](#state-和-props-区别)
@@ -286,10 +291,12 @@
     - [webpack对css处理](#webpack对css处理)
       - [抽离单独css文件](#抽离单独css文件)
       - [importLoaders 配置](#importloaders-配置)
+      - [webpack单独分离css](#webpack单独分离css)
     - [babel-loader](#babel-loader)
       - [babel不能处理的es语法](#babel不能处理的es语法)
       - [单独使用](#单独使用)
     - [webpack 实现生产和测试环境](#webpack-实现生产和测试环境)
+    - [webpack plugins](#webpack-plugins)
 
 
 ## html
@@ -5399,6 +5406,88 @@ export default {
 
 ![value](book_files/110.jpg)
 
+### Vue3中watch和watchEffect的区别
+1. 两者都可以监听data属性的变化
+2. Watch需要明确监听哪个属性，如果监听多个属性可第一个参数要写成数组形式，第二个处理函数的参数也要注意处理
+3. watchEffect会根据其中的属性，自动监听其变化
+
+#### 监听ref
+```js
+watch(numberRef, (newNumber, oldNumber) => {
+        console.log('ref watch', newNumber, oldNumber)
+    }
+    // , {
+    //     immediate: true // 初始化之前就监听，可选
+    // }
+)
+```
+
+#### 监听reactive
+```js
+ watch(
+    // 第一个参数，确定要监听哪个属性
+    () => state.age,
+
+    // 第二个参数，回调函数
+    (newAge, oldAge) => {
+        console.log('state watch', newAge, oldAge)
+    },
+
+    // 第三个参数，配置项
+    {
+        immediate: true, // 初始化之前就监听，可选
+        // deep: true // 深度监听
+    }
+)
+```
+#### Watch监听多个
+```js
+ //监听两个值，fooRef，barRef;变化后foo bar值；变化前的值prevFoo prevBar
+watch([fooRef, barRef], ([foo, bar], [prevFoo, prevBar]) => {
+  /* ... */
+})
+watchEffect初始化要收集数据一定会执行一次
+watchEffect(() => {
+    // 初始化时，一定会执行一次（收集要监听的数据）
+    console.log('hello watchEffect')
+})
+```
+
+### Setup中如何获取组件实例
+```js
+<script>
+import { onMounted, getCurrentInstance } from 'vue'
+
+export default {
+    name: 'GetInstance',
+    data() {
+        return {
+            x: 1,
+            y: 2
+        }
+    },
+    setup() {
+        // 没有this
+        console.log('this1', this)
+
+        onMounted(() => {
+            console.log('this in onMounted', this)
+            console.log('x', instance.data.x)
+        })
+        
+        const instance = getCurrentInstance()
+        //还没实例化，也获取不到，需要在onMounted中获取
+        console.log('instance', instance)
+    },
+    mounted() {
+        //options API 可以继续使用this
+        console.log('this2', this)
+        console.log('y', this.y)
+    }
+}
+</script>
+```
+
 ## React
 
 React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、声明式编程范式和函数式编程概念，以使前端应用程序更高效
@@ -9146,6 +9235,59 @@ module.exports = {
 }
 ```
 
+#### webpack单独分离css
+Css 文件目前被打包到 js 文件中，当 js 文件加载时，会创建一个 style 标签来生成样式，这样对于网站来说，会出现闪屏现象，用户体验不好,应该是单独的 Css 文件，通过 link 标签加载性能才好
+
+![style-loader](book_files/120.jpg)
+
+使用MiniCssExtractPlugin，在插件和loader中配置
+```js
+npm i mini-css-extract-plugin -D
+```
+```js
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');  
+
+module.exports = {  
+  // ... 其他的 webpack 配置 ...  
+
+  plugins: [  
+    // ... 其他的插件 ...  
+    new MiniCssExtractPlugin({  
+      // 选项（可选）  
+      // 例如: filename: '[name].css',  
+      // chunkFilename: '[id].css',  
+	  // 定义输出文件名和目录
+	  filename: "static/css/main.css",
+    }),  
+  ],  
+
+  module: {  
+    rules: [  
+      // ... 其他的 loader 规则 ...  
+
+      // 对于 CSS 文件，使用 style-loader（开发环境）或 mini-css-extract-plugin.loader（生产环境）  
+      {  
+        test: /\.css$/,  
+        use: [  
+          process.env.NODE_ENV !== 'production'  
+            ? 'style-loader' // 开发环境下内联样式  
+            : MiniCssExtractPlugin.loader, // 生产环境下提取到单独文件  
+          'css-loader', // 将 CSS 转化成 CommonJS 模块  
+          // 你可以在这里添加其他预处理器，比如 'postcss-loader', 'sass-loader', 'less-loader' 等  
+        ],  
+      },  
+
+      // ... 其他的 loader 规则 ...  
+    ],  
+  },  
+
+  // ... 其他的 webpack 配置 ...  
+};
+```
+
+![加载](book_files/1.png)
+
+
 ### babel-loader
 Babel：JavaScript 编译器。
 
@@ -9333,3 +9475,48 @@ module.exports = (env, options) => {
 + .env.development 是开发环境下的配置文件，仅在开发环境加载。
 + .env.production 是生产环境下的配置文件（也就是正式环境），仅在生产环境加载。
 
+### webpack plugins
+
+plugins是需要引入的
+```js
+...
+plugins:{
+	new HtmlWebpackPlugin({
+	  template: "./public/index.html",
+	  title: "新的标题" //需要index中使用了ejs等模板才生效
+	}),
+	new DefinePlugin({
+		  BASE_URL: "'./img'"
+		}),
+	new CleanWebpackPlugin(),
+	new CopyWebpackPlugin({
+		  patterns: [
+			{
+			  from: "public",
+			  to: "./src",// 放在src目录下
+			  globOptions: {
+				ignore: [
+				  "**/index.html"//忽略掉index.html
+				]
+			  }
+			}
+		  ]
+	}),
+	new CssMinimizerPlugin()
+}
+```
+
++ CleanWebpackPlugin：W5版本之后不需要配置具体的文件夹，但是他会从output里读取，所以output的配置不能省略
++ CopyWebpackPlugin: 某些文件，直接复制到打包后的文件中
++ CssMinimizerPlugin:压缩css
+
++ 在webpack5中，可以不安装clearnwebpackplugin，内置的outpue配置clean为true即可清除
+
+```js
+ output: {  
+    path: path.resolve(__dirname, 'min'),  
+    filename: 'bundle.js', 
+    clean:true 
+  },  
+```
++ purgecss-webpack-plugin:移除未被使用的css，比较复杂
