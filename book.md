@@ -8261,6 +8261,7 @@ defer和async都是异步加载JS的方法：
 ### 长列表虚拟列表
 
 1. 方案1：借助scrollTop + slice + 设置好高度 + startIndex + endIndex 
+
 ```html
 <template>
   <div>
