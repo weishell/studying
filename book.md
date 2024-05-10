@@ -5003,15 +5003,20 @@ Monorepo 的主要优势包括：
 ### 与Vue2的不同
 1. 速度更快
 	+ 重写了虚拟Dom实现
-	+ 编译模板的优化
+	+ 编译模板的优化（PatchFlag）
 	+ 更高效的组件初始化
 	+ update性能提高1.3~2倍
 	+ SSR速度提高了2~3倍
+	+ proxy
+	+ 将静态节点的定义，提升到父作用域，缓存起来
+	+ 缓存事件，空间换时间
 2. 体积更小
-	+ 通过webpack的tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的
+	+ 通过tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的
 3. 更易维护：compositon Api + options Api
 4. 更好的Typescript支持
 5. 编译器重写
+
+![diff](book_files/121.jpg)
 
 #### 功能改变
 + fragments： 支持多根节点
@@ -5140,6 +5145,11 @@ export default {
 ```
 可以看到，整个数据来源清晰了，即使去编写更多的 hook 函数，也不会出现命名冲突的问题
 
+#### Composition API 和 React hooks 对比
+1. 前者setup只会调用一次，而后者函数会被多次调用
+2. 前者无需useMemo useCallback缓存，因为setup只调用一次
+3. 前者无需顾虑调用顺序，而后者需要保证hooks的执行顺序
+4. ref+reactive理解难于useState
 
 ### vue3性能提升主要体现在哪几个方面
 回顾Vue2，每个组件实例都对应一个 watcher 实例，它会在组件渲染的过程中把用到的数据property记录为依赖，当依赖发生改变，触发setter，则会通知watcher，从而使关联的组件重新渲染
