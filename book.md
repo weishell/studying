@@ -169,6 +169,7 @@
     - [与Vue2的不同](#与vue2的不同)
       - [功能改变](#功能改变)
     - [vue3的Composition Api的好处](#vue3的composition-api的好处)
+      - [Composition API 和 React hooks 对比](#composition-api-和-react-hooks-对比)
     - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
     - [vue3proxy取代defineProperty API原因](#vue3proxy取代defineproperty-api原因)
     - [如何理解ref reactive toRef toRefs](#如何理解ref-reactive-toref-torefs)
@@ -297,6 +298,11 @@
       - [单独使用](#单独使用)
     - [webpack 实现生产和测试环境](#webpack-实现生产和测试环境)
     - [webpack plugins](#webpack-plugins)
+    - [模块热替换HMR](#模块热替换hmr)
+  - [Vite](#vite)
+    - [构建工具](#构建工具)
+    - [vite为什么比webpack快](#vite为什么比webpack快)
+    - [vite预构建](#vite预构建)
 
 
 ## html
@@ -9531,3 +9537,60 @@ plugins:{
   },  
 ```
 + purgecss-webpack-plugin:移除未被使用的css，比较复杂
+
+### 模块热替换HMR
+在程序运行中，替换、添加或删除模块，而无需重新加载整个页面。
+
+原理：webpack-dev-server会创建两个服务：提供静态资源的服务（express）和Socket服务（net.Socket）；
+
+![HMR](book_files/122.jpg)
+
+## Vite
+它主要由两部分组成：
+
+一个开发服务器，它基于 原生 ES 模块 提供了 丰富的内建功能，如速度快到惊人的 模块热更新（HMR）。
+
+一套构建指令，它使用 Rollup 打包你的代码，并且它是预配置的，可输出用于生产环境的高度优化过的静态资源。
+
+### 构建工具
+构建工具让大家不用关心代码如何运行，只需要提供对应的配置，有了这个集成配置文件，他可以在下次需要更新时自动调用对应的命令完成对应的操作。
+
+它能做哪些：
+1. 模块化开发，虽然浏览器支持esmodule，但是引入/node_modules/中的文件就会无法识别(识别的话浏览器请求资源可能陷入非常之多的情况，第三方模块也会引入其他模块等)。打包工具可以处理且还可以适配其他模块化(require commonjs)
+2. 处理代码兼容：babel core-js less sass postcss
+3. 提高性能：代码压缩，代码分割
+4. 优化体验
+	- HMR
+	- 跨域
+
+### vite为什么比webpack快
+webpack考虑了服务端兼容性问题，支持esModule和commonjs等规范，在启动编译时，还需要额外操作将多种模块化规范统一。
+
+![1](book_files/123.jpg)
+![2](book_files/124.jpg)
+
+webpack会将所有依赖读取整理一遍再形成bundle，而vite是基于esModuel设计，可按需加载，速度更快
+
+![3](book_files/125.jpg)
+![4](book_files/126.jpg)
+
+### vite预构建
+1. 不同的第三方包会有不同的导出格式，vite会通过esbuild处理转换
+2. 对路径的处理可以直接使用.vite/deps,方便路径重写
+3. 网络多包传输的性能问题（也是原生esmodule规范不敢支持node_modules的原因之一）,有了依赖预构建以后无论有多少额外的export和import，vite都尽可能讲它们集成最后只生成一个或者几个模块
+
+```js
+// a
+export default function a(){}
+```
+```js
+// main.js
+export {default as a} from './a.js'
+//实际先import后导出
+```
+```js
+// vite发现main.js中用到了a，直接处理成function a，减少了import数量
+function a(){}
+```
+
+![预构建](book_files/127.jpg)
