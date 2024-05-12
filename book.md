@@ -303,6 +303,8 @@
     - [构建工具](#构建工具)
     - [vite为什么比webpack快](#vite为什么比webpack快)
     - [vite预构建](#vite预构建)
+    - [vite环境变量设置](#vite环境变量设置)
+      - [vite客户端配置环境变量](#vite客户端配置环境变量)
 
 
 ## html
@@ -9594,3 +9596,66 @@ function a(){}
 ```
 
 ![预构建](book_files/127.jpg)
+
+### vite环境变量设置
+Vite 使用了 dotenv 这个第三方的库来处理环境变量。
+
+具体来说，dotenv 会自动读取 .env 这个文件，并解析这个文件中对应的环境变量，但 Vite 考虑到和其他配置的冲突问题，它不会直接将这些环境变量注入到 process 对象下。vite提供了loadEnv来手动确认env文件。
+
+```js
+loadEnv(mode, root, prefix)
+```
+```js
+// process.cwd()：用于返回 Node.js 进程当前工作目录的路径
+const env = loadEnv(mode,process.cwd(),'SBXG_')
+```
+
+**如果设置了前缀，那么符合的前缀会被添加loadEnv返回值中，不符合的被过滤掉**
+
+.env文件
+```bash
+SBXG_API_URL=https://api.example.com  
+SBXG_APP_TITLE=My Superb App  
+SBXG1_DEBUG=true #会被过滤掉
+```
+
+```bash
+yarn dev --mode devexxx
+```
+
+loadEnv会做以下几件事：
+1. 直接找到.env文件，并解析其中环境变量，将他们放进一个对象中
+2. 会将传进来的mode变量的值进行拼接，如```.env.[devexxx]```，并根据提供的目录去寻找对应的配置文件进行解析，放进一个对象中
+3. 合并操作
+
+```js
+const baseEnvConfig = 读取.env的配置
+const modeEnvConfig = 读取env相关配置
+const lastEnvConfig = {...baseEnvConfig ,... modeEnvConfig }
+```
+
+#### vite客户端配置环境变量
+使用import.meta.env去获取
+
+为了安全，除了基本变量外，默认打印的是`VITE_`为前缀的变量，如果要修改，借助配置文件中envPrefix去设置
+```js
+{
+	SBXG_API_URL: 'https://api.example.com', 
+	SBXG_APP_TITLE: 'My Superb App', 
+	BASE_URL: '/', 
+	MODE: 'development',
+	DEV: true,
+	…
+}
+```
+
+```js
+import {defineConfig} from 'vite'
+
+export default defineConfig({
+    optimizeDeps:{
+        
+    },
+    envPrefix:'SBXG_'//下划线非必须
+})
+```
