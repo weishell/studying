@@ -30,6 +30,7 @@
     - [3D立体感绕x轴旋转](#3d立体感绕x轴旋转)
       - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
     - [css性能优化](#css性能优化)
+    - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
   - [js](#js)
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -305,6 +306,8 @@
     - [vite预构建](#vite预构建)
     - [vite环境变量设置](#vite环境变量设置)
       - [vite客户端配置环境变量](#vite客户端配置环境变量)
+    - [vite怎么读取App.vue文件](#vite怎么读取appvue文件)
+    - [vite对css支持](#vite对css支持)
 
 
 ## html
@@ -1432,6 +1435,19 @@ esheet'">
 4. 选择器(从右往左执行，不要写太多层级div #x 直接写 #x更快)，尽量不用通配符和属性选择器
 5. 减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能
 6. 少使用@import
+
+### 协同开发css类名冲突解决方案
+1. css module
+2. scoped
+3. css in js 库
+
+scoped 的实现原理是，Vue 会为每个组件生成一个唯一的 data-v-hash 属性（其中 hash 是基于组件选项计算得出的一个唯一值），并在编译时将组件的 CSS 选择器添加这个属性，以确保这些选择器只选中当前组件的元素。这样，即使两个组件使用了相同的类名，也不会发生样式冲突，因为它们的 CSS 选择器实际上并不相同。
+
+例如，如果你有一个带有 scoped 属性的 `<style>`标签，并且其中定义了一个 .my-class 的选择器，那么在运行时，这个选择器实际上会被转换为类似 .my-class[data-v-hash] 的形式。因此，只有具有相同 data-v-hash 属性的元素才会应用这个样式。
+
+css-module流程
+
+![流程](book_files/129.jpg)
 
 ## js
 
@@ -9659,3 +9675,12 @@ export default defineConfig({
     envPrefix:'SBXG_'//下划线非必须
 })
 ```
+
+### vite怎么读取App.vue文件
+
+![案例](book_files/128.jpg)
+
+### vite对css支持
+![解读](book_files/130.jpg)
+
+![解读2](book_files/131.jpg)
