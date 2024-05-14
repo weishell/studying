@@ -183,6 +183,7 @@
 </ul>
 </li>
 <li><a href="#css%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96">css性能优化</a></li>
+<li><a href="#%E5%8D%8F%E5%90%8C%E5%BC%80%E5%8F%91css%E7%B1%BB%E5%90%8D%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88">协同开发css类名冲突解决方案</a></li>
 </ul>
 </li>
 <li><a href="#js">js</a>
@@ -432,7 +433,11 @@
 <li><a href="#%E5%8A%9F%E8%83%BD%E6%94%B9%E5%8F%98">功能改变</a></li>
 </ul>
 </li>
-<li><a href="#vue3%E7%9A%84composition-api%E7%9A%84%E5%A5%BD%E5%A4%84">vue3的Composition Api的好处</a></li>
+<li><a href="#vue3%E7%9A%84composition-api%E7%9A%84%E5%A5%BD%E5%A4%84">vue3的Composition Api的好处</a>
+<ul>
+<li><a href="#composition-api-%E5%92%8C-react-hooks-%E5%AF%B9%E6%AF%94">Composition API 和 React hooks 对比</a></li>
+</ul>
+</li>
 <li><a href="#vue3%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E4%B8%BB%E8%A6%81%E4%BD%93%E7%8E%B0%E5%9C%A8%E5%93%AA%E5%87%A0%E4%B8%AA%E6%96%B9%E9%9D%A2">vue3性能提升主要体现在哪几个方面</a></li>
 <li><a href="#vue3proxy%E5%8F%96%E4%BB%A3defineproperty-api%E5%8E%9F%E5%9B%A0">vue3proxy取代defineProperty API原因</a></li>
 <li><a href="#%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3ref-reactive-toref-torefs">如何理解ref reactive toRef toRefs</a>
@@ -441,8 +446,18 @@
 <li><a href="#reactive">reactive</a></li>
 <li><a href="#toref">toRef</a></li>
 <li><a href="#torefs">toRefs</a></li>
+<li><a href="#%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81ref">为何需要ref</a></li>
+<li><a href="#%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81vuale">为何需要.vuale</a></li>
 </ul>
 </li>
+<li><a href="#vue3%E4%B8%ADwatch%E5%92%8Cwatcheffect%E7%9A%84%E5%8C%BA%E5%88%AB">Vue3中watch和watchEffect的区别</a>
+<ul>
+<li><a href="#%E7%9B%91%E5%90%ACref">监听ref</a></li>
+<li><a href="#%E7%9B%91%E5%90%ACreactive">监听reactive</a></li>
+<li><a href="#watch%E7%9B%91%E5%90%AC%E5%A4%9A%E4%B8%AA">Watch监听多个</a></li>
+</ul>
+</li>
+<li><a href="#setup%E4%B8%AD%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E7%BB%84%E4%BB%B6%E5%AE%9E%E4%BE%8B">Setup中如何获取组件实例</a></li>
 </ul>
 </li>
 <li><a href="#react">React</a>
@@ -642,6 +657,7 @@
 <ul>
 <li><a href="#%E6%8A%BD%E7%A6%BB%E5%8D%95%E7%8B%ACcss%E6%96%87%E4%BB%B6">抽离单独css文件</a></li>
 <li><a href="#importloaders-%E9%85%8D%E7%BD%AE">importLoaders 配置</a></li>
+<li><a href="#webpack%E5%8D%95%E7%8B%AC%E5%88%86%E7%A6%BBcss">webpack单独分离css</a></li>
 </ul>
 </li>
 <li><a href="#babel-loader">babel-loader</a>
@@ -651,6 +667,27 @@
 </ul>
 </li>
 <li><a href="#webpack-%E5%AE%9E%E7%8E%B0%E7%94%9F%E4%BA%A7%E5%92%8C%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83">webpack 实现生产和测试环境</a></li>
+<li><a href="#webpack-plugins">webpack plugins</a></li>
+<li><a href="#%E6%A8%A1%E5%9D%97%E7%83%AD%E6%9B%BF%E6%8D%A2hmr">模块热替换HMR</a></li>
+</ul>
+</li>
+<li><a href="#vite">Vite</a>
+<ul>
+<li><a href="#%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7">构建工具</a></li>
+<li><a href="#vite%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%94webpack%E5%BF%AB">vite为什么比webpack快</a></li>
+<li><a href="#vite%E9%A2%84%E6%9E%84%E5%BB%BA">vite预构建</a></li>
+<li><a href="#vite%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE">vite环境变量设置</a>
+<ul>
+<li><a href="#vite%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F">vite客户端配置环境变量</a></li>
+</ul>
+</li>
+<li><a href="#vite%E6%80%8E%E4%B9%88%E8%AF%BB%E5%8F%96appvue%E6%96%87%E4%BB%B6">vite怎么读取App.vue文件</a></li>
+<li><a href="#vite%E5%AF%B9css%E6%94%AF%E6%8C%81">vite对css支持</a></li>
+<li><a href="#vite%E4%B8%AD%E5%A4%84%E7%90%86css">vite中处理css</a>
+<ul>
+<li><a href="#vite%E5%A4%84%E7%90%86css%E9%A2%84%E7%BC%96%E8%AF%91%E8%AF%AD%E8%A8%80">vite处理css预编译语言</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1713,6 +1750,19 @@ esheet&#x27;&quot;</span>&gt;</span>
 <li>减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能</li>
 <li>少使用@import</li>
 </ol>
+<h3 id="协同开发css类名冲突解决方案">协同开发css类名冲突解决方案</h3>
+<ol>
+<li>css module</li>
+<li>scoped</li>
+<li>css in js 库</li>
+</ol>
+<p>scoped 的实现原理是，Vue 会为每个组件生成一个唯一的 data-v-hash 属性（其中 hash 是基于组件选项计算得出的一个唯一值），并在编译时将组件的 CSS 选择器添加这个属性，以确保这些选择器只选中当前组件的元素。这样，即使两个组件使用了相同的类名，也不会发生样式冲突，因为它们的 CSS 选择器实际上并不相同。</p>
+<p>例如，如果你有一个带有 scoped 属性的 <code>&lt;style&gt;</code>标签，并且其中定义了一个 .my-class 的选择器，那么在运行时，这个选择器实际上会被转换为类似 .my-class[data-v-hash] 的形式。因此，只有具有相同 data-v-hash 属性的元素才会应用这个样式。</p>
+<p>css-module流程</p>
+<p><img src="file:///e:\studying\book_files\129.jpg" alt="流程"></p>
+<h3 id="postcss">postcss</h3>
+<p>PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。它允许你使用未来的 CSS 语法，并为你提供许多有用的功能，如变量、嵌套规则、混合（mixins）、函数等，这些功能在原生 CSS 中是不可用的，并且可以添加前缀和低浏览器适配。</p>
+<p>它支持的功能可以通过添加各类插件得到实现。</p>
 <h2 id="js">js</h2>
 <h3 id="windowgetcomputedstyleelement-获取伪类中的内容">window.getComputedStyle(element) 获取伪类中的内容</h3>
 <ol>
@@ -5008,25 +5058,30 @@ performance.<span class="hljs-title function_">getEntriesByName</span>(<span cla
 <li>速度更快
 <ul>
 <li>重写了虚拟Dom实现</li>
-<li>编译模板的优化</li>
+<li>编译模板的优化（PatchFlag）</li>
 <li>更高效的组件初始化</li>
 <li>update性能提高1.3~2倍</li>
 <li>SSR速度提高了2~3倍</li>
+<li>proxy</li>
+<li>将静态节点的定义，提升到父作用域，缓存起来</li>
+<li>缓存事件，空间换时间</li>
 </ul>
 </li>
 <li>体积更小
 <ul>
-<li>通过webpack的tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的</li>
+<li>通过tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的</li>
 </ul>
 </li>
 <li>更易维护：compositon Api + options Api</li>
 <li>更好的Typescript支持</li>
 <li>编译器重写</li>
 </ol>
+<p><img src="file:///e:\studying\book_files\121.jpg" alt="diff"></p>
 <h4 id="功能改变">功能改变</h4>
 <ul>
 <li>fragments： 支持多根节点</li>
 <li>Teleport：传送门</li>
+<li>suspense：加载一步组件loading</li>
 <li>composition Api</li>
 <li>createRenderer:能够构建自定义渲染器，能够将 vue 的开发模型扩展到其他平台</li>
 </ul>
@@ -5051,8 +5106,23 @@ performance.<span class="hljs-title function_">getEntriesByName</span>(<span cla
 <li>移除$on，$off和$once 实例方法</li>
 <li>移除过滤filter</li>
 <li>移除内联模板 attribute</li>
+<li>移除.sync</li>
 <li>移除$destroy 实例方法。用户不应再手动管理单个Vue 组件的生命周期。在 Vue 3 中，$destroy 方法已经被完全移除，进一步强调了开发者应该依赖 Vue 的自动生命周期管理，而不是手动去销毁组件或实例。</li>
+<li>CreateAPP</li>
+<li>emit</li>
+<li>生命周期</li>
+<li>多事件</li>
+<li>异步组件的写法</li>
 </ul>
+<p><img src="file:///e:\studying\book_files\111.jpg" alt="createapp"></p>
+<p><img src="file:///e:\studying\book_files\112.jpg" alt="emit"></p>
+<p><img src="file:///e:\studying\book_files\113.jpg" alt="多事件"></p>
+<p><img src="file:///e:\studying\book_files\114.jpg" alt="Fragment"></p>
+<p><img src="file:///e:\studying\book_files\115.jpg" alt="sync"></p>
+<p><img src="file:///e:\studying\book_files\116.jpg" alt="异步组件"></p>
+<p><img src="file:///e:\studying\book_files\117.jpg" alt="filter"></p>
+<p><img src="file:///e:\studying\book_files\118.jpg" alt="teleport"></p>
+<p><img src="file:///e:\studying\book_files\119.jpg" alt="suspense"></p>
 <h3 id="vue3的composition-api的好处">vue3的Composition Api的好处</h3>
 <ol>
 <li>不需要像options API一个功能代码跳转很多地方</li>
@@ -5122,6 +5192,13 @@ performance.<span class="hljs-title function_">getEntriesByName</span>(<span cla
 </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 <p>可以看到，整个数据来源清晰了，即使去编写更多的 hook 函数，也不会出现命名冲突的问题</p>
+<h4 id="composition-api-和-react-hooks-对比">Composition API 和 React hooks 对比</h4>
+<ol>
+<li>前者setup只会调用一次，而后者函数会被多次调用</li>
+<li>前者无需useMemo useCallback缓存，因为setup只调用一次</li>
+<li>前者无需顾虑调用顺序，而后者需要保证hooks的执行顺序</li>
+<li>ref+reactive理解难于useState</li>
+</ol>
 <h3 id="vue3性能提升主要体现在哪几个方面">vue3性能提升主要体现在哪几个方面</h3>
 <p>回顾Vue2，每个组件实例都对应一个 watcher 实例，它会在组件渲染的过程中把用到的数据property记录为依赖，当依赖发生改变，触发setter，则会通知watcher，从而使关联的组件重新渲染</p>
 <p><img src="file:///e:\studying\book_files\69.jpg" alt="vue2"></p>
@@ -5376,6 +5453,95 @@ performance.<span class="hljs-title function_">getEntriesByName</span>(<span cla
 </code></pre>
 <p>使用toRefs，合成函数返回响应式对象，可方便解构</p>
 <p><img src="file:///e:\studying\book_files\109.jpg" alt="ref"></p>
+<h4 id="为何需要ref">为何需要ref</h4>
+<ol>
+<li>直接返回值类型，会丢失响应式</li>
+<li>在setup、computed、合成函数中都有可能返回值类型</li>
+</ol>
+<h4 id="为何需要vuale">为何需要.vuale</h4>
+<ol>
+<li>Ref是一个响应式对象，value存储值</li>
+<li>通过.value属性的get set实现响应式</li>
+<li>用于模板、reactive中【vue编译自己控制】，不需要加.value，其他情况需要【js自己获取】</li>
+</ol>
+<p>举个例子，如果是有.value，那么改变的是对象中属性，对象因为引用关系，也会变化，而错误的写法，是值类型的变化，改变了值，就没关联了。</p>
+<p><img src="file:///e:\studying\book_files\110.jpg" alt="value"></p>
+<h3 id="vue3中watch和watcheffect的区别">Vue3中watch和watchEffect的区别</h3>
+<ol>
+<li>两者都可以监听data属性的变化</li>
+<li>Watch需要明确监听哪个属性，如果监听多个属性可第一个参数要写成数组形式，第二个处理函数的参数也要注意处理</li>
+<li>watchEffect会根据其中的属性，自动监听其变化</li>
+</ol>
+<h4 id="监听ref">监听ref</h4>
+<pre><code class="language-js"><span class="hljs-title function_">watch</span>(numberRef, <span class="hljs-function">(<span class="hljs-params">newNumber, oldNumber</span>) =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ref watch&#x27;</span>, newNumber, oldNumber)
+    }
+    <span class="hljs-comment">// , {</span>
+    <span class="hljs-comment">//     immediate: true // 初始化之前就监听，可选</span>
+    <span class="hljs-comment">// }</span>
+)
+</code></pre>
+<h4 id="监听reactive">监听reactive</h4>
+<pre><code class="language-js"> <span class="hljs-title function_">watch</span>(
+    <span class="hljs-comment">// 第一个参数，确定要监听哪个属性</span>
+    <span class="hljs-function">() =&gt;</span> state.<span class="hljs-property">age</span>,
+
+    <span class="hljs-comment">// 第二个参数，回调函数</span>
+    <span class="hljs-function">(<span class="hljs-params">newAge, oldAge</span>) =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;state watch&#x27;</span>, newAge, oldAge)
+    },
+
+    <span class="hljs-comment">// 第三个参数，配置项</span>
+    {
+        <span class="hljs-attr">immediate</span>: <span class="hljs-literal">true</span>, <span class="hljs-comment">// 初始化之前就监听，可选</span>
+        <span class="hljs-comment">// deep: true // 深度监听</span>
+    }
+)
+</code></pre>
+<h4 id="watch监听多个">Watch监听多个</h4>
+<pre><code class="language-js"> <span class="hljs-comment">//监听两个值，fooRef，barRef;变化后foo bar值；变化前的值prevFoo prevBar</span>
+<span class="hljs-title function_">watch</span>([fooRef, barRef], <span class="hljs-function">(<span class="hljs-params">[foo, bar], [prevFoo, prevBar]</span>) =&gt;</span> {
+  <span class="hljs-comment">/* ... */</span>
+})
+watchEffect初始化要收集数据一定会执行一次
+<span class="hljs-title function_">watchEffect</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-comment">// 初始化时，一定会执行一次（收集要监听的数据）</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;hello watchEffect&#x27;</span>)
+})
+</code></pre>
+<h3 id="setup中如何获取组件实例">Setup中如何获取组件实例</h3>
+<pre><code class="language-js">&lt;script&gt;
+<span class="hljs-keyword">import</span> { onMounted, getCurrentInstance } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;GetInstance&#x27;</span>,
+    <span class="hljs-title function_">data</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">return</span> {
+            <span class="hljs-attr">x</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-attr">y</span>: <span class="hljs-number">2</span>
+        }
+    },
+    <span class="hljs-title function_">setup</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// 没有this</span>
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this1&#x27;</span>, <span class="hljs-variable language_">this</span>)
+
+        <span class="hljs-title function_">onMounted</span>(<span class="hljs-function">() =&gt;</span> {
+            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this in onMounted&#x27;</span>, <span class="hljs-variable language_">this</span>)
+            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;x&#x27;</span>, instance.<span class="hljs-property">data</span>.<span class="hljs-property">x</span>)
+        })
+        
+        <span class="hljs-keyword">const</span> instance = <span class="hljs-title function_">getCurrentInstance</span>()
+        <span class="hljs-comment">//还没实例化，也获取不到，需要在onMounted中获取</span>
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;instance&#x27;</span>, instance)
+    },
+    <span class="hljs-title function_">mounted</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">//options API 可以继续使用this</span>
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this2&#x27;</span>, <span class="hljs-variable language_">this</span>)
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;y&#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span>)
+    }
+}
+&lt;/script&gt;
+</code></pre>
 <h2 id="react">React</h2>
 <p>React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、声明式编程范式和函数式编程概念，以使前端应用程序更高效</p>
 <p>使用虚拟 DOM 来有效地操作 DOM，遵循从高阶组件到低阶组件的<code>单向数据流</code></p>
@@ -8930,6 +9096,52 @@ miniRouter.<span class="hljs-title function_">push</span>(<span class="hljs-stri
     <span class="hljs-attribute">color</span>:green
 }
 </code></pre>
+<h4 id="webpack单独分离css">webpack单独分离css</h4>
+<p>Css 文件目前被打包到 js 文件中，当 js 文件加载时，会创建一个 style 标签来生成样式，这样对于网站来说，会出现闪屏现象，用户体验不好,应该是单独的 Css 文件，通过 link 标签加载性能才好</p>
+<p><img src="file:///e:\studying\book_files\120.jpg" alt="style-loader"></p>
+<p>使用MiniCssExtractPlugin，在插件和loader中配置</p>
+<pre><code class="language-js">npm i mini-css-extract-plugin -D
+</code></pre>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">MiniCssExtractPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mini-css-extract-plugin&#x27;</span>);  
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {  
+  <span class="hljs-comment">// ... 其他的 webpack 配置 ...  </span>
+
+  <span class="hljs-attr">plugins</span>: [  
+    <span class="hljs-comment">// ... 其他的插件 ...  </span>
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">MiniCssExtractPlugin</span>({  
+      <span class="hljs-comment">// 选项（可选）  </span>
+      <span class="hljs-comment">// 例如: filename: &#x27;[name].css&#x27;,  </span>
+      <span class="hljs-comment">// chunkFilename: &#x27;[id].css&#x27;,  </span>
+	  <span class="hljs-comment">// 定义输出文件名和目录</span>
+	  <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;static/css/main.css&quot;</span>,
+    }),  
+  ],  
+
+  <span class="hljs-attr">module</span>: {  
+    <span class="hljs-attr">rules</span>: [  
+      <span class="hljs-comment">// ... 其他的 loader 规则 ...  </span>
+
+      <span class="hljs-comment">// 对于 CSS 文件，使用 style-loader（开发环境）或 mini-css-extract-plugin.loader（生产环境）  </span>
+      {  
+        <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.css$/</span>,  
+        <span class="hljs-attr">use</span>: [  
+          process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> !== <span class="hljs-string">&#x27;production&#x27;</span>  
+            ? <span class="hljs-string">&#x27;style-loader&#x27;</span> <span class="hljs-comment">// 开发环境下内联样式  </span>
+            : <span class="hljs-title class_">MiniCssExtractPlugin</span>.<span class="hljs-property">loader</span>, <span class="hljs-comment">// 生产环境下提取到单独文件  </span>
+          <span class="hljs-string">&#x27;css-loader&#x27;</span>, <span class="hljs-comment">// 将 CSS 转化成 CommonJS 模块  </span>
+          <span class="hljs-comment">// 你可以在这里添加其他预处理器，比如 &#x27;postcss-loader&#x27;, &#x27;sass-loader&#x27;, &#x27;less-loader&#x27; 等  </span>
+        ],  
+      },  
+
+      <span class="hljs-comment">// ... 其他的 loader 规则 ...  </span>
+    ],  
+  },  
+
+  <span class="hljs-comment">// ... 其他的 webpack 配置 ...  </span>
+};
+</code></pre>
+<p><img src="file:///e:\studying\book_files\1.png" alt="加载"></p>
 <h3 id="babel-loader">babel-loader</h3>
 <p>Babel：JavaScript 编译器。</p>
 <p>主要用于将 ES6 语法编写的代码转换为向后兼容的 JavaScript 语法，以便能够运行在当前和旧版本的浏览器或其他环境中。</p>
@@ -9091,6 +9303,242 @@ npm run dev
 <li>.env.development 是开发环境下的配置文件，仅在开发环境加载。</li>
 <li>.env.production 是生产环境下的配置文件（也就是正式环境），仅在生产环境加载。</li>
 </ul>
+<h3 id="webpack-plugins">webpack plugins</h3>
+<p>plugins是需要引入的</p>
+<pre><code class="language-js">...
+<span class="hljs-attr">plugins</span>:{
+	<span class="hljs-keyword">new</span> <span class="hljs-title class_">HtmlWebpackPlugin</span>({
+	  <span class="hljs-attr">template</span>: <span class="hljs-string">&quot;./public/index.html&quot;</span>,
+	  <span class="hljs-attr">title</span>: <span class="hljs-string">&quot;新的标题&quot;</span> <span class="hljs-comment">//需要index中使用了ejs等模板才生效</span>
+	}),
+	<span class="hljs-keyword">new</span> <span class="hljs-title class_">DefinePlugin</span>({
+		  <span class="hljs-attr">BASE_URL</span>: <span class="hljs-string">&quot;&#x27;./img&#x27;&quot;</span>
+		}),
+	<span class="hljs-keyword">new</span> <span class="hljs-title class_">CleanWebpackPlugin</span>(),
+	<span class="hljs-keyword">new</span> <span class="hljs-title class_">CopyWebpackPlugin</span>({
+		  <span class="hljs-attr">patterns</span>: [
+			{
+			  <span class="hljs-attr">from</span>: <span class="hljs-string">&quot;public&quot;</span>,
+			  <span class="hljs-attr">to</span>: <span class="hljs-string">&quot;./src&quot;</span>,<span class="hljs-comment">// 放在src目录下</span>
+			  <span class="hljs-attr">globOptions</span>: {
+				<span class="hljs-attr">ignore</span>: [
+				  <span class="hljs-string">&quot;**/index.html&quot;</span><span class="hljs-comment">//忽略掉index.html</span>
+				]
+			  }
+			}
+		  ]
+	}),
+	<span class="hljs-keyword">new</span> <span class="hljs-title class_">CssMinimizerPlugin</span>()
+}
+</code></pre>
+<ul>
+<li>
+<p>CleanWebpackPlugin：W5版本之后不需要配置具体的文件夹，但是他会从output里读取，所以output的配置不能省略</p>
+</li>
+<li>
+<p>CopyWebpackPlugin: 某些文件，直接复制到打包后的文件中</p>
+</li>
+<li>
+<p>CssMinimizerPlugin:压缩css</p>
+</li>
+<li>
+<p>在webpack5中，可以不安装clearnwebpackplugin，内置的outpue配置clean为true即可清除</p>
+</li>
+</ul>
+<pre><code class="language-js"> <span class="hljs-attr">output</span>: {  
+    <span class="hljs-attr">path</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;min&#x27;</span>),  
+    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;bundle.js&#x27;</span>, 
+    <span class="hljs-attr">clean</span>:<span class="hljs-literal">true</span> 
+  },  
+</code></pre>
+<ul>
+<li>purgecss-webpack-plugin:移除未被使用的css，比较复杂</li>
+</ul>
+<h3 id="模块热替换hmr">模块热替换HMR</h3>
+<p>在程序运行中，替换、添加或删除模块，而无需重新加载整个页面。</p>
+<p>原理：webpack-dev-server会创建两个服务：提供静态资源的服务（express）和Socket服务（net.Socket）；</p>
+<p><img src="file:///e:\studying\book_files\122.jpg" alt="HMR"></p>
+<h2 id="vite">Vite</h2>
+<p>它主要由两部分组成：</p>
+<p>一个开发服务器，它基于 原生 ES 模块 提供了 丰富的内建功能，如速度快到惊人的 模块热更新（HMR）。</p>
+<p>一套构建指令，它使用 Rollup 打包你的代码，并且它是预配置的，可输出用于生产环境的高度优化过的静态资源。</p>
+<h3 id="构建工具">构建工具</h3>
+<p>构建工具让大家不用关心代码如何运行，只需要提供对应的配置，有了这个集成配置文件，他可以在下次需要更新时自动调用对应的命令完成对应的操作。</p>
+<p>它能做哪些：</p>
+<ol>
+<li>模块化开发，虽然浏览器支持esmodule，但是引入/node_modules/中的文件就会无法识别(识别的话浏览器请求资源可能陷入非常之多的情况，第三方模块也会引入其他模块等)。打包工具可以处理且还可以适配其他模块化(require commonjs)</li>
+<li>处理代码兼容：babel core-js less sass postcss</li>
+<li>提高性能：代码压缩，代码分割</li>
+<li>优化体验
+<ul>
+<li>HMR</li>
+<li>跨域</li>
+</ul>
+</li>
+</ol>
+<h3 id="vite为什么比webpack快">vite为什么比webpack快</h3>
+<p>webpack考虑了服务端兼容性问题，支持esModule和commonjs等规范，在启动编译时，还需要额外操作将多种模块化规范统一。</p>
+<p><img src="file:///e:\studying\book_files\123.jpg" alt="1">
+<img src="file:///e:\studying\book_files\124.jpg" alt="2"></p>
+<p>webpack会将所有依赖读取整理一遍再形成bundle，而vite是基于esModuel设计，可按需加载，速度更快</p>
+<p><img src="file:///e:\studying\book_files\125.jpg" alt="3">
+<img src="file:///e:\studying\book_files\126.jpg" alt="4"></p>
+<p>Vite 比 Webpack 快的原因主要有以下几点：</p>
+<ol>
+<li>利用原生 <code>ES Modules</code>：Vite 利用了现代浏览器对原生 ES Modules 的支持，<code>允许浏览器直接加载和执行 JavaScript 模块</code>，无需经过 Webpack 的打包过程。这大大减少了构建时间和服务器启动时间。</li>
+<li>快速的冷启动：Vite 采用了基于浏览器原生支持的 HTTP/2 协议，可以实现快速的<code>冷启动</code>时间，避免了 Webpack 繁重的打包过程。</li>
+<li>按需编译：Vite 通过静态分析技术，<code>只编译当前所需的代码片段</code>，而不是整个应用。这减少了不必要的编译时间，并且可以更好地利用缓存。</li>
+<li><code>更快的热重载</code>：在开发过程中，Vite 使用了原生 ES 模块，只重新编译被修改的文件，而不需要重新构建整个项目。这样可以实现更快速度的热重载，提高开发效率。</li>
+<li><code>轻量级</code>：Vite 在构建时只负责将源代码转换为浏览器可执行代码，而将其他功能如<code>压缩、合并</code>等工作交给生产环境打包工具处理。因此，它相对于 Webpack 来说更加轻量级。</li>
+<li>简单的配置：Vite 的配置相对更简单，因为它无需进行大量的配置，只需指定一些基本的选项就可以开始开发。而 Webpack 的配置更加复杂，需要针对具体项目进行不同的配置，且需要理解各种插件、Loader 等概念。</li>
+</ol>
+<p>总的来说，Vite 通过利用现代浏览器的原生功能和优化构建过程，实现了比 Webpack 更快的开发体验。</p>
+<h3 id="vite预构建">vite预构建</h3>
+<ol>
+<li>不同的第三方包会有不同的导出格式，vite会通过esbuild处理转换</li>
+<li>对路径的处理可以直接使用.vite/deps,方便路径重写</li>
+<li>网络多包传输的性能问题（也是原生esmodule规范不敢支持node_modules的原因之一）,有了依赖预构建以后无论有多少额外的export和import，vite都尽可能讲它们集成最后只生成一个或者几个模块</li>
+</ol>
+<pre><code class="language-js"><span class="hljs-comment">// a</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">a</span>(<span class="hljs-params"></span>){}
+</code></pre>
+<pre><code class="language-js"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">export</span> {<span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> a} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./a.js&#x27;</span>
+<span class="hljs-comment">//实际先import后导出</span>
+</code></pre>
+<pre><code class="language-js"><span class="hljs-comment">// vite发现main.js中用到了a，直接处理成function a，减少了import数量</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">a</span>(<span class="hljs-params"></span>){}
+</code></pre>
+<p><img src="file:///e:\studying\book_files\127.jpg" alt="预构建"></p>
+<h3 id="vite环境变量设置">vite环境变量设置</h3>
+<p>Vite 使用了 dotenv 这个第三方的库来处理环境变量。</p>
+<p>具体来说，dotenv 会自动读取 .env 这个文件，并解析这个文件中对应的环境变量，但 Vite 考虑到和其他配置的冲突问题，它不会直接将这些环境变量注入到 process 对象下。vite提供了loadEnv来手动确认env文件。</p>
+<pre><code class="language-js"><span class="hljs-title function_">loadEnv</span>(mode, root, prefix)
+</code></pre>
+<pre><code class="language-js"><span class="hljs-comment">// process.cwd()：用于返回 Node.js 进程当前工作目录的路径</span>
+<span class="hljs-keyword">const</span> env = <span class="hljs-title function_">loadEnv</span>(mode,process.<span class="hljs-title function_">cwd</span>(),<span class="hljs-string">&#x27;SBXG_&#x27;</span>)
+</code></pre>
+<p><strong>如果设置了前缀，那么符合的前缀会被添加loadEnv返回值中，不符合的被过滤掉</strong></p>
+<p>.env文件</p>
+<pre><code class="language-bash">SBXG_API_URL=https://api.example.com  
+SBXG_APP_TITLE=My Superb App  
+SBXG1_DEBUG=<span class="hljs-literal">true</span> <span class="hljs-comment">#会被过滤掉</span>
+</code></pre>
+<pre><code class="language-bash">yarn dev --mode devexxx
+</code></pre>
+<p>loadEnv会做以下几件事：</p>
+<ol>
+<li>直接找到.env文件，并解析其中环境变量，将他们放进一个对象中</li>
+<li>会将传进来的mode变量的值进行拼接，如<code>.env.[devexxx]</code>，并根据提供的目录去寻找对应的配置文件进行解析，放进一个对象中</li>
+<li>合并操作</li>
+</ol>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> baseEnvConfig = 读取.<span class="hljs-property">env</span>的配置
+<span class="hljs-keyword">const</span> modeEnvConfig = 读取env相关配置
+<span class="hljs-keyword">const</span> lastEnvConfig = {...baseEnvConfig ,... modeEnvConfig }
+</code></pre>
+<h4 id="vite客户端配置环境变量">vite客户端配置环境变量</h4>
+<p>使用import.meta.env去获取</p>
+<p>为了安全，除了基本变量外，默认打印的是<code>VITE_</code>为前缀的变量，如果要修改，借助配置文件中envPrefix去设置</p>
+<pre><code class="language-js">{
+	<span class="hljs-attr">SBXG_API_URL</span>: <span class="hljs-string">&#x27;https://api.example.com&#x27;</span>, 
+	<span class="hljs-attr">SBXG_APP_TITLE</span>: <span class="hljs-string">&#x27;My Superb App&#x27;</span>, 
+	<span class="hljs-attr">BASE_URL</span>: <span class="hljs-string">&#x27;/&#x27;</span>, 
+	<span class="hljs-attr">MODE</span>: <span class="hljs-string">&#x27;development&#x27;</span>,
+	<span class="hljs-attr">DEV</span>: <span class="hljs-literal">true</span>,
+	…
+}
+</code></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> {defineConfig} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vite&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title function_">defineConfig</span>({
+    <span class="hljs-attr">optimizeDeps</span>:{
+        
+    },
+    <span class="hljs-attr">envPrefix</span>:<span class="hljs-string">&#x27;SBXG_&#x27;</span><span class="hljs-comment">//下划线非必须</span>
+})
+</code></pre>
+<h3 id="vite怎么读取appvue文件">vite怎么读取App.vue文件</h3>
+<p><img src="file:///e:\studying\book_files\128.jpg" alt="案例"></p>
+<h3 id="vite对css支持">vite对css支持</h3>
+<p><img src="file:///e:\studying\book_files\130.jpg" alt="解读"></p>
+<p><img src="file:///e:\studying\book_files\131.jpg" alt="解读2"></p>
+<h3 id="vite中处理css">vite中处理css</h3>
+<p><img src="file:///e:\studying\book_files\132.jpg" alt="图"></p>
+<p><img src="file:///e:\studying\book_files\133.jpg" alt="图"></p>
+<pre><code class="language-js"><span class="hljs-comment">// /**</span>
+<span class="hljs-comment">//  * @type {import(&#x27;vite&#x27;).UserConfig}</span>
+<span class="hljs-comment">//  */</span>
+<span class="hljs-comment">// const config = {</span>
+<span class="hljs-comment">//     optimizeDeps:{</span>
+<span class="hljs-comment">//         exclude:[&#x27;lodash-es&#x27;]</span>
+<span class="hljs-comment">//     }</span>
+<span class="hljs-comment">//   }</span>
+  
+<span class="hljs-comment">// export default config</span>
+
+
+<span class="hljs-keyword">import</span> {defineConfig} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vite&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title function_">defineConfig</span>({
+    <span class="hljs-attr">optimizeDeps</span>:{
+        
+    },
+    <span class="hljs-attr">css</span>:{
+        <span class="hljs-attr">modules</span>:{
+            <span class="hljs-attr">localsConvention</span>:<span class="hljs-string">&quot;camelCase&quot;</span>,<span class="hljs-comment">//这是给导出的key名字定义的规则</span>
+            <span class="hljs-attr">scopeBehaviour</span>:<span class="hljs-string">&quot;local&quot;</span>,<span class="hljs-comment">//如果设置成全局则都不按模块化解析</span>
+            <span class="hljs-attr">generateScopedName</span>:<span class="hljs-string">&#x27;[name]_[local]&#x27;</span>,<span class="hljs-comment">// 生成的类名，可在这里配置</span>
+            <span class="hljs-comment">// generateScopedName:(name,filename,css)=&gt;{</span>
+            <span class="hljs-comment">//     console.warn(`name`,name)</span>
+            <span class="hljs-comment">//     console.warn(`filename`,filename)</span>
+            <span class="hljs-comment">//     console.warn(`css`,css)</span>
+            <span class="hljs-comment">//     return `sbxg_${name}`</span>
+            <span class="hljs-comment">//     return &#x27;sbxg_&#x27;</span>
+            <span class="hljs-comment">// },</span>
+            <span class="hljs-attr">hashPrefix</span>:<span class="hljs-string">&quot;hhhhh&quot;</span>,
+            <span class="hljs-attr">globalModulePaths</span>:[<span class="hljs-string">&#x27;./c3.module.css&#x27;</span>]<span class="hljs-comment">//排除c3模块，不按照模块化解析，仍按普通css解析</span>
+        }
+    }
+})
+</code></pre>
+<p><code>localsConvention</code>可以更好的规定引入css后模块化的写法，而<code>globalModulePaths</code>则可避免不必要处理的css仍按原来解析方式，比如里面引入@import url('antd')等，不要影响第三方css</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.cc-key</span>{
+    <span class="hljs-attribute">color</span>:red
+}
+</code></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> styles <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./c2.module.css&#x27;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(styles)
+<span class="hljs-keyword">let</span> div = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;div&#x27;</span>)
+div.<span class="hljs-property">className</span> = styles.<span class="hljs-property">ccKey</span><span class="hljs-comment">//如果配置了转成驼峰写法，就可以这样用了</span>
+</code></pre>
+<p>这里可以根据不同的localsConvention得到不同的结果，就是上文的styles会打印出的东西
+<img src="file:///e:\studying\book_files\134.jpg" alt="图"></p>
+<h4 id="vite处理css预编译语言">vite处理css预编译语言</h4>
+<p><img src="file:///e:\studying\book_files\136.jpg" alt="less"></p>
+<pre><code class="language-js">......
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title function_">defineConfig</span>({
+    <span class="hljs-attr">css</span>:{
+        <span class="hljs-attr">preprocessorOptions</span>:{
+            <span class="hljs-attr">less</span>:{
+                <span class="hljs-attr">math</span>:<span class="hljs-string">&quot;always&quot;</span>, <span class="hljs-comment">//对一些计算属性的处理</span>
+                <span class="hljs-attr">globalVars</span>:{
+                    <span class="hljs-attr">mainColor</span>:<span class="hljs-string">&quot;red&quot;</span><span class="hljs-comment">//设置全局变量，可以不需要每个文件总是引入</span>
+                }
+            }
+        }
+    }
+})
+</code></pre>
+<p>可以获取<strong>全局变量</strong>里的值</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.k1</span>{
+    <span class="hljs-selector-class">.k2</span>{
+        <span class="hljs-attribute">margin</span>: <span class="hljs-number">100px</span> / <span class="hljs-number">2</span>;
+        <span class="hljs-attribute">padding</span>:(<span class="hljs-number">100px</span>/<span class="hljs-number">2</span>);
+        <span class="hljs-attribute">color</span>:@mainColor
+    }
+}
+</code></pre>
+<p><img src="file:///e:\studying\book_files\135.jpg" alt="图"></p>
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             

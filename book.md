@@ -1,4 +1,23 @@
-
+<style>
+	*{
+		font-family:"宋体"
+	}
+	strong,b{
+		color:purple
+	}
+	code{
+		color:orange;
+		font-family:"楷体" !important
+	}
+	em{
+		font-style:normal;
+		color:black;
+		/* text-decoration: underline; */
+		font-weight:normal;
+		display:inline-block;
+		border-bottom: 1px solid green
+	}
+</style>
 
 
 # 前端整理合集
@@ -31,6 +50,7 @@
       - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
     - [css性能优化](#css性能优化)
     - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
+    - [postcss](#postcss)
   - [js](#js)
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -246,6 +266,8 @@
     - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
+  - [node](#node)
+    - [为什么拼接目录不用相对目录要用path处理](#为什么拼接目录不用相对目录要用path处理)
   - [http](#http)
     - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
     - [http状态码](#http状态码)
@@ -308,6 +330,12 @@
       - [vite客户端配置环境变量](#vite客户端配置环境变量)
     - [vite怎么读取App.vue文件](#vite怎么读取appvue文件)
     - [vite对css支持](#vite对css支持)
+    - [vite中处理css](#vite中处理css)
+      - [vite对css预编译和兼容处理](#vite对css预编译和兼容处理)
+    - [vite对静态资源处理](#vite对静态资源处理)
+      - [svg怎么悬浮变色](#svg怎么悬浮变色)
+    - [vite alias的原理实现](#vite-alias的原理实现)
+    - [vite生产配置](#vite生产配置)
 
 
 ## html
@@ -338,7 +366,7 @@
 ## css
 
 ### offsetWidth
-offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.一个典型的（译者注：各浏览器的 offsetWidth `可能有所不同`）.offsetWidth = border + padding + scrollbar(竖直方向滚动条) + width.
+offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各浏览器的 offsetWidth `可能有所不同`）.offsetWidth = border + padding + scrollbar(竖直方向滚动条) + width.
 
 ![offsetWidth](book_files/2.jpg)
 
@@ -1449,6 +1477,13 @@ css-module流程
 
 ![流程](book_files/129.jpg)
 
+### postcss
+PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。它允许你使用未来的 CSS 语法，并为你提供许多有用的功能，如变量、嵌套规则、混合（mixins）、函数等，这些功能在原生 CSS 中是不可用的，并且可以添加前缀和低浏览器适配。
+
+它支持的功能可以通过添加各类插件得到实现。
+
+![图](book_files/137.jpg)
+
 ## js
 
 ### window.getComputedStyle(element) 获取伪类中的内容
@@ -1476,7 +1511,7 @@ console.log(window.getComputedStyle(k1, ':before').getPropertyValue("content")) 
 ```
 
 ### js中哪些会被判断为false
-以下这些都会： 0 null undefined NaN ""
+以下这些都会： 0 null undefined **NaN** ""
 ```js
 if (0) {  
   console.log("This will not be logged because 0 is falsy.");  
@@ -1544,7 +1579,7 @@ undefined+1//NaN
 
 #### 词法作用域案例
 
-词法作用域，也被称为`静态作用域`，是定义在词法阶段的作用域，即在写代码时就已经确定了变量和函数的作用范围。词法作用域关注的是函数在`何处声明`，而不是从何处调用。
+词法作用域，也被称为`静态作用域`，是定义在词法阶段的作用域，即在写代码时就已经**确定了变量和函数**的作用范围。词法作用域关注的是函数在`何处声明`，而不是从何处调用。
 ```js
 var a = 2;
 function foo(){
@@ -1591,7 +1626,7 @@ JavaScript中有三种类型的执行上下文：
 
 
 ### 闭包
-函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。
+***函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。***
 
 ![闭包](book_files/36.jpg)
 
@@ -1650,7 +1685,8 @@ function func() {
 	}
 	test = null;//没有这一步，则会形成不必要的闭包
 	//再给test赋值onclick的时候点击事件已经存在dom上了，test只是一个暂存dom元素的变量
-	//这仅仅断开了局部变量 test 和 DOM 元素之间的引用，但并没有改变 DOM 元素本身或它的任何属性，包括 onclick 事件处理器。，如果是要解绑点击事件，需要把dom上的onclick设置为null
+	//这仅仅断开了局部变量 test 和 DOM 元素之间的引用，但并没有改变 DOM 元素本身或它的任何属性，
+	//包括 onclick 事件处理器。如果是要解绑点击事件，需要把dom上的onclick设置为null
 	// document.getElementById('test').onclick = null;
 }
 ```
@@ -1669,8 +1705,8 @@ function funcTest(){
 #### 防抖和节流
 防抖（debounce）和节流（throttle）是两种常用的浏览器事件处理方法，它们的主要目的都是为了减少事件触发频率，优化性能。
 
-+ 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。【搜索框自动补全、表单验证、按钮点击等】
-+ 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。【页面滚动、鼠标移动、懒加载】
++ 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。***【搜索框自动补全、表单验证、按钮点击等】***
++ 节流：在一段时间内，无论事件触发多少次，都只执行一次事件处理函数。***【页面滚动、鼠标移动、懒加载】***
 
 #### 闭包为什么会延长变量的生命周期
 
@@ -8047,6 +8083,22 @@ window.onload = setAppropriateImageSrc;
 window.onresize = setAppropriateImageSrc;
 ```
 
+
+## node
+
+### 为什么拼接目录不用相对目录要用path处理
+因为node启动命令会调用process.cwd()去拼接对应的路径，如果是在当前文件夹则没问题，如果是node a/index.js路径就是拿的a的路径
+
+![参考](book_files/138.jpg)
+
+而使用path处理可帮助解决不同系统路径`/\`等不同造成的困扰
+
+__dirname一直指向运行的当前文件目录
+```js
+path.resolve(__dirname,'./index.js')
+```
+
+
 ## http
 
 ### 从输入URL到渲染页面的整个过程
@@ -9592,6 +9644,19 @@ webpack会将所有依赖读取整理一遍再形成bundle，而vite是基于esM
 ![3](book_files/125.jpg)
 ![4](book_files/126.jpg)
 
+
+Vite 比 Webpack 快的原因主要有以下几点：
+
+1. 利用原生 `ES Modules`：Vite 利用了现代浏览器对原生 ES Modules 的支持，`允许浏览器直接加载和执行 JavaScript 模块`，无需经过 Webpack 的打包过程。这大大减少了构建时间和服务器启动时间。
+2. 快速的冷启动：Vite 采用了基于浏览器原生支持的 HTTP/2 协议，可以实现快速的`冷启动`时间，避免了 Webpack 繁重的打包过程。
+3. 按需编译：Vite 通过静态分析技术，`只编译当前所需的代码片段`，而不是整个应用。这减少了不必要的编译时间，并且可以更好地利用缓存。
+4. `更快的热重载`：在开发过程中，Vite 使用了原生 ES 模块，只重新编译被修改的文件，而不需要重新构建整个项目。这样可以实现更快速度的热重载，提高开发效率。
+5. `轻量级`：Vite 在构建时只负责将源代码转换为浏览器可执行代码，而将其他功能如`压缩、合并`等工作交给生产环境打包工具处理。因此，它相对于 Webpack 来说更加轻量级。
+6. 简单的配置：Vite 的配置相对更简单，因为它无需进行大量的配置，只需指定一些基本的选项就可以开始开发。而 Webpack 的配置更加复杂，需要针对具体项目进行不同的配置，且需要理解各种插件、Loader 等概念。
+
+总的来说，Vite 通过利用现代浏览器的原生功能和优化构建过程，实现了比 Webpack 更快的开发体验。
+
+
 ### vite预构建
 1. 不同的第三方包会有不同的导出格式，vite会通过esbuild处理转换
 2. 对路径的处理可以直接使用.vite/deps,方便路径重写
@@ -9684,3 +9749,150 @@ export default defineConfig({
 ![解读](book_files/130.jpg)
 
 ![解读2](book_files/131.jpg)
+
+### vite中处理css
+![图](book_files/132.jpg)
+
+![图](book_files/133.jpg)
+
+```js
+// /**
+//  * @type {import('vite').UserConfig}
+//  */
+// const config = {
+//     optimizeDeps:{
+//         exclude:['lodash-es']
+//     }
+//   }
+  
+// export default config
+
+
+import {defineConfig} from 'vite'
+
+export default defineConfig({
+    optimizeDeps:{
+        
+    },
+    css:{
+        modules:{
+            localsConvention:"camelCase",//这是给导出的key名字定义的规则
+            scopeBehaviour:"local",//如果设置成全局则都不按模块化解析
+            generateScopedName:'[name]_[local]',// 生成的类名，可在这里配置
+            // generateScopedName:(name,filename,css)=>{
+            //     console.warn(`name`,name)
+            //     console.warn(`filename`,filename)
+            //     console.warn(`css`,css)
+            //     return `sbxg_${name}`
+            //     return 'sbxg_'
+            // },
+            hashPrefix:"hhhhh",
+            globalModulePaths:['./c3.module.css']//排除c3模块，不按照模块化解析，仍按普通css解析
+        }
+    }
+})
+```
+`localsConvention`可以更好的规定引入css后模块化的写法，而`globalModulePaths`则可避免不必要处理的css仍按原来解析方式，比如里面引入@import url('antd')等，不要影响第三方css
+
+```css
+.cc-key{
+    color:red
+}
+```
+```js
+import styles from './c2.module.css'
+console.log(styles)
+let div = document.createElement('div')
+div.className = styles.ccKey//如果配置了转成驼峰写法，就可以这样用了
+```
+
+这里可以根据不同的localsConvention得到不同的结果，就是上文的styles会打印出的东西
+![图](book_files/134.jpg)
+
+#### vite对css预编译和兼容处理
+
+![less](book_files/136.jpg)
+
+```js
+......
+export default defineConfig({
+    css:{
+        preprocessorOptions:{
+            less:{
+                math:"always", //对一些计算属性的处理
+                globalVars:{
+                    mainColor:"red"//设置全局变量，可以不需要每个文件总是引入
+                }
+            }
+        }
+    }
+})
+```
+
+可以获取**全局变量**里的值
+```css
+.k1{
+    .k2{
+        margin: 100px / 2;
+        padding:(100px/2);
+        color:@mainColor
+    }
+}
+```
+
+![图](book_files/135.jpg)
+
+```js
+import {defineConfig} from 'vite'
+import postcssPresetEnv from 'postcss-preset-env'
+
+export default defineConfig({
+    css:{
+        postcss:{
+            plugins:[postcssPresetEnv] //兼容 添加前缀都功能
+        }
+    }
+})
+```
+
+### vite对静态资源处理
+vite会帮助获取图片的路径，对json文件也会直接转成对象而不需要手动反序列化
+```js
+import styleImg from './src/assets/demo.png' //返回路径
+// import styleImg from './src/assets/demo.png?raw' //返回buffer
+
+import myJson,{age} from './src/json/demo.json' // json已经转成对象，还可以解构，方便tree-shaking
+
+console.log(styleImg)
+console.log(myJson)
+console.log(typeof myJson)
+console.log(age)
+```
+
+![图片](book_files/139.jpg)
+
+#### svg怎么悬浮变色
+```html
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"   
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">  
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  
+    <polygon points="50,0 100,50 50,100 0,50" fill="blue" stroke="black" stroke-width="2"/>  
+</svg>
+```
+```js
+import styleSvg from '@assets/deno.svg?raw'
+document.body.innerHTML = styleSvg
+let svg = document.getElementsByTagName('svg')[0]
+svg.onmouseenter = function(e){
+    this.style.fill ='red' //这种写法不生效，只是举例
+}
+console.log(styleSvg)// 就是svg里的代码
+```
+
+### vite alias的原理实现
+
+基于字符串替换，包括buffer转字符串等操作
+![字符串替换](book_files/140.jpg)
+
+
+### vite生产配置
