@@ -6,8 +6,9 @@
 		color:purple
 	}
 	code{
-		color:orange;
-		font-family:"楷体" !important
+		color:green;
+		font-family:"楷体" !important;
+		font-size:16px !important;
 	}
 	em{
 		font-style:normal;
@@ -249,6 +250,7 @@
       - [react路由传参的形式](#react路由传参的形式)
     - [项目中使用redux，结构划分](#项目中使用redux结构划分)
       - [react-redux redux-thunk](#react-redux-redux-thunk)
+  - [Angular](#angular)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -336,6 +338,8 @@
       - [svg怎么悬浮变色](#svg怎么悬浮变色)
     - [vite alias的原理实现](#vite-alias的原理实现)
     - [vite生产配置](#vite生产配置)
+    - [vite插件](#vite插件)
+      - [vite-aliases](#vite-aliases)
 
 
 ## html
@@ -1729,7 +1733,7 @@ fn()
 ```
 
 1. 在执行所有代码之前，引擎会在内存里创建GO对象或者VE（ox100），它里面有String对象，window对象等内置对象。是被提前创建好的。然后现在去执行代码，GO对象是不会被销毁的。
-2. 创建执行上下文栈，然后执行全局代码，创建全局执行上下文VO，这个VO指向GO。
+2. **创建执行上下文栈，然后执行全局代码**，创建全局执行上下文VO，这个VO指向GO。
 3. 然后，这个时候解析全局代码，往全局GO里面加东西了，原来的全局里面有Date,window,String等等，现在又加入message（undefined）foo(oxa00)，test(oxboo)等变量。解析foo是函数，就**创建一个函数对象 foo（oxa00）**，里面有函数的父级作用域，也就是全局的GO对象（ox100）,还有函数执行体（函数代码）。
 4. 接下来执行执行代码，先给message赋值，变成了hello，然后执行函数foo。
 5. 创建foo函数的函数执行上下文。往里面创建VO对象，VO指向AO对象。 创建一个foo函数的AO对象（ox200）。默认里面没有对象，然后**解析函数**，里面放入name:undefined,age:undefined
@@ -1740,7 +1744,7 @@ fn()
 
 ![图](book_files/38.jpg)
 
-7.	foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁，一旦销毁，对foo的AO对象的引用将会没有，然后ox2oo就会被销毁。
+7.	`foo函数执行完之后，栈里面的foo函数执行上下文就会被销毁`，一旦销毁，对foo的`AO对象的引用`将会没有，然后ox2oo就会被销毁。
 8. 存在闭包的情况，然后foo的执行上下文被销毁，但是bar不会被销毁，因为fn指着它。 然后bar对象不会被销毁，它上面的 foo的ao对象也不会被销毁的。因为bar里面有parentScope这个东西，它指向foo的AO对象。
 9. 把fn=null;虽然这时候bar和foo的AO循环引用，但是根据标记清除法，只要从根对象GO开始能找到的对象就不会被销毁。但是bar和foo的AO从根对象指不向他们，他们就会被销毁。
 
@@ -1812,7 +1816,7 @@ fun()
 ```js
 var test = document.getElementById('test');
 ...... //绑定事件
-test = null;//接触关联
+test = null;//解除关联
 ```
 ```js
 const refA = document.getElementById('refA');
@@ -1949,7 +1953,7 @@ let hexNum1 = 0xA //16进制 10(0x开头)
 
 #### undefined和null的区别
 + undefined是声明后未赋值，而null通常表示一个空的对象引用(空指针)
-+ 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的低位字节中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
++ 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的`低位字节`中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
 + 在两等情况下，二者相等，三等情况下则不相等
 
 #### 判断数据类型的方法
@@ -2020,18 +2024,19 @@ console.log(f1 instanceof F2)//true
 在选择使用数组还是链表时，需要根据具体的应用场景和需求来权衡。在大多数情况下，数组是前端开发中更常用的数据结构，因为它们提供了直观的访问方式和丰富的API。但在某些特定场景下，如需要频繁地插入或删除元素，或者实现特定的数据结构时，链表可能会是一个更好的选择。
 
 ### 字符串常用的方法
-+ 增：concat(拼接，不影响原字符串)
++ 增：**concat(拼接，不影响原字符串)**
 + 删：slice substr substring(都不影响原字符串)
 + 改：trim repeat padStart(填充) toLowerCase
 + 查：indexOf includes chartAt startWith
 + 转换方法： split(转为数组),可以是正则或者字符串
-+ 正则方法：match search(可以是正则或者字符串,返回第一个匹配的内容下标) replace
++ 正则方法：**match search(可以是正则或者字符串,返回第一个匹配的内容下标) replace**
 
 ```js
 let colorText = "red,blue,green,yellow";
 let colors1 = colorText.split(",");       // ["red", "blue", "green", "yellow"]
 let colors2 = colorText.split(",", 2);    // ["red", "blue"]
 let colors3 = colorText.split(/[e]+/);  // ['r', 'd,blu', ',gr', 'n,y', 'llow']
+let colors4 = colorText.split('e');  // ['r', 'd,blu', ',gr', '', 'n,y', 'llow']
 console.log(colors1)
 console.log(colors2)
 console.log(colors3)
@@ -2108,8 +2113,8 @@ console.log(...str.matchAll(/(hel)(lo)/g))
 
 
 ### 数组常用的方法
-+ 增 push unshift splice concat(只有它不影响原数组)
-+ 删 pop shift splice slice(只有它不影响原数组)
++ 增 push unshift splice `concat(只有它不影响原数组)`
++ 删 pop shift splice `slice(只有它不影响原数组)`
 + 改 splice
 + 查 find(返回第一个匹配的选项) indexOf includes
 + 排序 sort reverse(会修改原数组)
@@ -2126,7 +2131,7 @@ console.log(a)//7
 ```
 
 #### 影响到原数组的方法
-+ vue2中重写了 push pop unshift shift splice sort reverse
++ vue2中重写了 `push pop unshift shift splice sort reverse`
 + fill copyWithin
 ```js
 let arr = [1, 2, 3, 4, 5];  
@@ -2224,7 +2229,7 @@ js是单线程，同一时间只能做一件事，而避免阻塞的方法就是
 #### event loop 宏任务 微任务 和dom渲染的关联
 每一次 call stack（当前轮询结束） 结束，都会触发 DOM 渲染（**不一定非得渲染，就是给一次 DOM 渲染的机会！！！**）然后再进行 event loop。
 + 宏任务：DOM 渲染后再触发，ES 语法没有，JS 引擎不处理，浏览器（或 nodejs）干预处理。
-+ 微任务：DOM 渲染前会触发，ES 语法标准之内，JS 引擎来统一处理。即，不用浏览器有任何关于，即可一次性处理完，更快更及时。
++ 微任务：DOM 渲染前会触发，ES 语法标准之内，JS 引擎来统一处理。即，不用浏览器有任何干预，即可一次性处理完，更快更及时。
 
 ![处理](book_files/27.jpg)
 
@@ -7575,6 +7580,9 @@ Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redu
 ```
 
 
+## Angular
+
+
 ## DOM
 文档对象模型（DOM）是 HTML 和 XML 文档的编程接口。Dom的数据结构是一颗树。
 
@@ -9896,3 +9904,45 @@ console.log(styleSvg)// 就是svg里的代码
 
 
 ### vite生产配置
+
+hash的作用当文件有变动后会修改，这样防止浏览器缓存策略造成文件变化后仍加载之前的版本文件。
+```js
+import {defineConfig} from 'vite'
+export default defineConfig({
+    build:{// 构建生产包时的一些配置策略
+        rollupOptions:{// 配置rollup的一些基本构建策略
+            output:{// 控制输出
+                // 在rollup里，hash代表文件名和文件内容组合计算结果
+                // 输出的是静态资源，所以打包出来的js不收约束
+                assetFileNames:"[hash].[name].[ext]"
+            }
+        },
+        // 配置静态资源是否行内的大小，默认小于4kb转base64
+        assetsInlineLimit:4096,
+        outDir:"myDist",//打包文件夹，默认dist
+        assetsDir:"pubilc",//静态资源目录，默认assets
+		emptyOutDir:true// 清空上一次打包的文件，默认true
+    }
+})
+```
+
+![参考](book_files/141.jpg)
+
+### vite插件
+在vite的不同的生命周期去完成的不同的任务的工具 
+
+#### vite-aliases
+根据插件自动把src目录下的内容添加别名
+
+```js
+import { ViteAliases } from 'vite-aliases'
+export default defineConfig({
+	 plugins:[
+		ViteAliases({
+			prefix:"@"//注意配置，新版本默认改为了~
+		})
+	]
+})
+```
+
+![注意](book_files/142.jpg)
