@@ -143,6 +143,7 @@
     - [Proxy的应用场景](#proxy的应用场景)
     - [ES6中的Module](#es6中的module)
     - [Map与Object和 Set与Array的区别](#map与object和-set与array的区别)
+  - [Typescript](#typescript)
   - [Vue2](#vue2)
     - [Vue 生命周期](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
@@ -324,6 +325,7 @@
     - [webpack 实现生产和测试环境](#webpack-实现生产和测试环境)
     - [webpack plugins](#webpack-plugins)
     - [模块热替换HMR](#模块热替换hmr)
+    - [wbepack动态加载实现](#wbepack动态加载实现)
   - [Vite](#vite)
     - [构建工具](#构建工具)
     - [vite为什么比webpack快](#vite为什么比webpack快)
@@ -340,6 +342,11 @@
     - [vite生产配置](#vite生产配置)
     - [vite插件](#vite插件)
       - [vite-aliases](#vite-aliases)
+      - [vite-plugin-html](#vite-plugin-html)
+      - [vite-plugin-checker](#vite-plugin-checker)
+      - [手写一个基础的vite插件](#手写一个基础的vite插件)
+    - [vite构建的性能优化](#vite构建的性能优化)
+    - [vite跨域](#vite跨域)
 
 
 ## html
@@ -4000,6 +4007,9 @@ console.timeEnd('set find')
 ```
 
 ![arr](book_files/71.jpg)
+
+
+## Typescript
 
 
 ## Vue2
@@ -9623,12 +9633,19 @@ plugins:{
 
 ![HMR](book_files/122.jpg)
 
+
+### wbepack动态加载实现
+
+![webpack实现伪代码](book_files/146.jpg)
+
 ## Vite
 它主要由两部分组成：
 
 一个开发服务器，它基于 原生 ES 模块 提供了 丰富的内建功能，如速度快到惊人的 模块热更新（HMR）。
 
 一套构建指令，它使用 Rollup 打包你的代码，并且它是预配置的，可输出用于生产环境的高度优化过的静态资源。
+
+![配置](book_files/144.jpg)
 
 ### 构建工具
 构建工具让大家不用关心代码如何运行，只需要提供对应的配置，有了这个集成配置文件，他可以在下次需要更新时自动调用对应的命令完成对应的操作。
@@ -9655,7 +9672,7 @@ webpack会将所有依赖读取整理一遍再形成bundle，而vite是基于esM
 
 Vite 比 Webpack 快的原因主要有以下几点：
 
-1. 利用原生 `ES Modules`：Vite 利用了现代浏览器对原生 ES Modules 的支持，`允许浏览器直接加载和执行 JavaScript 模块`，无需经过 Webpack 的打包过程。这大大减少了构建时间和服务器启动时间。
+1. 利用原生 `ES Modules`：Vite 利用了现代浏览器对原生 ES Modules 的支持，`允许浏览器直接加载和执行 JavaScript 模块`，无需经过 Webpack 的打包过程。这大大减少了构建时间和服务器启动时间。vite是按需加载，webpack是打包后再启动服务，即使模块没用上，其实也编译了，只不过放在一个单独的script标签里，没有被页面引用。
 2. 快速的冷启动：Vite 采用了基于浏览器原生支持的 HTTP/2 协议，可以实现快速的`冷启动`时间，避免了 Webpack 繁重的打包过程。
 3. 按需编译：Vite 通过静态分析技术，`只编译当前所需的代码片段`，而不是整个应用。这减少了不必要的编译时间，并且可以更好地利用缓存。
 4. `更快的热重载`：在开发过程中，Vite 使用了原生 ES 模块，只重新编译被修改的文件，而不需要重新构建整个项目。这样可以实现更快速度的热重载，提高开发效率。
@@ -9931,6 +9948,8 @@ export default defineConfig({
 ### vite插件
 在vite的不同的生命周期去完成的不同的任务的工具 
 
+![生命周期](book_files/143.jpg)
+
 #### vite-aliases
 根据插件自动把src目录下的内容添加别名
 
@@ -9946,3 +9965,130 @@ export default defineConfig({
 ```
 
 ![注意](book_files/142.jpg)
+
+#### vite-plugin-html
+用来往html注入动态内容，使用ejs模板实现
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
+```
+```js
+import {defineConfig} from 'vite'
+import { ViteAliases } from 'vite-aliases'
+import { createHtmlPlugin } from 'vite-plugin-html'
+export default defineConfig({
+    plugins:[
+        ViteAliases({
+            prefix:"@"//注意配置，新版本默认改为了~
+        }),
+        createHtmlPlugin({
+            // template: './index.html',
+            inject:{
+                data:{
+                    title:"china12121"
+                }
+            }
+        })
+    ]
+})
+```
+
+#### vite-plugin-checker
+对代码出现可能的问题进行在控制台提示
+```js
+import checker from 'vite-plugin-checker'
+export default defineConfig({
+    plugins:[
+        checker({
+            typescript: true
+        })
+    ]
+})
+```
+ts.config.json
+```json
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@assets/*": [
+                "src/assets/*"
+            ],
+            "@json/*": [
+                "src/json/*"
+            ],
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "skipLibCheck": true,// 忽略第三方插件的报错问题
+        "module": "ESNext"//根据需求配置
+    }
+}
+```
+
+#### 手写一个基础的vite插件
+根据需要扩展或者修改部分配置，同时设计从成函数形式，方便配置和传参。插件可以通过判断去实现生产和测试等环境不同的配置。
+
+```js
+
+export default (options)=>{
+    return {
+        config(config,obj){
+            // config:vite的配置
+            // obj:
+            // {
+            //     mode: 'development',
+            //     command: 'serve',
+            //     isSsrBuild: false,
+            //     isPreview: false
+            //   }
+            console.log(config,obj)
+            // 返回需要修改的部分config配置，后续会进行merge
+            return {
+                // resolve:{
+                //     alias:{
+                //         ...
+                //     }
+                // }
+            }
+        },
+		// 老版本的变异需要改变这个钩子触发时机，否则会报错
+        // transformIndexHtml:{
+        //     enforce:"pre",
+        //     transform:(html,ctx)=>{
+        //         console.log("html",html)
+        //         return html.replace(/<%= title %>/g,options.inject.data.title)
+        //     }
+        // },
+		// 新版本不需要做额外的处理
+        transformIndexHtml(html,ctx){
+            console.log("html",html)
+            return html.replace(/<%= title %>/g,options.inject.data.title)
+        }
+    }
+}
+```
+
+对服务做某些定制的操作
+![其他钩子](book_files/2.png)
+
+![vite](book_files/145.jpg)
+
+### vite构建的性能优化
+1. 分包 在build中的output可配置
+2. 动态加载 import
+3. gzip压缩 后端运维需配合
+4. cdn加速
+
+### vite跨域
+
+![跨域配置](book_files/147.jpg)
