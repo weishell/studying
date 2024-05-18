@@ -192,6 +192,7 @@
       - [原理和SEO优化](#原理和seo优化)
       - [SPA首屏加载优化](#spa首屏加载优化)
       - [hisotory路由404](#hisotory路由404)
+    - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
   - [Vue3](#vue3)
     - [与Vue2的不同](#与vue2的不同)
       - [功能改变](#功能改变)
@@ -315,6 +316,7 @@
   - [webpack](#webpack)
     - [webpack五个核心概念](#webpack五个核心概念)
     - [谈谈webpack升级变化](#谈谈webpack升级变化)
+    - [如何区分 Webpack 中的 hash/chunkhash/contenthash](#如何区分-webpack-中的-hashchunkhashcontenthash)
     - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
       - [loader和plugin](#loader和plugin)
     - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
@@ -357,6 +359,11 @@
       - [手写一个基础的vite插件](#手写一个基础的vite插件)
     - [vite构建的性能优化](#vite构建的性能优化)
     - [vite跨域](#vite跨域)
+    - [vite HMR](#vite-hmr)
+  - [代码维护兼容工具](#代码维护兼容工具)
+    - [core-js和core-js-pure](#core-js和core-js-pure)
+    - [Babel](#babel)
+      - [自己的bable-preset](#自己的bable-preset)
 
 
 ## html
@@ -5100,6 +5107,56 @@ server {
 
 > hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 website.com/#/login 只有 website.com 会被包含在请求中 ，因此对于服务端来说，即使没有配置location，也不会返回404错误
 
+### 第三方库没有babel降级，vuecli怎么处理
+```js
+// vue.config.js  
+module.exports = {  
+  transpileDependencies: [  
+	'module-name/library-name', // 出现问题的那个库
+    // 或者  
+    /some-dependency-/, // 使用正则表达式来匹配多个依赖  
+  ],  
+  // 其他配置...  
+}
+```
+但非常老旧的项目可能依然无法解决
+
+![报错](book_files/165.jpg)
+
+看看Babel有没有办法可以即能够处理CommonJS模块，又能够处理ES6 module模块呢？Babel里面有这么一个配置sourceType，如果把sourceType设置为`unambiguous`就可以解决这个问题。
+
+![babel](book_files/164.jpg)
+
+这样Babel就会根据模块文件中有没有import/export来决定使用哪种解析模块的方式。在vue.config.js中添加了transpileDependencies选项的配置，然后在项目中的Babel配置文件中添加了如下的配置：
+
+```js
+module.exports = {
+  ...  // 省略的配置
+  sourceType: 'unambiguous',
+  ...  // 省略的配置
+};
+```
+可以解决问题，但是，这样的话会有一些风险，因为就算不使用import/export语句的这些模块也可能是完全有效的ES6 module，所以这样的话就有可能会出现一些意外的情况。
+
+可以利用overrides这个配置选项将我需要的第三方包使用unambiguous的处理方式，然后其他的第三方库都按照之前的方式处理不就可以了。
+![其他方案](book_files/166.jpg)
+
+```js
+// babel.config.js
+module.exports = {
+  ...  // 省略的配置
+  overrides: [
+    {
+      include: './node_modules/module-name/library-name/name.common.js',  // 使用的第三方库
+      sourceType: 'unambiguous'
+    }
+  ],
+  ...  // 省略的配置
+};
+```
+
+
+
 ## Vue3
 vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
 
@@ -9049,6 +9106,44 @@ miniRouter.push('/page2')  // page2
 webpack是一个`打包模块化js工具`，在webpack里一切文件皆模块，通过loader转换文件，通过plugin注入钩子，最后输出由多个模块组合成的文件，webpack专注构建模块化项目。
 ![webpack](book_files/93.jpg)
 
+基本配置
+```js
+const path = require('path');  
+  
+module.exports = {  
+  entry: {  
+    // 为每个页面指定一个唯一的名称作为键，并设置其对应的入口文件路径  
+    page1: './src/pages/page1/index.js',  
+    page2: './src/pages/page2/index.js',  
+    // 可以继续添加更多页面的入口  
+    // ...  
+  },  
+  output: {  
+    // 使用 [name] 占位符来确保输出文件的名字与 entry 中的键相对应  
+    filename: '[name]/bundle.js', // 输出到各自页面的文件夹下，例如：page1/bundle.js  
+    path: path.resolve(__dirname, 'dist'), // 打包后的文件存放的目录  
+    // 如果需要为每个页面生成 HTML 文件，还需要配置 HtmlWebpackPlugin  
+  },  
+  // 插件配置（如果需要的话）  
+  plugins: [  
+    // 为每个页面配置 HtmlWebpackPlugin，以生成对应的 HTML 文件  
+    new HtmlWebpackPlugin({  
+      filename: 'page1/index.html', // 生成的 HTML 文件名  
+      template: './src/pages/page1/index.html', // HTML 模板文件路径  
+      chunks: ['page1'], // 该 HTML 应该包含的 chunks，与 entry 的键相对应  
+    }),  
+    new HtmlWebpackPlugin({  
+      filename: 'page2/index.html',  
+      template: './src/pages/page2/index.html',  
+      chunks: ['page2'],  
+    }),  
+    // ... 为其他页面继续添加 HtmlWebpackPlugin 配置  
+  ],  
+  // ... 其他配置  
+};
+```
+
+
 ### webpack五个核心概念
 1. Entry
 2. Output
@@ -9078,6 +9173,33 @@ splitChunks:{
 	}
 }
 ```
+
+### 如何区分 Webpack 中的 hash/chunkhash/contenthash
+hash 反映了项目的`构建版本`，因此同一次构建过程中生成的 hash 都是一样的。换句话说，如果项目里某个模块发生更改，触发项目的重新构建，那么文件的 hash 值将会相应地改变。[这个哈希值基于整个 webpack 编译的结果。也就是说，即使你的项目中的一个文件改变了，所有文件的 hash 值都会改变。这通常不推荐用于长期缓存，因为它会导致所有文件都被重新下载。]
+
+如果使用 hash 策略，存在一个问题：**即使某个模块的内容压根没有改变，但是重新构建后会产生一个新的 hash 值，使得缓存命中率较低。**
+
+针对以上问题，chunkhash 和 contenthash 就不一样了，`chunkhash 会根据入口文件（Entry）进行依赖解析。`
+
+`contenthash 则会根据文件具体内容，生成 hash 值。`
+
+假设应用项目中做到了把公共库和业务项目入口文件区分开单独进行打包，采用 chunkhash 策略，如果改动了业务项目入口文件，就不会引起公共库的 hash 值改变。对应以下示例：
+```js
+entry:{
+    main: path.join(__dirname,'./main.js'),
+    vendor: ['react']
+},
+output:{
+    path:path.join(__dirname,'./build'),
+    publicPath: '/build/',
+    filname: 'bundle.[chunkhash].js'
+}
+```
+再看一个例子，在 index.js 中出现了对 index.css 的引用：
+```js
+require('./index.css')
+```
+此时因为 index.js 和 index.css 具有依赖关系，所以共用相同的 chunkhash 值。如果 index.js 内容发生变化，index.css 即使没有改动，在使用 chunkhash 策略时，被单独拆分的 index.css 的 hash 值也发生了变化。如果想让 index.css 完全根据文件内容来确定 hash 值，就可以使用 contenthash 策略了。
 
 ### 说出几个常见的loader和plugin
 
@@ -9516,6 +9638,15 @@ module.exports = {
 
 ![加载](book_files/1.png)
 
+> 考虑分包策略，如果存在css引入在某个js中，但是该js总是不断变化，而css内容不变，那么可以配置contenthash
+
+```js
+ new MiniCssExtractPlugin({  
+    filename: '[name].[contenthash].css',  
+    chunkFilename: '[id].[contenthash].css',  
+  }), 
+```
+
 
 ### babel-loader
 Babel：JavaScript 编译器。
@@ -9765,11 +9896,19 @@ plugins:{
 ## Vite
 它主要由两部分组成：
 
-一个开发服务器，它基于 原生 ES 模块 提供了 丰富的内建功能，如速度快到惊人的 模块热更新（HMR）。
+一个基于浏览器原生 ES imports 的开发服务器，利用浏览器去解析 imports，在服务器端按需编译返回，完全跳过了打包这个概念，服务器随起随用。，如速度快到惊人的 模块热更新（HMR）。
 
 一套构建指令，它使用 Rollup 打包你的代码，并且它是预配置的，可输出用于生产环境的高度优化过的静态资源。
 
+甚至可以说得更直白一些：Vite 在开发环境下并没有打包和构建过程。
+
+开发者在代码中写到的 ESM 导入语法会直接发送给服务器，而服务器也直接将 ESM 模块内容运行处理后，下发给浏览器。接着，现代浏览器通过解析 script module，对每一个 import 到的模块进行 HTTP 请求，服务器继续对这些 HTTP 请求进行处理并响应。
+
 ![配置](book_files/144.jpg)
+
+![1](book_files/157.jpg)
+
+![2](book_files/158.jpg)
 
 ### 构建工具
 构建工具让大家不用关心代码如何运行，只需要提供对应的配置，有了这个集成配置文件，他可以在下次需要更新时自动调用对应的命令完成对应的操作。
@@ -10213,8 +10352,143 @@ export default (options)=>{
 3. gzip压缩 后端运维需配合
 4. cdn加速
 
+![GZIP](book_files/161.jpg)
+
 ![分包](book_files/148.jpg)
+
+![CDN](book_files/3.png)
 
 ### vite跨域
 
 ![跨域配置](book_files/147.jpg)
+
+### vite HMR
+当浏览器请求 HTML 页面时，服务端通过 serverPluginHtml 插件向 HTML 内容注入一段脚本。如下图所示，我们可以看到， index.html 中就有一段引入 /vite/client 代码，进行 WebSocket 的注册和监听。
+
+![client](book_files/160.jpg)
+
+![HMR](book_files/159.jpg)
+
+
+## 代码维护兼容工具
+
+### core-js和core-js-pure
+core-js和core-js-pure的主要区别在于它们对全局变量的处理方式。
+
+core-js是一个JavaScript标准库的polyfill（垫片/补丁），主要用于提供ECMAScript标准中缺失的功能和特性的垫片，以实现跨浏览器的兼容性。它包含了ECMAScript 2020在内的多项特性的polyfills，以及ECMAScript在proposals阶段的特性、WHATWG/W3C新特性等，因此它是一个现代化前端项目的“标准套件”。
+
+而core-js-pure是core-js的一个子包，它与core-js的主要区别在于core-js-pure不会修改任何全局变量，而core-js会。这意味着，如果你使用core-js，你可能会影响到全局作用域，从而可能导致与其他库的冲突。而core-js-pure则完全避免了这个问题，它只会在你明确导入它的时候提供功能，而不会影响到全局作用域。
+
+因此，在选择使用core-js还是core-js-pure时，你需要根据你的项目需求和你对全局作用域的控制需求来做出决定。
+
+然后，在你的JavaScript文件中，可以这样使用 core-js-pure：
+```js
+// 导入Promise的polyfill  
+import 'core-js-pure/features/promise';  
+  
+// 现在你可以使用Promise了，无论环境是否原生支持  
+new Promise((resolve, reject) => {  
+  setTimeout(() => {  
+    resolve('Hello, Promise!');  
+  }, 1000);  
+})  
+.then(result => {  
+  console.log(result); // 输出 'Hello, Promise!'  
+})  
+.catch(error => {  
+  console.error('Error:', error);  
+});
+```
+
+### Babel
+Babel is a JavaScript compiler.一个 JavaScript 的“编译器”。
+
+它需要完成以下内容：
+1. 语法转换，一般是高级语言特性的降级；
+2. Polyfill（垫片/补丁）特性的实现和接入；
+3. 源码转换，比如 JSX 等。
+
+Babel 的设计，在**工程化**的角度上，需要秉承以下理念：
+1. 可插拔（Pluggable），比如 Babel 需要有一套灵活的插件机制，召集第三方开发者力量，同时还需要方便接入各种工具；
+2. 可调式（Debuggable），比如 Babel 在编译过程中，要提供一套 Source Map，来帮助使用者在编译结果和编译前源码之间建立映射关系，方便调试；
+3. 基于协定（Compact），Compact 可以简单翻译为基于协定，主要是指实现灵活的配置方式，比如你熟悉的 Babelloose 模式，Babel 提供 loose 选项，帮助开发者在“尽量还原规范”和“更小的编译产出体积”之间，**找到平衡。**
+
+![babel家族](book_files/4.png)
+
+@babel/core 是 Babel 实现转换的核心，它可以根据配置，进行源码的编译转换：
+
+```js
+var babel = require("@babel/core");
+
+babel.transform(code, options, function(err, result) {
+	result; // => { code, map, ast }
+});
+```
+@babel/cli 是 Babel 提供的命令行，它可以在终端中通过命令行方式运行，编译文件或目录。@babel/cli 负责获取配置内容，并最终依赖了 @babel/core 完成编译。
+
+@babel/standalone这个包非常有趣，它可以在非 Node.js 环境（比如浏览器环境）自动编译含有 text/babel 或 text/jsx 的 type 值的 script 标签.@babel/standalone 可以在浏览器中直接执行，因此这个包对于浏览器环境动态插入高级语言特性的脚本、在线自动解析编译非常有意义。
+
+![babel编译](book_files/162.jpg)
+
+![babel家族](book_files/163.jpg)
+
+#### 自己的bable-preset
+当编写 Babel 预设时，你通常会先编写一些 Babel 插件，然后将这些插件组合成一个预设。但是，为了给你一个基础的代码配置例子，我将展示如何创建一个简单的 Babel 预设配置，该配置只是引用了现有的插件。
+
+首先，你需要一个目录来存放你的 Babel 预设。在这个目录中，你可以创建一个 package.json 文件来定义你的预设，以及一个 index.js 文件来导出你的预设配置。
+
+```js
+{  
+  "name": "my-babel-preset",  
+  "version": "1.0.0",  
+  "description": "My custom Babel preset",  
+  "main": "index.js",  
+  "dependencies": {  
+    "@babel/plugin-transform-runtime": "^7.x.x",  
+    "@babel/plugin-proposal-class-properties": "^7.x.x"  
+    // 这里可以添加其他你需要的插件  
+  },  
+  "peerDependencies": {  
+    "@babel/core": "^7.x.x"  
+  }  
+}
+```
+
+```js
+module.exports = function (api, options = {}) {  
+  api.assertVersion(7);  
+  
+  // 这里可以添加一些处理 options 或 api 的逻辑  
+  // 例如，你可以根据 options 来动态地添加或删除插件  
+  
+  const plugins = [  
+    // 引用现有的 Babel 插件  
+    ["@babel/plugin-transform-runtime", {  
+      // 这里可以配置插件的选项  
+      corejs: 3,  
+      helpers: true,  
+      regenerator: true,  
+      useESModules: false,  
+    }],  
+    ["@babel/plugin-proposal-class-properties", {  
+      // 这里可以配置插件的选项  
+      loose: true, // 默认为 false  
+    }],  
+    // 可以添加更多插件...  
+  ];  
+  
+  return {  
+    plugins,  
+    // 如果你还需要添加解析器（parser）或生成器（generator）选项，可以在这里添加  
+  };  
+};
+```
+这个简单的 Babel 预设配置引用了两个现有的 Babel 插件：@babel/plugin-transform-runtime 和 @babel/plugin-proposal-class-properties。这些插件被添加到 plugins 数组中，并作为预设的输出返回。
+
+你可以通过 npm 或 yarn 来安装这个预设，并在你的 Babel 配置文件中使用它，就像使用其他任何 Babel 预设一样。例如，在你的 .babelrc 或 babel.config.js 文件中：
+
+```json
+{  
+  "presets": ["my-babel-preset"] // 如果没有发布在本地，记得填入对应的路径 
+}
+```
