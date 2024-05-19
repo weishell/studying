@@ -277,6 +277,7 @@
   - [node](#node)
     - [为什么拼接目录不用相对目录要用path处理](#为什么拼接目录不用相对目录要用path处理)
   - [包管理工具](#包管理工具)
+    - [避免某些文件被tree-shaking](#避免某些文件被tree-shaking)
     - [npm缓存机制](#npm缓存机制)
       - [优缺点](#优缺点)
     - [npm link的应用场景](#npm-link的应用场景)
@@ -338,6 +339,7 @@
     - [webpack plugins](#webpack-plugins)
     - [模块热替换HMR](#模块热替换hmr)
     - [wbepack动态加载实现](#wbepack动态加载实现)
+    - [split-chunks-plugin的使用](#split-chunks-plugin的使用)
   - [Vite](#vite)
     - [构建工具](#构建工具)
     - [vite为什么比webpack快](#vite为什么比webpack快)
@@ -360,10 +362,21 @@
     - [vite构建的性能优化](#vite构建的性能优化)
     - [vite跨域](#vite跨域)
     - [vite HMR](#vite-hmr)
-  - [代码维护兼容工具](#代码维护兼容工具)
+  - [代码维护和兼容](#代码维护和兼容)
     - [core-js和core-js-pure](#core-js和core-js-pure)
     - [Babel](#babel)
       - [自己的bable-preset](#自己的bable-preset)
+      - [按需加载问题](#按需加载问题)
+    - [Tree shaking](#tree-shaking)
+      - [副作用模块和Tree shaking](#副作用模块和tree-shaking)
+      - [Tree shaking 友好模式](#tree-shaking-友好模式)
+      - [babel和tree shaking](#babel和tree-shaking)
+      - [Webpack 和 Tree Shaking](#webpack-和-tree-shaking)
+      - [如何设计一个兼顾 Tree Shaking 和易用性的公共库](#如何设计一个兼顾-tree-shaking-和易用性的公共库)
+      - [CSS 和 Tree Shaking](#css-和-tree-shaking)
+    - [AST](#ast)
+      - [acorn 解析](#acorn-解析)
+      - [基于acorn实现简单的tree-shaking](#基于acorn实现简单的tree-shaking)
 
 
 ## html
@@ -5155,7 +5168,7 @@ module.exports = {
 };
 ```
 
-
+![解决思路](book_files/167.jpg)
 
 ## Vue3
 vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
@@ -8213,6 +8226,22 @@ path.resolve(__dirname,'./index.js')
 
 ## 包管理工具
 
+### 避免某些文件被tree-shaking
+“副作用”通常指的是除了导出模块之外，还执行了其他操作（如修改全局变量、添加事件监听器等）的文件。当 Webpack 或其他构建工具进行 tree shaking（消除未使用的代码）时，它们会尝试静态分析代码来确定哪些模块是真正需要的，并排除那些未使用的模块。但是，如果某个模块具有副作用，即使它没有直接导出任何内容或内容没有被明确引用，也可能需要包含在整个构建中。
+
+通过设置 sideEffects 选项，你可以为构建工具提供有关模块是否具有副作用的提示。特别是，当你将 sideEffects 设置为 false 时，你告诉构建工具你的包中的所有文件都没有副作用，除非在 package.json 中明确列出了有副作用的文件。
+
+例如，在 CSS-in-JS 库中，如 styled-components 或 emotion，你可能有一些样式文件或入口点，这些文件直接修改了 DOM 或注册了全局样式，但并没有导出任何可以在 JavaScript 中使用的值。在这种情况下，将这些文件标记为具有副作用是很重要的，以确保它们不会被 tree shaking 掉。
+
+但是，如果你的包中的所有文件都是纯函数式或声明式的，并且没有全局副作用，那么将 sideEffects 设置为 false 可以帮助构建工具更准确地消除未使用的代码，从而减小最终构建的大小。
+```json
+{  
+  "name": "my-package",  
+  "sideEffects": ["*.css", "*.scss", "side-effect.js"]  
+}
+```
+在这个例子中，只有以 .css、.scss 结尾的文件和 side-effect.js 文件会被认为具有副作用。其他所有文件都将被视为没有副作用，并可能被 tree shaking 掉。
+
 ### npm缓存机制
 npm（Node Package Manager）缓存机制在Node.js开发中扮演着重要的角色，其主要目的是提高开发效率和减少网络请求。
 
@@ -9892,6 +9921,56 @@ plugins:{
 ### wbepack动态加载实现
 
 ![webpack实现伪代码](book_files/146.jpg)
+![流程](book_files/168.jpg)
+
+### split-chunks-plugin的使用
+它用于将公共的依赖模块提取到已有的入口 chunk 中，或者提取到新生成的 chunk。
+```js
+module.exports = {  
+  // ... 其他配置 ...  
+  optimization: {  
+    splitChunks: {  
+      chunks: 'all', // 可以是 'all'（所有chunks），'async'（按需加载的chunks），'initial'（初始chunks）  
+      minSize: 30000, // 最小拆分大小（以字节为单位），只有大于此值的模块才会被拆分  
+      maxSize: 0, // 最大拆分大小（以字节为单位），大于此值的模块会被再次拆分  
+      minChunks: 1, // 最小在多少个 chunk 中共享，才会被拆分出来形成公共 chunk  
+      maxAsyncRequests: 30, // 按需加载时并行请求的最大数量  
+      maxInitialRequests: 30, // 入口点并行请求的最大数量  
+      automaticNameDelimiter: '~', // 当拆分公共模块时，用于生成文件名的分隔符  
+      enforceSizeThreshold: 50000, // 强制拆分大于此阈值的模块，即使它们只在一个chunk中出现  
+      cacheGroups: { // 缓存组，你可以根据需要将模块拆分到不同的缓存组中  
+        vendors: {  
+          test: /[\\/]node_modules[\\/]/, // 正则表达式，用于匹配模块源路径  
+          priority: -10, // 优先级（可选）  
+          // ... 其他配置 ...  
+        },  
+        default: {  
+          minChunks: 2, // 至少被 2 个 chunk 共享 ,它才会被拆分到一个新的 chunk 中。 
+          priority: -20, // 优先级低于 vendors  
+          reuseExistingChunk: true, // 如果当前 chunk 包含已从主 bundle 中拆分出的模块，则不会再次拆分该模块  
+        },  
+      },  
+    },  
+  },  
+  // ... 其他配置 ...  
+};
+```
+
+另外，webpack 会在满足一定条件时自动拆分代码块，例如：
+
+1. 会被共享的代码块。
+2. 来自 node_modules 文件夹中的代码块。
+3. 体积大于指定大小（默认为 30KB，在压缩前）的代码块。
+4. 按需加载代码块时的并行请求数量不超过指定数量（默认为 5）。
+5. 加载初始页面时的并行请求数量不超过指定数量（默认为 3）。
+
+配置 SplitChunksPlugin 的 minChunks 字段为不同的值（如3或4），而不是直接设置为大于2就单独提取出来打包，是基于特定的优化考虑和项目需求。
+
+1. 代码复用和打包效率：当 minChunks 设置得更高时，意味着模块需要被更多的 chunks 共享，才会被提取到一个单独的 chunk 中。这可以确保提取出的公共 chunk 是真正被多个地方复用的，从而提高代码复用率。如果 minChunks 设置得太低（如2），可能会导致生成过多的公共 chunk，而这些 chunk 可能只被少数几个 chunks 共享，这样做可能并不会带来显著的代码复用优势，反而会增加打包的复杂性和最终构建文件的大小。
+2. 缓存效率：通过提高 minChunks 的值，可以确保提取出的公共 chunk 是真正被多个页面或组件共享的。这样，这些公共 chunk 就有更高的概率被缓存起来，并在后续的页面加载中被重用，从而提高缓存效率。
+3. 项目需求：不同的项目有不同的需求和优化目标。有些项目可能更注重代码复用和打包效率，而有些项目可能更注重缓存效率和加载速度。因此，minChunks 的值应该根据项目需求进行灵活配置。
+4. 测试和性能分析：最终确定 minChunks 的值应该基于实际的测试和性能分析。你可以尝试不同的值，并观察对打包结果、代码复用率、缓存效率和加载速度的影响，从而找到最适合你项目的配置。
+
 
 ## Vite
 它主要由两部分组成：
@@ -10370,7 +10449,7 @@ export default (options)=>{
 ![HMR](book_files/159.jpg)
 
 
-## 代码维护兼容工具
+## 代码维护和兼容
 
 ### core-js和core-js-pure
 core-js和core-js-pure的主要区别在于它们对全局变量的处理方式。
@@ -10491,4 +10570,575 @@ module.exports = function (api, options = {}) {
 {  
   "presets": ["my-babel-preset"] // 如果没有发布在本地，记得填入对应的路径 
 }
+```
+
+#### 按需加载问题
+1. 基于包自身已实现，按需引入即可
+2. 使用babel-plugin-import去配置
+
+```js
+import {Button as Btn,Input,TimePicker,ConfigProvider,Haaaa} from 'antd'
+```
+这样的代码就可以被编译为：
+```js
+import _ConfigProvider from "antd/lib/config-provider";
+import _Button from "antd/lib/button";
+import _Input from "antd/lib/input";
+import _TimePicker from "antd/lib/time-picker";
+```
+Babel 插件核心依赖于对 AST 的解析和操作。它本质上就是一个函数，在 Babel 对 AST 语法树进行转换的过程中介入，通过相应的操作，最终让生成的结果发生改变。
+
+```js
+ import {Button as Btn, Input} from 'antd'
+```
+这样的代码，经过 Babel AST 分析后，得到结构：
+```js
+{
+    "type": "ImportDeclaration",
+    "specifiers": [
+        {
+            "type": "ImportSpecifier",
+            "imported": {
+                "type": "Identifier",
+                "loc": {
+                    "identifierName": "Button"
+                },
+                "name": "Button"
+            },
+            "importKind": null,
+            "local": {
+                "type": "Identifier",
+                "loc": {
+                    "identifierName": "Btn"
+                },
+                "name": "Btn"
+            }
+        },
+        {
+            "type": "ImportSpecifier",
+            "imported": {
+                "type": "Identifier",
+                "loc": {
+                    "identifierName": "Input"
+                },
+                "name": "Input"
+            },
+            "importKind": null,
+            "local": {
+                "type": "Identifier",
+                "start": 23,
+                "end": 28,
+                "loc": {
+                    "identifierName": "Input"
+                },
+                "name": "Input"
+            }
+        }
+    ],
+    "importKind": "value",
+    "source": {
+        "type": "StringLiteral",
+        "value": "antd"
+    }
+}
+```
+再经过其他步骤便可实现按需加载打包。
+
+项目中使用
+```bash
+npm install babel-plugin-import --save-dev  
+```
+```js
+// babel.config.js
+module.exports = {  
+  plugins: [  
+    [  
+      "import",  
+      {  
+        libraryName: "antd", // 要按需加载的库的名称  
+        libraryDirectory: "es", // 通常设置为 'es' 或 'lib'，取决于库的结构  
+        style: true, // 是否自动引入样式文件，默认为 true  
+        // 你还可以设置其他的选项，如 camel2DashComponentName: false（默认是 true）  
+      },  
+      "antd" // 如果你需要为特定的库配置不同的规则，可以添加额外的数组项  
+    ],  
+    // 其他插件...  
+  ],  
+};
+```
+项目中使用
+```js
+import { Button } from 'antd';  
+  
+function MyComponent() {  
+  return <Button type="primary">Click me!</Button>;  
+}  
+export default MyComponent;
+```
+
+### Tree shaking
+事实上，Tree Shaking 是在编译时进行无用代码消除的，因此它需要在编译时确定依赖关系，进而确定哪些代码可以被“摇掉”，而 ESM 具备以下特点：
++ import 模块名只能是字符串常量
++ import 一般只能在模块的最顶层出现
++ import binding 是 immutable 的
+
+这些特点使得 ESM 具有静态分析能力。**而CommonJS 定义的模块化规范，只有在执行代码后，才能动态确定依赖模块**，因此不具备 Tree Shaking 的先天条件。
+
+#### 副作用模块和Tree shaking
+```js
+// 如果 memoize 被挂载到 window 对象上，它实际上已经成为了全局作用域的一部分  
+// 这意味着打包工具不能通过静态分析来准确地判断 memoize 函数的使用情况  
+// 因为它可能是通过全局变量在任何地方、任何时间被调用的  
+export function add(a, b) {
+	return a + b
+}
+export const memoizedAdd = window.memoize(add)
+// 在这里，由于 add 函数被直接用于计算 memoizedAdd 的值  
+// 并且 memoizedAdd 被导出，所以 add 函数肯定会被包含在最终的打包文件中  
+// 无论 memoizedAdd 是否在其它地方被使用
+```
+该模块被 import 时，window.memoize方法会被执行，那么对于工程化工具（比如 Webpack）来说，分析思路是这样的：
+
+创建一个纯函数add，如果没有其他模块引用add函数，那么add函数可以被 Tree Shaking 掉；
+
+接着调用window.memoize方法，并传入add函数作为其参数；
+
+工程化工具（比如 Webpack）并不知道window.memoize方法会做什么事情，也许window.memoize方法会调用add函数，并触发某些副作用（比如维护一个全局的 Cache Map）；
+
+工程化工具（比如 Webpack）为了安全起见，即便没有其他模块依赖的add函数，那么也要将add函数打包到最后的 bundle 中。
+
+因此，具有副作用的模块难以被 Tree Shaking 优化，即便开发者知道window.memoize方法是无副作用的。
+
+为了解决“具有副作用的模块难以被 Tree Shaking 优化”这个问题，Webpack 给出了自己的方案，我们可以利用 package.json 的sideEffects属性来告诉工程化工具哪些模块具有副作用，哪些剩余模块没有副作用，可以被 Tree Shaking 优化：
+
+```json
+//表示全部代码均无副作用，告知 webpack，它可以安全地删除未用到的 export 导出。
+{
+  "name": "your-project",
+  "sideEffects": false
+}
+```
+
+```json
+{
+  "name": "your-project",
+  "sideEffects": [
+    "./src/some-side-effectful-file.js"，
+    "*.css"
+  ]
+}
+```
+通过数组表示，./src/some-side-effectful-file.js和所有.css文件模块都有副作用。对于 Webpack 工具，开发者可以在module.rule配置中声明副作用模块。
+
+事实上，仅对上面add函数，即便不通过声明 sideEffects，Webpack 也足够智能，能够分析出可 Tree Shaking 掉的部分，不过这需要对上述代码进行重构：
+```js
+import { memoize } from './util'
+export function add(a, b) {
+	return a + b
+}
+export const memoizedAdd = memoize(add)
+// 在这里，如果 memoizedAdd 被使用，add 函数和 memoize 函数都会被包含在最终的打包文件中  
+// 但如果 memoizedAdd 没有被使用，由于 add 没有被直接导出或引用，它可能会被树摇掉
+```
+此时 Webpack 的分析逻辑：
+
+memoize函数是一个 ESM 模块，我们去util.js中检查一下memoize函数内容；
+
+在util.js中，发现memoize函数是一个纯函数，因此如果add函数没有被其他模块依赖，可以被安全 Tree Shaking 掉。
+
+#### Tree shaking 友好模式
+以 Webpack 为例，Webpack 将会`趋向保留整个默认导出对象/class`（Webpack 和 Rollup 只处理函数和顶层的 import/export 变量，不能把没用到的类或对象内部的方法消除掉）。
+
+因此：
+1. 导出一个包含多项属性和方法的对象
+2. 导出一个包含多项属性和方法的 class
+3. 使用export default导出
+
+都不利于 Tree Shaking。即便现代化工程工具或 Webpack 支持对于对象或 class 的方法属性剪裁（比如 `webpack-deep-scope-plugin` 这个插件的设计，或 Webpack 和 Rollup 新版本的跟进），这些都产生了不必要的成本，增加了编译时负担。
+
+```js
+export default {
+	add(a, b) {
+		return a + b
+	}
+	subtract(a, b) {
+		return a - b
+	}
+}
+```
+```js
+export class Number {
+	constructor(num) {
+		this.num = num
+	}
+	add(otherNum) {
+		return this.num + otherNum
+	}
+	subtract(otherNum) {
+		return this.num - otherNum
+	}
+}
+```
+更加推荐的原则是：**原子化和颗粒化导出**。如下代码，就是一个更好的实践：
+```js
+export function add(a, b) {
+	return a + b
+}
+export function subtract(a, b) {
+	return a - b
+}
+```
+这种方式可以让 Webpack 更好地在编译时掌控和分析 Tree Shaking 信息，取得一个更优的 bundle size。
+
+#### babel和tree shaking
+Babel 已经成为现代化工程和基建方案的必备工具，但是考虑到 Tree Shaking，需要开发者注意：**如果使用 Babel 对代码进行编译，Babel 默认会将 ESM 编译为 CommonJS 模块规范。**而Tree Shaking 必须依托于 ESM。
+
+为此，需要配置 Babel 对于模块化的编译降级，具体配置项在 babel-preset-env#modules 中可以找到。
+
+但既然是“前端工程生态”，那问题就没这么好解决。事实上，如果我们不使用 Babel 将代码编译为 CommonJS 规范的代码，某些工程链上的工具可能就要罢工了。比如 Jest，Jest 是基于 Node.js 开发的，运行在 Node.js 环境。因此使用 Jest 进行测试时，也就需要模块符合 CommonJS 规范，那么如何处理这种“模块死锁”呢？
+
+思路之一是根据不同的环境，采用不同的 Babel 配置。在 production 编译环境中，我们配置：
+```js
+production: {
+   presets: [
+    [
+     '@babel/preset-env',
+     {
+      modules: false
+     }
+    ]
+   ]
+  },
+}
+```
+在测试环境中：
+```js
+test: {
+   presets: [
+    [
+     '@babel/preset-env',
+     {
+      modules: 'commonjs
+     }
+    ]
+   ]
+  },
+}
+```
+但是在测试环境中，编译了业务代码为 CommonJS 规范并没有大功告成，我们还需要处理第三方模块代码。一些第三方模块代码为了方便进行 Tree Shaking，暴露出符合 ESM 模块的代码，对于这些模块，比如 Library1、Library2，我们还需要进行处理，这时候需要配置 Jest：
+```js
+const path = require('path')
+const librariesToRecompile = [
+ 'Library1',
+ 'Library2'
+].join('|')
+const config = {
+ transformIgnorePatterns: [
+  `[\\/]node_modules[\\/](?!(${librariesToRecompile})).*$`
+ ],
+ transform: {
+  '^.+\.jsx?$': path.resolve(__dirname, 'transformer.js')
+ }
+}
+```
+transformIgnorePatterns是 Jest 的一个配置项，默认值为node_modules，它表示：node_modules中的第三方模块代码，都不需要经过babel-jest编译。因此，我们自定义 transformIgnorePatterns的值为一个包含了 Library1、Library2 的正则表达式即可。
+
+> @babel/preset-env 默认不会改变你的模块系统，除非你在其配置中指定了 modules 选项。
+
+#### Webpack 和 Tree Shaking
+Webpack4.0 以上版本在 mode 为 production 时，会自动开启 Tree Shaking 能力。默认 production mode 的配置如下：
+```js
+const config = {
+ mode: 'production',
+ optimization: {
+  usedExports: true,
+  minimizer: [
+   new TerserPlugin({...}) // 支持删除死代码的压缩器
+  ]
+ }
+}
+```
+其实，Webpack 真正执行模块去除，是依赖了 TerserPlugin、UglifyJS 等压缩插件。Webpack 负责对模块进行分析和标记，而这些压缩插件负责根据标记结果，进行代码删除。Webpack 在分析时，有三类相关的标记：
+
+1. harmony export，被使用过的 export 会被标记为 harmony export；
+2. unused harmony export，没被使用过的 export 标记为 unused harmony export；
+3. harmony import，所有 import 标记为 harmony import。
+
+#### 如何设计一个兼顾 Tree Shaking 和易用性的公共库
+如果我们以 ESM 的方式对外暴露代码，那么就很难直接兼容 CommonJS 规范，也就是说在 Node.js 环境中，使用者如果直接以 require 方式引用的话，就会得到报错。如果以 CommonJS 规范对外暴露代码，又不利于 Tree Shaking。
+
+因此，如果想要一个 npm 包既能向外提供 ESM 规范的代码，又能向外提供 CommonJS 规范的代码，我们就只能通过“协约”来定义清楚。实际上，npmpackage.json以及社区工程化规范，解决了这个问题：
+```json
+{
+  "name": "Library",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+}
+```
+其实，标准 package.json 语法中，只有一个入口main。作为公共库设计者，我们通过main来暴露 CommonJS 规范打包的代码dist/index.cjs.js；在 Webpack 等构建工具中，又支持了module——这个新的入口字段。因此，module并非 package.json 的标准字段，而是打包工具专用的字段，用来指定符合 ESM 标准的入口文件。
+
+这样一来，当require('Library')时，Webpack 会找到：dist/index.cjs.js；当import Library from 'Library'时，Webpack 会找到：dist/index.esm.js。
+
+这里我们不妨举一个著名的公共库例子，那就是 Lodash。Lodash 其实并不支持 Tree Shaking，其package.json：
+```json
+{
+  "name": "lodash",
+  "version": "5.0.0",
+  "license": "MIT",
+  "private": true,
+  "main": "lodash.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  //...
+}
+```
+只有一个main入口，且lodash.js是 UMD 形式的代码，不利于做到 Tree Shaking。为了支持 Tree shakibng，lodash 打包出来专门的 lodash-es，其package.json：
+```js
+{
+  "main": "lodash.js",
+  "module": "lodash.js",
+  "name": "lodash-es",
+  "sideEffects": false,
+  //...
+}
+```
+由上述代码可知，lodash-esmain、module、sideEffects三字段齐全，通过 ESM 导出，天然支持了 Tree Shaking。
+
+#### CSS 和 Tree Shaking
+以上内容都是针对 JavaScript 代码的 Tree Shaking，作为前端工程师，我们当然也要考虑对 CSS 文件做 Tree Shaking。
+
+实现思路也很简单，CSS 的 Tree Shaking 要在样式表中，找出没有被应用到选择器样式，进行删除。那么我们只需要：
+1. 遍历所有 CSS 文件的选择器；
+2. 根据所有 CSS 文件的选择器，在 JavaScript 代码中进行选择器匹配；
+3. 如果没有匹配到，则删除对应选择器的样式代码。
+
+如何遍历所有 CSS 文件的选择器呢？Babel 依靠 AST 技术，完成了对 JavaScript 代码的遍历分析，而在样式世界中，PostCSS 就起到了 Babel 的作用。PostCSS 提供了一个解析器，它能够将 CSS 解析成 AST 抽象语法树，我们可以通过 PostCSS 插件对 CSS 对应的 AST 进行操作，达到 Tree Shaking 的目的。
+
+purgecss-webpack-plugin
+
+![webpack](book_files/169.jpg)
+
+### AST
+Abstract Syntax Tree 的缩写，表示抽象语法树
+
+AST 的应用场景经常出现在源代码的编译过程中：一般语法分析器创建出 AST，然后 AST 在语义分析阶段添加一些信息，甚至修改 AST 内容，最终产出编译后代码。
+
+![编译](book_files/170.jpg)
+
+Program 包含了多段 Statement，Statement 又由多个 Expression 或者 Statement 组成。这三种大元素，就构成了遵循 ESTree 规范的 AST。最终的 AST 产出，也是这三种元素的数据结构拼合。
+
+#### acorn 解析
+acorn 是一个完全使用 JavaScript 实现的、小型且快速的 JavaScript 解析器。
+```js
+let acorn = require('acorn')
+let code = 1 + 2
+console.log(acorn.parse(code))
+```
+![acorn 工作流程图](book_files/171.jpg)
+
+源代码经过词法分析，即分词得到 Token 序列，对 Token 序列进行语法分析，得到最终 AST 结果。但 acorn 稍有不同的是：acorn 将词法分析和语法分析交替进行，只需要扫描一遍代码即可得到最终 AST 结果。
+
+#### 基于acorn实现简单的tree-shaking
+
+```js
+function add(a, b) {
+    return a + b
+}
+function multiple(a, b) {
+    return a * b
+}
+var firstOp = 9
+var secondOp = 10
+add(firstOp, secondOp)
+```
+
+![步骤](book_files/172.jpg)
+
+
+```js
+class JSEmitter {
+    // 访问变量声明，以下都是工具方法
+    visitVariableDeclaration(node) {
+        let str = ''
+        str += node.kind + ' '
+        str += this.visitNodes(node.declarations)
+        return str + '\n'
+    }
+    visitVariableDeclarator(node, kind) {
+        let str = ''
+        str += kind ? kind + ' ' : str
+        str += this.visitNode(node.id)
+        str += '='
+        str += this.visitNode(node.init)
+        return str + ';' + '\n'
+    }
+    visitIdentifier(node) {
+        return node.name
+    }
+    visitLiteral(node) {
+        return node.raw
+    }
+    visitBinaryExpression(node) {
+        let str = ''
+        str += this.visitNode(node.left)
+        str += node.operator
+        str += this.visitNode(node.right)
+        return str + '\n'
+    }
+    visitFunctionDeclaration(node) {
+        let str = 'function '
+        str += this.visitNode(node.id)
+        str += '('
+        for (let param = 0; param < node.params.length; param++) {
+            str += this.visitNode(node.params[param])
+            str += ((node.params[param] == undefined) ? '' : ',')
+        }
+        str = str.slice(0, str.length - 1)
+        str += '){'
+        str += this.visitNode(node.body)
+        str += '}'
+        return str + '\n'
+    }
+    visitBlockStatement(node) {
+        let str = ''
+        str += this.visitNodes(node.body)
+        return str
+    }
+    visitCallExpression(node) {
+        let str = ''
+        const callee = this.visitIdentifier(node.callee)
+        str += callee + '('
+        for (const arg of node.arguments) {
+            str += this.visitNode(arg) + ','
+        }
+        str = str.slice(0, str.length - 1)
+        str += ');'
+        return str + '\n'
+    }
+    visitReturnStatement(node) {
+        let str = 'return ';
+        str += this.visitNode(node.argument)
+        return str + '\n'
+    }
+    visitExpressionStatement(node) {
+        return this.visitNode(node.expression)
+    }
+    visitNodes(nodes) {
+        let str = ''
+        for (const node of nodes) {
+            str += this.visitNode(node)
+        }
+        return str
+    }
+    // 根据类型，执行相关处理函数
+    visitNode(node) {
+        let str = ''
+        switch (node.type) {
+            case 'VariableDeclaration':
+                str += this.visitVariableDeclaration(node)
+                break;
+            case 'VariableDeclarator':
+                str += this.visitVariableDeclarator(node)
+                break;
+            case 'Literal':
+                str += this.visitLiteral(node)
+                break;
+            case 'Identifier':
+                str += this.visitIdentifier(node)
+                break;
+            case 'BinaryExpression':
+                str += this.visitBinaryExpression(node)
+                break;
+            case 'FunctionDeclaration':
+                str += this.visitFunctionDeclaration(node)
+                break;
+            case 'BlockStatement':
+                str += this.visitBlockStatement(node)
+                break;
+            case "CallExpression":
+                str += this.visitCallExpression(node)
+                break;
+            case "ReturnStatement":
+                str += this.visitReturnStatement(node)
+                break;
+            case "ExpressionStatement":
+                str += this.visitExpressionStatement(node)
+                break;
+        }
+        return str
+    }
+    // 入口
+    run(body) {
+        let str = ''
+        str += this.visitNodes(body)
+        return str
+    }
+}
+module.exports = JSEmitter
+```
+```js
+//  treeShaking.js
+const acorn = require("acorn")
+const l = console.log
+const JSEmitter = require('./js-emitter')
+const fs = require('fs')
+// 获取命令行参数
+const args = process.argv[2]
+const buffer = fs.readFileSync(args).toString()
+const body = acorn.parse(buffer).body
+const jsEmitter = new JSEmitter()
+let decls = new Map()
+let calledDecls = []
+let code = []
+// 遍历处理
+body.forEach(function(node) {
+    if (node.type == "FunctionDeclaration") {
+        const code = jsEmitter.run([node])
+        decls.set(jsEmitter.visitNode(node.id), code)
+        return;
+    }
+    if (node.type == "ExpressionStatement") {
+        if (node.expression.type == "CallExpression") {
+            const callNode = node.expression
+            calledDecls.push(jsEmitter.visitIdentifier(callNode.callee))
+            const args = callNode.arguments
+            for (const arg of args) {
+                if (arg.type == "Identifier") {
+                    calledDecls.push(jsEmitter.visitNode(arg))
+                }
+            }
+        }
+    }
+    if (node.type == "VariableDeclaration") {
+        const kind = node.kind
+        for (const decl of node.declarations) {
+            decls.set(jsEmitter.visitNode(decl.id), jsEmitter.visitVariableDeclarator(decl, kind))
+        }
+        return
+    }
+    if (node.type == "Identifier") {
+        calledDecls.push(node.name)
+    }
+    code.push(jsEmitter.run([node]))
+});
+// 生成 code
+code = calledDecls.map(c => {
+    return decls.get(c)
+}).concat([code]).join('')
+fs.writeFileSync('test.shaked.js', code)
+```
+
+```bash
+node treeShaking test.js
+```
+
+```js
+// tree-shaking后的代码
+function add(a,b){return a+b
+
+}
+var firstOp=9;
+var secondOp=10;
+add(firstOp,secondOp);
 ```
