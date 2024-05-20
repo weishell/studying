@@ -63,6 +63,7 @@
     - [let const var](#let-const-var)
     - [作用域的理解](#作用域的理解)
       - [词法作用域案例](#词法作用域案例)
+      - [作用域](#作用域)
       - [作用域链](#作用域链)
     - [执行上下文和执行栈](#执行上下文和执行栈)
       - [执行上下文的生命周期](#执行上下文的生命周期)
@@ -75,6 +76,8 @@
       - [可能的内存泄漏场景](#可能的内存泄漏场景)
     - [\[10, 20, 30\].map(parseInt)](#10-20-30mapparseint)
     - [函数声明和函数表达式区别](#函数声明和函数表达式区别)
+    - [严格模式要注意的地方](#严格模式要注意的地方)
+    - [LHS 和 RHS 是什么？会造成什么影响](#lhs-和-rhs-是什么会造成什么影响)
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
@@ -1665,6 +1668,17 @@ bar()
 
 ![词法环境应用](book_files/41.jpg)
 
+#### 作用域
+```js
+a = 3;  
+{  
+    a = 2;  
+    function a() {}  
+    a = 1;  
+}  
+console.log(a); // 2
+```
+
 #### 作用域链
 当尝试访问一个变量或函数时，JavaScript引擎会首先在当前的执行环境中进行查找。如果在当前环境中找到了对应的标识符，那么就直接使用它；如果没有找到，则会沿着作用域链向上一级作用域进行查找，这个过程会一直持续到找到对应的标识符或到达全局作用域为止。
 
@@ -1925,6 +1939,24 @@ var sum = function (x, y) {
     return x + y
 }
 ```
+
+### 严格模式要注意的地方
++ Module code is always strict mode code.
++ All parts of a ClassDeclaration or a ClassExpression are strict mode code.
++ 禁止意外创建全局变量，直接抛出错误
++ this 问题
++ arguments 和参数列表的独立性，并且 arguments 不可修改
++ 给 NaN 赋值会抛出错误
++ 对象操作：给不可写属性赋值(writable: false)；给只读属性赋值(只有 get，没有 set)；给不可扩展对象新增属性
++ 严格模式要求参数名唯一，属性名唯一
++ 禁止八进制数字
++ 禁止对 primitive type 的变量加属性或方法
++ 禁止使用with
++ eval 不再为 surrounding scope 添加新的变量
++ 禁止delete 声明的变量，禁止delete 不可删除的属性或方法
+
+### LHS 和 RHS 是什么？会造成什么影响
+LHS 是 Left Hand Side 的意思，左值查询一个变量，如果变量不存在，且在**非严格模式下，就会创建一个全局变量**。RHS 查询一个变量，如果变量不存在，就会报错 ReferenceError。
 
 ### == 和 ===
 全等不会存在隐式转换问题
@@ -11142,3 +11174,21 @@ var firstOp=9;
 var secondOp=10;
 add(firstOp,secondOp);
 ```
+
+对于上面代码分析，首先我们通过process.argv获取到目标文件，对于目标文件通过fs.readFileSync()方法读出字符串形式的内容buffer，对于这个buffer变量，我们使用acorn.parse进行解析，并对产出内容进行遍历。
+
+在遍历过程中，对于不同的节点类型，调用 JS Emitter 实例不同的处理方法。在整个过程中，我们维护了：
+
+1. decls——Map 类型
+2. calledDecls——数组类型
+3. code——数组类型
+
+三个关键变量。decls存储所有的函数或变量声明类型节点，calledDecls则存储了代码中真正使用到的数或变量声明，code存储了其他所有没有被节点类型匹配的 AST 部分。
+
+下面我们来分析具体的遍历过程。
+
+在遍历过程中，我们对所有函数和变量的声明，都维护到decls中。
+
+接着，我们对所有的 CallExpression 和 IDentifier 进行检测。因为 CallExpression 代表了一次函数调用，因此在该 if 条件分支内，将相关函数节点调用情况推入到calledDecls数组中，同时我们对于该函数的参数变量也推入到calledDecls数组。因为 IDentifier 代表了一个变量的取值，我们也推入到calledDecls数组。
+
+经过整个 AST 遍历，我们就可以只遍历calledDecls数组，并从decls变量中获取使用到的变量和函数声明，最终使用concat方法合并带入code变量中，使用join方法转化为字符串类型。
