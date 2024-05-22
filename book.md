@@ -160,9 +160,12 @@
     - [unknow类型和any类型的区别](#unknow类型和any类型的区别)
     - [混入和类型拓展操作 交叉类型的应用](#混入和类型拓展操作-交叉类型的应用)
     - [interface 和 type的各自应用场景](#interface-和-type的各自应用场景)
+    - [泛型Generics](#泛型generics)
+      - [泛型定义实际应用](#泛型定义实际应用)
     - [keyof](#keyof)
     - [映射类型](#映射类型)
-    - [部分关键字的实现](#部分关键字的实现)
+    - [部分高级特性的实现](#部分高级特性的实现)
+    - [Ts中的Pick，Omit，Extract和Exclude区别](#ts中的pickomitextract和exclude区别)
     - [infer 推断使用](#infer-推断使用)
     - [数组的只读和多维数组](#数组的只读和多维数组)
     - [元组和可选项](#元组和可选项)
@@ -4402,6 +4405,19 @@ const str: brand = 'imooc'
 const state: used = true
 ```
 
+### 泛型Generics
+泛型就是类型的参数化：Generics是指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
+
+```js
+function generic<T>() {}
+interface Generic<T> {}
+class Generic<T> {}
+```
+
+#### 泛型定义实际应用
+
+![实际应用](book_files/191.jpg)
+
 ### keyof
 keyof 可以获取对象/接口的**可访问索引字符串**字面量类型
 ```js
@@ -4488,20 +4504,39 @@ type Partial<T> = {
 }
 ```
 
-### 部分关键字的实现
+### 部分高级特性的实现
+ts内置的一些常用工具类型，简化ts的操作。它们都是基于泛型实现的，并且内置的，可直接使用。
+
 + Exclude<T, U> – 从 T 中剔除可以赋值给 U 的类型。
 + Extract<T, U> – 提取 T 中可以赋值给 U 的类型。
 + NonNullable<T> – 从 T 中剔除 null 和 undefined。
 + ReturnType<T> – 获取函数返回值类型。
 + InstanceType<T> – 获取构造函数类型的实例类型。
+
+```js
+// 原理
+type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
+```
+```js
+class C {
+  x = 0;
+  y = 0;
+}
+ 
+type T0 = InstanceType<typeof C>;
+     
+// type T0 = C
+
+let f:T0 ={
+  x:0,
+  y:0
+}
+
+```
+
 + Partial<T> - 设置可选部分类等
 + Required<T> - 将可选全部转为必选
 + Readonly<T> - 只读
-
-```js
-type T00 = Exclude<'a' | 'b' | 'c' | 'd', 'a' | 'c' | 'f'>  // 'b' | 'd'
-```
-
 + Record:将 K 中的所有属性值都转换为 T 类型，并返回新的对象类型
 
 ```js
@@ -4529,26 +4564,78 @@ type Record<K extends keyof any, T> = {
 //   }
 ```
 
-+ Pick:从 T 类型中选取部分 K 类型，并返回新的类型，这里 T 常用于对象类型
+### Ts中的Pick，Omit，Extract和Exclude区别
+1. Pick(选择)
+
+通俗的说法就是：`在已经定义的对象中选取一些`
+
+pick<T，keys>：从Type中选择一系列属性来构造新类型，属性来源于keys
+
+![pick](book_files/189.jpg)
 
 ```js
+// 实现源码
 type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
 ```
+
+pick两个类型变量：1.表示选择谁的属性 2.表示选择哪几个属性（**传入属性名，只能是第一个 类型变量中存在的属性**）
 ```js
-interface IPeople {
-  name:string,
-  age?: number,
-  sex: string,
+interface Props{
+    id:string
+    title:string
+    children:number[]
 }
-
-type TPick = Pick<IPeople, 'name' | 'age'>
-
-// 等同于
-//   type TPick = {
-//     name: string;
-//     age?: number;
-//   }
+type PickProps= Pick<Props,'id'|'title'>
 ```
+生成的新类型，只有id，title两个属性类型 相当于
+```js
+interface Props{
+    id:string
+    title:string
+}
+```
+
+2. Omit（省略）
+
+通俗的说法就是：在已经定义的对象中删除一些，留下剩下的 omit<T，keys>：从Type中选取所有的属性值，然后移除一系列属性值，属性值来源于keys。
+
+```js
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+```
+
+生成一个新的类型，该类型拥有T中除了K属性以外的所有属性 例子如下：
+
+![omit](book_files/190.jpg)
+
+3. Exclude（排除/不包括）
+
+通俗的说就 返回没有含有的那个 Exclude<T,U> `从第一个联合类型参数中，将第二个联合类型中出现的联合项全部排除`，只留下没有出现过的参数。
+
+```js
+// 实现原理
+type Exclude<T, U> = T extends U ? never : T;
+```
+
+```js
+type T00 = Exclude<'a' | 'b' | 'c' | 'd', 'a' | 'c' | 'f'>  // 'b' | 'd'
+```
+
+4. Extract (提取/包括）
+
+通俗的说就 返回含有的那个 Extract<T,U>提取Type中所有能够赋值给Union的属性，将这些属性构成一个新的类型
+
+传入两个泛型，如果 T 是 U 的子类型则返回，不是则返回 never
+
+```js
+type Extract<T, U> = T extends U ? T : never;
+```
+```js
+type A = "age" | "name";
+type B = "like" | "eat" | "name";
+type C = Extract<A, B>; //'name'
+```
+
+
 
 ### infer 推断使用
 infer会根据当前场景推断出具体类型
@@ -9379,6 +9466,7 @@ axios({
 
 ## 性能优化
 ![性能优化](book_files/101.jpg)
+![前端优化](book_files/5.png)
 
 ### 为什么css在页面head，js在body尾部
 CSS在加载过程中，不影响HTML的解析。但影响HTML渲染。
