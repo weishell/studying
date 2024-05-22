@@ -1,6 +1,6 @@
 <style>
 	*{
-		font-family:"宋体"
+		font-family: "Consolas", "topWebfont","宋体"
 	}
 	strong,b{
 		color:purple
@@ -157,6 +157,23 @@
     - [never类型的应用场景](#never类型的应用场景)
     - [联合类型的类型收窄操作(☆)](#联合类型的类型收窄操作)
     - [类型谓词is](#类型谓词is)
+    - [unknow类型和any类型的区别](#unknow类型和any类型的区别)
+    - [混入和类型拓展操作 交叉类型的应用](#混入和类型拓展操作-交叉类型的应用)
+    - [interface 和 type的各自应用场景](#interface-和-type的各自应用场景)
+    - [keyof](#keyof)
+    - [映射类型](#映射类型)
+    - [部分关键字的实现](#部分关键字的实现)
+    - [infer 推断使用](#infer-推断使用)
+    - [数组的只读和多维数组](#数组的只读和多维数组)
+    - [元组和可选项](#元组和可选项)
+    - [ts函数](#ts函数)
+      - [this和函数](#this和函数)
+    - [构造函数定义](#构造函数定义)
+    - [函数中extends约束](#函数中extends约束)
+    - [函数的重载](#函数的重载)
+    - [TS类的关键字](#ts类的关键字)
+    - [抽象类的作用](#抽象类的作用)
+    - [TS类的重写](#ts类的重写)
   - [Vue2](#vue2)
     - [Vue 生命周期(☆)](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
@@ -4190,7 +4207,7 @@ function printId(id: number | string) {
     }
 }
 ```
-```ts
+```js
 let x = Math.random()*10>5?100:'only';
 x=1000
 //x=true//不能将类型“boolean”分配给类型“string | number”。
@@ -4200,13 +4217,13 @@ x=1000
 isString 是一个类型守卫函数，它检查传入的 value 是否是字符串类型。**如果是，它返回 true，并且 TypeScript 编译器会将 value 的类型推断为 string。**
 
 适用于联合类型和未知类型处理。
-```ts
+```js
 function isString(value: unknown): value is string {  
     return typeof value === "string";  
 }
 ```
 应用场景：
-```ts
+```js
 // 判断参数是否为string类型, 返回布尔值
 function isString(s:unknown):boolean{
     return typeof s === 'string'
@@ -4222,14 +4239,14 @@ function isString(s:unknown):boolean{
     }
   }
 ```
-```ts
+```js
 // 使用类型谓词可以解决上述问题
 function isString(s:unknown):s is string{
     return typeof s === 'string'
 }
 ```
 
-```ts
+```js
 // 接口 interfaceA
 interface interfaceA {
   name: string;
@@ -4295,6 +4312,496 @@ if (isOfType<interfaceB>(target, "phone")) {
 }
 ```
 
+### unknow类型和any类型的区别
++ unknown：只能赋值给unknown或any类型的变量。any：可以赋值给任何类型的变量，也可以接收任何类型的值。
++ unknown 类型在被确定为某个类型之前，不能被进行诸如函数执行、实例化等操作，一定程度上对类型进行了保护
+
+```js
+let value: unknown
+
+let value1: unknown = value   // OK
+let value2: any = value       // OK
+
+let value4: number = value    // Error
+let value5: string = value    // Error
+let value7: any[] = value     // Error
+```
+```js
+let value: unknown
+
+value = true             // OK
+value = []               // OK
+value = new TypeError()  // OK
+```
+
+### 混入和类型拓展操作 交叉类型的应用
+```js
+type Person = {  
+  name: string;  
+  age: number;  
+};  
+  
+type Employee = {  
+  companyId: string;  
+  role: string;  
+};  
+  
+type PersonEmployee = Person & Employee;  
+  
+const personEmployee: PersonEmployee = {  
+  name: "Alice",  
+  age: 30,  
+  companyId: "ABC123",  
+  role: "Manager"  
+};
+```
+
+```js
+function extend<T, U>(first: T, second: U): T & U {
+  let f = first as T & U
+  for(const key in second) {
+    (f)[key] = second[key] as any
+  }
+  return f
+}
+class Person {
+  constructor(public name: string) { }
+}
+class ConsoleLogger {
+  log() {
+	  console.log('log')
+  } 
+}
+
+let jim = extend(new Person('Jim'), new ConsoleLogger())
+let n = jim.name
+jim.log()//log
+```
+
+### interface 和 type的各自应用场景
++ 接口可以实现 extends 和 implements,类型别名可以借助&进行继承,实现类应用type也可以借助implements
++ 类型别名并不会创建新类型，是对原有类型的引用，而接口会定义一个新类型。
++ 接口只能用于定义对象类型，而类型别名的声明方式除了对象之外还可以定义`交叉、联合、原始类型`等。
++ TS推荐尽可能的使用接口来规范代码。
+
+```js
+type Tree<T, U> = {
+  left: T,
+  right: U
+}
+
+let f:Tree<string,number> ={
+  left:'30',
+  right:20
+}
+
+type brand = string
+type used = true | false
+
+const str: brand = 'imooc'
+const state: used = true
+```
+
+### keyof
+keyof 可以获取对象/接口的**可访问索引字符串**字面量类型
+```js
+interface User {
+  id: number,
+  phone: string,
+  nickname: string,
+  readonly department: string,
+}
+
+class Token{
+  private secret: string | undefined
+  public accessExp: number = 60 * 60
+  public refreshExp: number = 60 * 60 * 24 * 30 * 3
+}
+
+//let user: keyof User // let user: "id" | "phone" | "nickname" | "department"
+
+let user: keyof User ='nickname'
+console.log(user)//nickname
+type token = keyof Token // type token = "accessExp" | "refreshExp"
+```
+
+索引访问操作符（T[K]），可以访问类私有的属性的类型，`但是不推荐`
+
+![查看](book_files/185.jpg)
+
+```js
+// T是Person类型。
+// K可以是'name'、'position'或'age'中的一个或多个。
+// 因此，T[K]可以是string（如果K是'name'或'position'）或number（如果K是'age'）。所以T[K]的完整类型是string | number。
+// T[K][]则是一个数组，其中的元素可以是string或number。
+function pluck<T, K extends keyof T>(o: T, names: K[]): T[K][] {
+  return names.map(n => o[n])
+}
+
+interface Person {
+  name: string
+  position: string
+  age: number
+}
+let person: Person = {
+  name: 'Evan',
+  position: 'Software Engineer',
+  age: 27
+}
+
+let values: unknown[] = pluck(person, ['name', 'age'])
+console.log(values)//[ 'Evan', 27 ]
+```
+
+### 映射类型
+映射类型可以将已知类型的每个属性都变为可选的或者只读的。**使用 Readonly 与 Partial 关键字**
+
+> [P in keyof T]: T[P] 是一个映射类型语法，它遍历 T 的所有属性（键名）
+
+```js
+interface Person{
+  name: string
+  age: number
+}
+
+type PersonOptional = Partial<Person>
+type PersonReadonly = Readonly<Person>
+```
+呈现结果
+```js
+type PersonOptional = {
+  name?: string
+  age?: number
+}
+type PersonReadonly = {
+  readonly name: string
+  readonly age: number
+}
+```
+实现原理
+```js
+type Readonly<T> = {
+  readonly [K in keyof T]: T[K]
+}
+type Partial<T> = {
+  [K in keyof T]?: T[K]
+}
+```
+
+### 部分关键字的实现
++ Exclude<T, U> – 从 T 中剔除可以赋值给 U 的类型。
++ Extract<T, U> – 提取 T 中可以赋值给 U 的类型。
++ NonNullable<T> – 从 T 中剔除 null 和 undefined。
++ ReturnType<T> – 获取函数返回值类型。
++ InstanceType<T> – 获取构造函数类型的实例类型。
++ Partial<T> - 设置可选部分类等
++ Required<T> - 将可选全部转为必选
++ Readonly<T> - 只读
+
+```js
+type T00 = Exclude<'a' | 'b' | 'c' | 'd', 'a' | 'c' | 'f'>  // 'b' | 'd'
+```
+
++ Record:将 K 中的所有属性值都转换为 T 类型，并返回新的对象类型
+
+```js
+type Record<K extends keyof any, T> = {
+    [P in K]: T;
+};
+```
+
+```js
+  type TKeys = 'A' | 'B' | 'C'
+
+  interface IPeople {
+    name:string,
+    age?: number,
+    sex: string
+  }
+
+  type TRecord = Record<TKeys, IPeople>
+  
+  // 等同于
+//   type TRecord = {
+//     B: IPeople;
+//     C: IPeople;
+//     A: IPeople;
+//   }
+```
+
++ Pick:从 T 类型中选取部分 K 类型，并返回新的类型，这里 T 常用于对象类型
+
+```js
+type Pick<T, K extends keyof T> = { [P in K]: T[P]; }
+```
+```js
+interface IPeople {
+  name:string,
+  age?: number,
+  sex: string,
+}
+
+type TPick = Pick<IPeople, 'name' | 'age'>
+
+// 等同于
+//   type TPick = {
+//     name: string;
+//     age?: number;
+//   }
+```
+
+### infer 推断使用
+infer会根据当前场景推断出具体类型
+```js
+
+type ElementOf<T> = T extends Array<infer E> ? E : boolean;
+
+type Tuple = string[];
+// Tuple是string[]，推断出E是string
+type TupleToUnion = ElementOf<Tuple>
+
+let k20t1:TupleToUnion ='30'
+
+console.log(k20t1)//“30”
+
+// number extends Array<?> =>不成立，走boolean
+let k20t2:ElementOf<number> = true
+cons
+```
+
+```js
+type T1 = { name: string };
+type T2 = { age: number };
+
+type K2<T> = T extends { a: (x: infer U) => void; b: (x: infer U) => void }
+  ? U
+  : never;
+
+interface Props {
+  a: (x: T1) => void;
+  b: (x: T2) => void;
+}
+
+type k3 = K2<Props>;
+
+const app: k3 = {
+  name: "k17",
+  age: 30,
+};
+console.log(app); //{ name: 'k17', age: 30 }
+```
+
+### 数组的只读和多维数组
+```js
+var arr_name:number[][][]=[ [[1]],[[2,3,4]] ]
+console.log(arr_name)
+```
+```js
+let arr: ReadonlyArray<number> = [1,2,3,4,5];
+arr[0] = 6; // Index signature in type 'readonly number[]' only permits reading
+```
+```js
+let arr:readonly number[] = [1,2,3,4,5];
+console.log(arr)
+//let arr1:readonly Array<number> = [1,2,3,4,5];
+//'readonly' type modifier is only permitted on array and tuple literal types.
+//console.log(arr1)
+```
+
+![数组的弊端](book_files/186.jpg)
+
+
+### 元组和可选项
+元组不推荐越界设置，除非没有定元组的长度
+```js
+const list: [number, ...string[]] = [10, 'a', 'b', 'c']
+list.push(122)
+console.log(list[4])//122
+```
+```js
+let list: [number, string?, boolean?]
+list = [10, 'Sherlock', true]
+list = [10, 'Sherlock']
+console.log(list)
+// list = [10]
+```
+
+### ts函数
+```js
+const add: (x: number, y: number) => string = function(x: number, y: number): string {
+  return (x + y).toString()
+}
+```
+
+#### this和函数
+```js
+type ThisType1 = { name: string };
+//这里的this如果要传，必须是第一个位置，且他是作为类型注解而不是参数
+function eating(this: ThisType1, message: string) {
+  console.log(arguments)
+  console.log(this.name + " eating", message);
+}
+
+const info = {
+  name: "why",
+  eating: eating,
+};
+
+// 隐式绑定
+info.eating("哈哈哈");
+
+// 显示绑定
+eating.call({name: "kobe"}, "呵呵呵")
+eating.apply({name: "james"}, ["嘿嘿嘿"])
+```
+
+![类型注解this](book_files/187.jpg)
+
+![使用this的意义](book_files/188.jpg)
+
+### 构造函数定义
+```js
+class Ctor {
+  //类里顶一个参数s类型sting
+  s: string
+  //再定义一个构造函数，这个函数需要传入一个s参数string类型，然后把参数s赋值给this.s
+  constructor(s: string) {
+      this.s = s
+  }
+}
+
+//1.通过type来定义一个构造签名,取名为SomeConstructor,后面是对象
+type f1 = new (s: string)=> Ctor
+type SomeConstructor = {
+
+  //在对象里先定义一个调用签名 格式：(函数的参数:参数的类型):返回的类型/构造的类
+  new (s: string): Ctor
+  // new 关键字表示这是一个构造函数
+  // (s: string) 构造函数的 参数列表，表示这个构造函数 接受一个类型为string的参数s
+  // :Ctor是构造函数的返回类型
+}
+//3.使用函数 参数为Ctor:类型为type定义好的类型名:SomeConstructor
+function Fn(Ctor: SomeConstructor) {
+  ////Ctor: SomeConstructor可以理解为一个构造函数，那么这里就可以调用这个函数了,Ctor('字符串')，
+  //但是这里只实现了调用签名，并没有实现构造签名，在ts里要实现构造签名，
+  //需要在type SomeConstructor={}对象里的方法添加一个new,这样它就是一个构造函数类型了,
+  //那么在这里的Ctor('字符串')前面也要加一个new才能够被实例化。如果要返回这个实例，前面再加一个return，那么这里就返回了一个构造函数的实例了
+ return new Ctor('字符串');
+}
+
+//4.调用函数,传入的参数是构造函数类型，这里传入Ctor
+const fn = Fn(Ctor)
+//5.打印，运行
+console.log(fn.s);
+```
+
+### 函数中extends约束
+Type extends { length: number } 是一个泛型约束，它限制了泛型参数 Type 必须是一个拥有 length 属性的对象，并且这个 length 属性的类型是 number。
+```js
+function longest<Type extends { length: number }>(a: Type, b: Type) {
+  if (a.length >= b.length) {
+    return a;
+  } else {
+    return b;
+  }
+}
+ 
+// longerArray is of type 'number[]'
+const longerArray = longest([1, 2], [1, 2, 3]);
+// longerString is of type 'alice' | 'bob'
+const longerString = longest("alice", "bob");
+// Error! Numbers don't have a 'length' property
+const notOK = longest(10, 100);
+// 类型“number”的参数不能赋给类型“{ length: number; }”的参数。
+```
+
+### 函数的重载
+注意重载的兼容性，以及参数和返回值的实现性
+```js
+function reverse(x: string): string
+function reverse(x: number): number
+//兼容参数
+function reverse(target: string | number) {
+  if (typeof target === 'string') {
+	// return string
+    return target.split('').reverse().join('')
+  }
+  if (typeof target === 'number') {
+	// return number
+    return +[...target.toString()].reverse().join('')
+  }
+}
+console.log(reverse('imooc'))   // coomi
+console.log(reverse(23874800))  // 847832
+```
+
+### TS类的关键字
+1. static: 关键字用于定义类的数据成员（属性和方法）为静态的，静态成员可以直接通过类名调用。
+2. public（默认） : 公有，可以在任何地方被访问。
+3. protected : 受保护，可以被其自身以及其子类和父类访问。
+4. private : 私有，只能被其定义所在的类访问。
+5. 通过 readonly 关键字将属性设置为只读的。只读属性必须在声明时或构造函数里被初始化。
+	- readonly如果定义的是对象，和js一样，可以修改里面的属性值，但是不能直接改这个对象
+
+### 抽象类的作用
+抽象类是一种特殊的类，它不能被实例化。抽象类主要用于为其他类提供一个基础的框架或结构，同时它可以包含一些抽象方法和非抽象方法。
+
+1. 定义公共接口：抽象类可以定义一组公共的属性和方法，这些属性和方法将由继承它的子类共享和实现。
+2. 实现代码复用：抽象类可以包含非抽象方法（即具体方法），这些方法可以直接在子类中继承和使用，从而实现代码复用。
+3. 强制子类实现某些方法：抽象类可以包含抽象方法，这些方法在抽象类中只有声明而没有实现。任何继承自抽象类的子类都必须实现这些抽象方法，否则子类也将成为一个抽象类。这有助于确保子类遵循某种特定的行为模式。
+4. 提供类型安全：通过抽象类，你可以确保只有符合特定接口（即继承自抽象类）的类才能被用作某个特定类型的对象。这有助于在编译时捕获类型错误，提高代码的可维护性和可读性。
+5. 实现设计模式：抽象类经常用于实现各种设计模式，如工厂模式、模板方法模式、策略模式等。这些设计模式通过使用抽象类来定义通用行为和结构，从而使代码更加灵活和可扩展。
+6. 提供多态性：多态性是面向对象编程的三大特性之一，它允许不同类型的对象对同一消息做出响应。抽象类可以作为多态性的基础，子类可以通过重写抽象类中的方法来提供不同的实现。
+
+```js
+abstract class Animal {
+  abstract makeSound(): void;
+  move(): void {
+      console.log('roaming the earch...');
+  }
+}
+
+class Dog extends Animal {
+  makeSound() {
+    console.log('bark bark bark...')
+  }
+}
+
+const dog = new Dog()
+
+dog.makeSound()  // bark bark bark...
+dog.move()       // roaming the earch...
+```
+
+### TS类的重写
+```js
+class Jspang{
+  public name:string
+  public age : number
+  public skill: string
+  constructor(name:string,age:number,skill:string){
+      this.name = name
+      this.age = age
+      this.skill = skill
+  }
+  public interest(){
+      console.log('xxx')
+  }
+}
+
+class JsShuai extends Jspang{
+  public xingxiang:string = '帅气'
+// 子类重写方法
+  public interest(){
+  //如果有需要，可以继续借用父类的方法和自己的方法组合
+      super.interest()
+      console.log('建立电商平台')
+  }
+  public zhuangQian(){
+      console.log('一天赚了一个亿')
+  }
+}
+```
 
 ## Vue2
 
