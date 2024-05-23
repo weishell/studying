@@ -18,6 +18,12 @@
 		display:inline-block;
 		border-bottom: 1px solid green
 	}
+	a{
+		color:purple !important;
+	}
+	.markdown-body blockquote{
+		border-left:3px solid red !important
+	}
 </style>
 
 
@@ -28,8 +34,11 @@
     - [p标签里面不能嵌套ul、div等块级元素原因](#p标签里面不能嵌套uldiv等块级元素原因)
     - [src 和 href 的区别](#src-和-href-的区别)
     - [说说常用的 meta 标签(☆)](#说说常用的-meta-标签)
-    - [HTML5 为什么只需要写 `<!DOCTYPE HTML>`](#html5-为什么只需要写-doctype-html)
+    - [meta作用](#meta作用)
+      - [HTML meta viewport属性](#html-meta-viewport属性)
+    - [HTML5 为什么只需要写 !DOCTYPE HTML](#html5-为什么只需要写-doctype-html)
     - [iframe有哪些优点和缺点](#iframe有哪些优点和缺点)
+    - [H5新增属性](#h5新增属性)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
     - [margin负值(☆)](#margin负值)
@@ -48,6 +57,8 @@
     - [css选择器](#css选择器)
       - [css选择器读取顺序](#css选择器读取顺序)
       - [可继承](#可继承)
+    - [伪类和伪元素的区别](#伪类和伪元素的区别)
+      - [伪类 伪元素有哪些](#伪类-伪元素有哪些)
     - [css元素隐藏](#css元素隐藏)
     - [css画三角形(☆)](#css画三角形)
     - [css视差滚动实现方案](#css视差滚动实现方案)
@@ -63,7 +74,7 @@
     - [let const var(☆)](#let-const-var)
     - [作用域的理解](#作用域的理解)
       - [词法作用域案例](#词法作用域案例)
-      - [作用域](#作用域)
+      - [全局作用域诡异问题](#全局作用域诡异问题)
       - [作用域链](#作用域链)
     - [执行上下文和执行栈](#执行上下文和执行栈)
       - [执行上下文的生命周期](#执行上下文的生命周期)
@@ -72,7 +83,12 @@
       - [防抖和节流(☆)](#防抖和节流)
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
     - [内存泄漏](#内存泄漏)
-      - [垃圾回收机制(☆)](#垃圾回收机制)
+      - [垃圾回收机制GC(☆)](#垃圾回收机制gc)
+      - [Mark-Sweep标记清除优缺点](#mark-sweep标记清除优缺点)
+        - [优化方案：标记整理](#优化方案标记整理)
+      - [V8对GC的优化:分代式垃圾回收](#v8对gc的优化分代式垃圾回收)
+        - [增量标记与惰性清理的优缺？](#增量标记与惰性清理的优缺)
+        - [并发回收](#并发回收)
       - [可能的内存泄漏场景](#可能的内存泄漏场景)
     - [\[10, 20, 30\].map(parseInt)](#10-20-30mapparseint)
     - [函数声明和函数表达式区别](#函数声明和函数表达式区别)
@@ -162,6 +178,7 @@
     - [interface 和 type的各自应用场景](#interface-和-type的各自应用场景)
     - [泛型Generics](#泛型generics)
       - [泛型定义实际应用](#泛型定义实际应用)
+    - [约束泛型](#约束泛型)
     - [keyof](#keyof)
     - [映射类型](#映射类型)
     - [部分高级特性的实现](#部分高级特性的实现)
@@ -241,6 +258,7 @@
       - [监听reactive](#监听reactive)
       - [Watch监听多个](#watch监听多个)
     - [Setup中如何获取组件实例](#setup中如何获取组件实例)
+    - [Vue3中 script setup props emit 向父组件暴露数据用法](#vue3中-script-setup-props-emit-向父组件暴露数据用法)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [state 和 props 区别](#state-和-props-区别)
@@ -332,6 +350,7 @@
     - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
     - [堆和二叉树的关系](#堆和二叉树的关系)
   - [算法](#算法)
+    - [f](#f)
     - [递归](#递归)
       - [递归和尾递归](#递归和尾递归)
   - [write](#write)
@@ -450,7 +469,29 @@ meta 标签提供关于HTML文档的元数据。元数据不会显示在页面�
 2. http-equiv，把 content 属性连接到一个 HTTP 头部。
 3. name，把 content 属性连接到某个名称。
 
-### HTML5 为什么只需要写 `<!DOCTYPE HTML>`
+### meta作用
+
++ **字符集定义**：通过 `<meta charset="UTF-8">` 声明文档使用的字符集，这有助于确保网页内容在不同浏览器和设备上的正确显示。
++ **页面描述**：`<meta name="description" content="页面描述内容">` 用于为搜索引擎提供页面的简短描述，这通常显示在搜索结果页面中。
++ **关键词**：`<meta name="keywords" content="关键词1,关键词2,...">` 虽然现代搜索引擎不再像过去那样依赖此标签进行排名，但它仍然可以为搜索引擎提供一些关于页面内容的线索。
++ 作者信息：`<meta name="author" content="作者姓名">` 提供页面的作者信息。
++ 页面刷新：`<meta http-equiv="refresh" content="5;URL=http://www.example.com">` 可以用于设置页面在指定的秒数后自动刷新并跳转到另一个 URL。
++ **响应式设计**：`<meta name="viewport" content="width=device-width, initial-scale=1.0">` 用于设置网页在移动设备上的视口宽度和初始缩放级别，这是响应式设计的重要部分。
++ X-UA-Compatible：`<meta http-equiv="X-UA-Compatible" content="IE=edge">` 告诉 Internet Explorer 使用其最新的渲染引擎来渲染页面。
++ 社交媒体分享：`<meta property="og:title" content="网页标题"> 和 <meta property="og:image" content="图片URL">` 等标签用于为社交媒体平台（如 Facebook、Twitter 等）提供分享时的页面标题、图片等信息。
++ **安全信息**：`<meta http-equiv="Content-Security-Policy" content="...">` 用于定义页面内容的**安全策略**，如禁止加载外部脚本或限制某些资源的加载。
+
+尽管 `<meta>` 标签提供了许多有用的功能，但过度使用或滥用这些标签可能会导致搜索引擎或其他网络工具对网页产生负面印象。因此，在使用 `<meta>` 标签时，请确保仅包含必要和相关的元信息。
+
+#### HTML meta viewport属性
+常见的meta viewport属性值包括：
+
+1. width: 设置视口的宽度，可以使用具体的像素值比如width=600，也可以使用特定的关键字比如width=device-width表示视口宽度等于设备屏幕的宽度
+2. initial-scale: 设置初始缩放比例，可以使用具体的数字值比如initial-scale=2.0，或者使用特性的关键值比如initial-scale=1.0表示不进行缩放
+3. minimum-scale和maximum-scale：设置允许用户进行缩放的最小和最大比例
+4. user-scalable：设置用户是否可以手动缩放网，可以设置为yes或no，通过设置不同的meta viewport属性值，开发者可以实现响应式设计，使网页在不同设备上呈现出最佳的显示效果
+
+### HTML5 为什么只需要写 !DOCTYPE HTML
 是因为 HTML5 不基于 SGML，所以不需要引用 DTD。
 
 在 HTML 4.01 中，<!DOCTYPE> 声明引用 DTD，因为 HTML 4.01 基于 SGML。
@@ -461,9 +502,33 @@ DTD 规定了标记语言的规则，这样浏览器才能正确地呈现内容�
 ```
 
 ### iframe有哪些优点和缺点
-优点：展现嵌入的网页；加载速度较慢的内容，如广告；**可以跨子域通信；**
+1. 优点：
+	+ 灵活性
+	+ 代码复用(header和aside等可以不考虑)
+	+ 独立性
+	+ 展现嵌入的网页
+	+ 加载速度较慢的内容，如广告
+	+ **可以跨子域通信**
 
-缺点：**iframe会阻塞主页面onload事件；**不利于搜索引擎识别；增加http请求；
+2. 缺点：
+	+ **iframe会阻塞主页面onload事件（可考虑iframe异步代码）**
+	+ 不利于搜索引擎识别
+	+ 增加http请求
+	+ 会增加页面的加载时间和渲染复杂度
+	+ 嵌入的内容可能来自不受信任的第三方网站，这可能会导致一些安全风险
+	+ 响应性问题：iframe内容的大小通常是固定的，这可能导致响应性问题，特别是在移动设备上
+
+### H5新增属性
+1. 语义标签 `<footer><nav>`等
+2. 表单功能增强 `<input type="submit"><input type="email">` oninvalid 当验证不通过时触发此事件等
+3. 新增了音频和视频
+4. 对canvas和svg的支持度
+5. 地理定位
+6. 拖放API `<div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`
+7. Web Worker
+8. Web Storage
+9. WebSocket
+
 
 ## css
 
@@ -605,7 +670,7 @@ k1和k2是两个div
 
 + 父元素的垂直`外边距`不会和子元素重叠
 + 开启BFC的元素`不会被浮动元素`所覆盖
-+ 开启BFC的元素能够包含浮动的子元素
++ 开启BFC的元素能够**包含浮动的子元素**
 
 
 1. 普通文档流布局规则
@@ -627,6 +692,8 @@ k1和k2是两个div
 4. BFC作用 :多栏布局,清除浮动,上下margin重叠
 
 > 多栏布局指的是左侧float，然后给整体父级加上BFC模式，这样就可以避免右侧的内容占据左侧
+
+![inline-block](book_files/193.jpg)
 
 ```html
 <!DOCTYPE html>
@@ -738,7 +805,7 @@ margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 ### 三栏布局
 + flex grid
 + absolute + margin
-+ 圣杯布局：center left right在同一层级全部浮动，父级设左右padding，左侧：left:-100% + right对应宽度，右边margin-right对应宽度 
++ 圣杯布局：center left right在同一层级全部浮动，父级设左右padding，左侧：margin-left:-100% + 定位right对应宽度，右边margin-right对应宽度 
 + 双飞翼布局：多一个div包裹，中间div用margin不是padding，左侧不需要再借助定位改变位置，右侧不需要通过margin-right直接使用margin-left即可
 
 ```html
@@ -964,7 +1031,8 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ### 响应式设计(☆)
 适配不同尺寸屏幕
 
-+ 媒体查询 @media
++ flex弹性盒子 grid 网格布局
++ 媒体查询 @media （设置不同屏幕的断点@media (min-width: 600px) and (max-width: 899px)）
 + 百分比
 + vw/vh
 + rem
@@ -1126,14 +1194,14 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ```
 + 变量处理
 
-```less
-// less要求变量@开头
+```css
+/* // less要求变量@开头 */
 @red : #c00;
 strong {
 	color: @red;
 }
 ```
-```scss
+```css
 /* sass变量$开头 */
 $red: #c00;
 strong {
@@ -1323,7 +1391,6 @@ body {
 ```
 
 
-
 ### flex布局(☆)
 + flex-direction: 设置主轴的方向
 + **justify-content**: `设置主轴上的子元素排列方式`
@@ -1389,6 +1456,34 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 + 可继承的属性：font-size, font-family, color
 + 不可继承的样式：border, padding, margin, width, height
 + 注意a标签不继承父级的`color`，h1-h6不继承font-size(是按照一定的em比例呈现的)
+
+### 伪类和伪元素的区别
+1. 用途：
+	+ 伪类主要用于为某些元素添加一些特殊的效果，这些效果通常是基于元素的某种状态来触发的，例如用户与元素的交互行为（如鼠标悬停、点击等）或元素的特定状态（如链接被访问过、元素获得焦点等）。伪类可以用于改变这些状态下元素的样式。
+	+ 伪元素则用于在某些元素的前面或后面添加一些内容或样式，这些内容或样式是虚拟的，不会出现在DOM结构中，但可以通过CSS进行样式控制。伪元素通常用于向元素添加装饰性的内容或样式，如添加下划线、背景图像等。
+2. 表示方式：
+	+ 伪类通常用单冒号“:”来表示，例如:hover、:active、:visited等。
+	+ 伪元素则用双冒号“::”来表示，这是为了与伪类进行区分。常见的伪元素有::before、::after、::first-letter、::first-line等。
+3. 匹配原理：
+	+ 伪类是基于元素的状态来匹配的，当元素处于特定的状态时，伪类选择器就会生效，从而改变元素的样式。
+	+ 伪元素则是基于元素的位置来创建的，它们并不与文档中的任何元素直接对应，而是根据CSS规则在元素的内容之前或之后生成虚拟的内容或样式。
+	
+总的来说，伪类和伪元素在CSS中各有其独特的用途和表示方式，开发者可以根据需要选择使用它们来实现不同的效果。
+
+#### 伪类 伪元素有哪些
+1. 伪类
+	- :hover：鼠标悬停在元素上时的状态。
+	- :active：元素当前被激活（如鼠标按下）的状态。
+	- :focus：元素当前获得焦点（如光标置于其上）的状态。
+	- :link 和 :visited：用于链接元素，分别表示未访问和已访问的链接。
+	- :target：用来匹配页面的URI中某个标识符的目标元素。
+	- :lang(language)：用来匹配使用指定语言的元素。
+2. 伪元素
+	- ::before 和 ::after：在元素的内容之前或之后插入内容。
+	- ::first-letter：选择块级元素的第一个字母。
+	- ::first-line：选择文本或块级元素的第一行。
+	- ::marker：选择列表项的标记，如无序列表中的项目符号点或有序列表中的数字。
+	- ::selection：选择用户选择的文本部分。
 
 ### css元素隐藏
 + display:none
@@ -1698,7 +1793,7 @@ bar()
 
 ![词法环境应用](book_files/41.jpg)
 
-#### 作用域
+#### 全局作用域诡异问题
 ```js
 a = 3;  
 {  
@@ -1731,10 +1826,10 @@ JavaScript中有三种类型的执行上下文：
 创建阶段（Creation phase）、执行阶段（Execution phase）和回收阶段（Cleanup phase）。
 
 + 创建阶段：当函数被调用，但尚未执行任何其内部代码之前，会进入创建阶段。在这个阶段，JavaScript引擎会进行以下操作：
-	- 创建变量对象（Variable Object）：该对象用于存储变量和函数声明。对于全局上下文，变量对象是全局对象（如window对象）。对于函数上下文，变量对象会初始化为函数的参数对象（arguments），然后提升函数声明和变量声明。
+	- **创建变量对象**（Variable Object）：该对象用于存储变量和函数声明。对于全局上下文，变量对象是全局对象（如window对象）。对于函数上下文，变量对象会初始化为函数的参数对象（arguments），然后提升函数声明和变量声明。
 	- 确定this的指向
 	- 创建作用域链
-+ 执行阶段：在此阶段，变量会被赋值，函数会被调用，代码的逻辑会按照顺序执行。
++ 执行阶段：在此阶段，**变量会被赋值，函数会被调用**，代码的逻辑会按照顺序执行。
 + 回收阶段：在这个阶段，JavaScript引擎会进行垃圾回收，释放不再需要的内存和对象，清理执行上下文，并将其从执行栈中弹出。
 
 
@@ -1743,7 +1838,7 @@ JavaScript中有三种类型的执行上下文：
 
 ![闭包](book_files/36.jpg)
 
-场景：[权限收敛] [设置鼠标样式] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存][私有仓库]
+场景：[权限收敛] [抖动和节流] [延长变量的生命周期] [函数柯里化] [缓存][私有仓库]
 ```js
 // 闭包隐藏数据，只提供 API
 	function createCache() {
@@ -1864,14 +1959,14 @@ fn()
 ### 内存泄漏
 内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
 
-#### 垃圾回收机制(☆)
+#### 垃圾回收机制GC(☆)
 原理：垃圾收集器会定期找出不再继续使用的变量，然后释放其内存
 
 + 标记清除算法：
 
 标记清除算法是JavaScript中最常用的垃圾回收机制。它的工作原理大致可以分为两个阶段：`标记阶段和清除阶段。`
 
-在标记阶段，垃圾收集器从根对象（通常是全局对象）开始，递归地访问对象的属性，并将所有访问到的对象都标记为“活动”或“可达”。这样，所有从根对象直接或间接可达的对象都会被标记。
+在标记阶段，垃圾收集器从**根对象**（通常是全局对象）开始，递归地访问对象的属性，并将所有访问到的对象都标记为“活动”或“可达”。这样，所有从根对象直接或间接可达的对象都会被标记。[这个算法可以很好的解决循环引用的问题；]
 
 在清除阶段，垃圾收集器会遍历堆中的所有对象，找出那些没有被标记为活动的对象。这些对象就是不再被引用的“垃圾”，垃圾收集器会释放它们的内存。
 
@@ -1904,6 +1999,92 @@ arr = null
 // arr置为null，则引用次数为0
 // 这只是个例子，标记清除也是可以实现arr = null 后的回收机制
 ```
+```js
+let a = new Object() 	// 此对象的引用计数为 1（a引用）
+let b = a 		// 此对象的引用计数是 2（a,b引用）
+a = null  		// 此对象的引用计数为 1（b引用）
+b = null 	 	// 此对象的引用计数为 0（无引用）
+...			// GC 回收此对象
+```
+
+#### Mark-Sweep标记清除优缺点
+整个标记清除算法大致过程就像下面这样
+
+1. 垃圾收集器在运行时会给内存中的所有变量都加上一个标记，假设内存中所有对象都是垃圾，全标记为0
+2. 然后从各个根对象开始遍历，把不是垃圾的节点改成1
+3. 清理所有标记为0的垃圾，销毁并回收它们所占用的内存空间
+4. 最后，把所有内存中对象标记修改为0，等待下一轮垃圾回收
+
++ 优点
+
+标记清除算法的优点只有一个，那就是实现比较简单，打标记也无非打与不打两种情况，这使得一位二进制位（0和1）就可以为其标记，非常简单
++ 缺点
+
+标记清除算法有一个很大的缺点，就是在清除之后，剩余的对象内存位置是不变的，也会**导致空闲内存空间是不连续的**，出现了内存碎片，并且由于剩余空闲内存不是一整块，它是由不同大小内存组成的内存列表，这就牵扯出了内存分配的问题
+
+![标记清除](book_files/194.jpg)
+
+假设新建对象分配内存时需要大小为 size，由于空闲内存是间断的、不连续的，则需要对空闲内存列表进行一次单向遍历找出大于等于 size 的块才能为其分配
+
+![新对象](book_files/195.jpg)
+
+那如何找到合适的块呢？可以采取下面三种分配策略
+
++ First-fit，找到大于等于 size 的块立即返回
++ Best-fit，遍历整个空闲列表，返回大于等于 size 的最小分块
++ Worst-fit，遍历整个空闲列表，找到最大的分块，然后切成两部分，一部分 size 大小，并将该部分返回
+
+这三种策略里面 Worst-fit 的空间利用率看起来是最合理，但实际上切分之后会造成更多的小块，形成内存碎片，所以不推荐使用，对于 First-fit 和 Best-fit 来说，考虑到分配的速度和效率 First-fit 是更为明智的选择
+
+综上所述，标记清除算法或者说策略就有两个很明显的缺点
+
+1. `内存碎片化`，空闲内存块是不连续的，容易出现很多空闲内存块，还可能会出现分配所需内存过大的对象时找不到合适的块
+2. `分配速度慢`，因为即便是使用 First-fit 策略，其操作仍是一个 O(n) 的操作，最坏情况是每次都要遍历到最后，同时因为碎片化，大对象的分配效率会更慢
+
+##### 优化方案：标记整理
+标记整理（Mark-Compact）算法 就可以有效地解决，它的标记阶段和标记清除算法没有什么不同，只是标记结束后，标记整理算法会将活着的对象（即不需要清理的对象）向内存的一端移动，最后清理掉边界的内存
+
+![移动](book_files/196.jpg)
+
+#### V8对GC的优化:分代式垃圾回收
+V8 的垃圾回收策略主要基于分代式垃圾回收机制，V8 中将堆内存分为新生代和老生代两区域，采用不同的垃圾回收器也就是不同的策略管理垃圾回收
+
+新生代的对象为存活时间较短的对象，简单来说就是新产生的对象，通常只支持 1～8M 的容量，而老生代的对象为存活事件较长或常驻内存的对象，简单来说就是经历过新生代垃圾回收后还存活下来的对象，容量通常比较大
+
+新生代对象是通过一个名为 Scavenge 的算法进行垃圾回收，在 Scavenge算法 的具体实现中，主要采用了一种复制式的方法即 Cheney算法 ，Cheney算法 中将堆内存一分为二，一个是处于使用状态的空间我们暂且称之为 使用区，一个是处于闲置状态的空间我们称之为空闲区
+
+当开始进行垃圾回收时，新生代垃圾回收器会对使用区中的活动对象做标记，标记完成之后将使用区的活动对象复制进空闲区并进行排序，随后进入垃圾清理阶段，即将非活动对象占用的空间清理掉。最后进行角色互换，把原来的使用区变成空闲区，把原来的空闲区变成使用区
+
+`当一个对象经过多次复制后依然存活，它将会被认为是生命周期较长的对象，随后会被移动到老生代中`
+
+老生代垃圾回收器来管理其垃圾回收执行，它的整个流程就采用的就是上文所说的标记清除算法了
+
+新生代对象空间就采用并行策略，在执行垃圾回收的过程中，会启动了多个线程来负责新生代中的垃圾清理操作，这些线程同时将对象空间中的数据移动到空闲区域，这个过程中由于数据地址会发生改变，所以还需要同步更新引用这些对象的指针，此即并行回收
+
+![新生代](book_files/197.jpg)
+
+![并行回收](book_files/198.jpg)
+
+##### 增量标记与惰性清理的优缺？
+增量标记与惰性清理的出现，使得主线程的停顿时间大大减少了，让用户与浏览器交互的过程变得更加流畅。但是由于每个小的增量标记之间执行了 JavaScript 代码，堆中的对象指针可能发生了变化，需要使用写屏障技术来记录这些引用关系的变化，所以增量标记缺点也很明显：
+
+首先是并没有减少主线程的总暂停的时间，甚至会略微增加，其次由于写屏障机制的成本，增量标记可能会降低应用程序的吞吐量(吞吐量是指应用程序线程用时占程序总用时的比例。 例如,吞吐量99/100意味着100秒的程序执行时间应用程序线程运行了99秒, 而在这一时间段内GC线程只运行了1秒。)
+
+三色标记法(暂停与恢复)：
++ 白色指的是未被标记的对象
++ 灰色指自身被标记，成员变量（该对象的引用对象）未被标记
++ 黑色指自身和成员变量皆被标记
+
+V8 增量回收使用 **写屏障** (Write-barrier) 机制，即一旦有黑色对象引用白色对象，该机制会强制将引用的白色对象改为灰色，从而保证下一次增量 GC 标记阶段可以正确标记，这个机制也被称作 强三色不变性
+
+![其他方案](book_files/199.jpg)
+
+![写屏障](book_files/200.jpg)
+
+##### 并发回收
+它指的是主线程在执行 JavaScript 的过程中，辅助线程能够在后台完成执行垃圾回收的操作，辅助线程在执行垃圾回收的时候，主线程也可以自由执行而不会被挂起，**它需要额外实现一些读写锁机制**
+![并发](book_files/201.jpg)
+
 
 #### 可能的内存泄漏场景
 + 意外的全局变量
@@ -1973,8 +2154,8 @@ var sum = function (x, y) {
 ### 严格模式要注意的地方
 + Module code is always strict mode code.
 + All parts of a ClassDeclaration or a ClassExpression are strict mode code.
-+ 禁止意外创建全局变量，直接抛出错误
-+ this 问题
++ `禁止意外创建全局变量，直接抛出错误`
++ `this 问题`
 + arguments 和参数列表的独立性，并且 arguments 不可修改
 + 给 NaN 赋值会抛出错误
 + 对象操作：给不可写属性赋值(writable: false)；给只读属性赋值(只有 get，没有 set)；给不可扩展对象新增属性
@@ -1983,10 +2164,17 @@ var sum = function (x, y) {
 + 禁止对 primitive type 的变量加属性或方法
 + 禁止使用with
 + eval 不再为 surrounding scope 添加新的变量
-+ 禁止delete 声明的变量，禁止delete 不可删除的属性或方法
++ **禁止delete 声明的变量，禁止delete 不可删除的属性或方法**
 
 ### LHS 和 RHS 是什么？会造成什么影响
 LHS 是 Left Hand Side 的意思，左值查询一个变量，如果变量不存在，且在**非严格模式下，就会创建一个全局变量**。RHS 查询一个变量，如果变量不存在，就会报错 ReferenceError。
+
+ReferenceError 同作用域判别失败相关，而 TypeError 则代表作用域判别成功了，但是对结果的操作是非法或不合理的。
+```js
+//Uncaught TypeError: b.push is not a function
+var b=40;
+b.push(1)
+```
 
 ### == 和 ===
 全等不会存在隐式转换问题
@@ -2040,7 +2228,7 @@ console.warn({} == !{})//false
 ### 判断对象是空对象
 1. Object.keys()+length； Object.entries
 2. JSON.stringify():不能包含复杂的结构，如函数等
-3. for...in + obj.hasOwnProperty(key)
+3. for...in + **obj.hasOwnProperty(key)**
 
 ### 深拷贝和浅拷贝(☆)
 
@@ -2317,7 +2505,6 @@ console.log(str)
 去重等等……
 
 
-
 ### 函数缓存
 
 场景：[昂贵的函数调用执行复杂计算的函数][纯函数][重复输入的递归函数]
@@ -2407,9 +2594,9 @@ setTimeout(() => {
 
 
 ### Class和实例的关系以及原型链(☆)
-1.	每个class都有显示原型prototype【class还有constructor和__proto__】
-2.	每个实例都有隐式原型__proto__【实例无prototype，有constructor】
-3.	实例的__proto__指向对应class的prototype
+1.	每个class都有显示原型prototype【class还有constructor和`__proto__`】
+2.	每个实例都有隐式原型`__proto__`【实例无prototype，有constructor】
+3.	实例的`__proto__`指向对应class的prototype
 
 原型（prototype）主要指的是一个对象，它用于存储`共享属性和方法`。js每个函数都有一个prototype属性，这个属性是一个指针，指向一个对象，这个对象就是原型对象。可提高代码的复用性和效率。
 
@@ -2421,7 +2608,7 @@ setTimeout(() => {
 ![图2](book_files/32.jpg)
 ![图3](book_files/34.jpg)
 
-特殊之处：Function的构造函数是自己；Function的prototype和__proto__都指向`Function.prototype`，Function作为对象时，它的__proto__指向它构造函数的prototype。Object的构造函数也是Function,同时`一切对象又是Object创建`。
+特殊之处：Function的构造函数是自己；Function的prototype和__proto__都指向`Function.prototype`，Function作为对象时，它的`__proto__`指向它构造函数的prototype。Object的构造函数也是Function,同时`一切对象又是Object创建`。
 
 > 一切函数对象（包括Object），都是继承Function对象 
 
@@ -2778,6 +2965,8 @@ console.warn(Object.fromEntries([
  ['foo', 'bar'],
  ['baz', 42]
 ]))
+
+//{foo: 'bar', baz: 42}
 ```
 
 ### new Object()和Object.cretate()以及Object.assign()区别
@@ -2787,6 +2976,9 @@ Object.create() 静态方法以一个**现有对象作为原型**，创建一个
 ```
 Object.create(proto, propertiesObject)
 ```
+
+![浅拷贝](book_files/202.jpg)
+
 Object.assign() 静态方法将一个或者多个源对象中所有`可枚举`的`自有属性`复制到目标对象，并返回修改后的目标对象。
 ```
 Object.assign(target, ...sources)
@@ -6536,6 +6728,65 @@ export default {
 </script>
 ```
 
+### Vue3中 script setup props emit 向父组件暴露数据用法
++ 定义属性 defineProps
++ 定义事件defineEmits
++ 暴露数据给父组件 defineExpose
+
+顶级变量，可直接用于template不需要return导出
+```js
+<script setup>
+import { defineProps, defineEmits } from 'vue'
+
+// 定义属性
+const props = defineProps({
+    name: String,
+    age: Number
+})
+
+// 定义事件，defineEmits返回一个emit
+const emit = defineEmits(['change', 'delete'])
+function deleteHandler() {
+    emit('delete', 'aaa')
+}
+
+</script>
+<template>
+    <p>Child2 - name: {{props.name}}, age: {{props.age}}</p>
+    <button @click="$emit('change', 'bbb')">change</button>
+    <button @click="deleteHandler">delete</button>
+</template>
+```
+```js
+//child3Ref
+<script setup>
+//子组件
+import { ref, defineExpose } from 'vue'
+
+const a = ref(101)
+const b = 201
+
+defineExpose({
+    a,
+    b
+})
+
+</script>
+
+// 父组件组件
+<child-3 ref="child3Ref"></child-3>
+<script>
+onMounted(() => {
+    // 拿到 Child3 组件的一些数据
+    console.log(child3Ref.value)
+    console.log(child3Ref.value.a)
+    console.log(child3Ref.value.b)
+})
+</script>
+```
+
+
+
 ## React
 
 React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、声明式编程范式和函数式编程概念，以使前端应用程序更高效
@@ -9642,6 +9893,22 @@ export function createLinkList(arr: number[]): ILinkListNode {
 
 
 ## 算法
+
+### f
+程序执行时需要的计算量和内存空间（和代码是否简洁无关），复杂度是个数量级，不是具体的数字
++ 时间复杂度：程序执行是所需要的计算量（CPU）
++ 空间复杂度：程序执行时需要的内存空间
+
+前端重时间轻空间
+
+![前端](book_files/192.jpg)
+
++ O(1):一次结束 如obj.key
++ O(n):for循环
++ O(n^2):for循环嵌套
++ O(logn):数量级的对数，如二分法
++ O(nlogn):for循环嵌套二分法
+
 
 ### 递归
 递归（Recursion）是计算机科学中的一个重要概念，它指的是一个函数或过程直接或间接地调用自身来解决问题。递归算法通过将问题分解为更小的子问题，并递归地解决这些子问题，最终将子问题的解组合起来形成原问题的解。
