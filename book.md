@@ -4418,8 +4418,30 @@ class Generic<T> {}
 
 ![实际应用](book_files/191.jpg)
 
+### 约束泛型
+有时候想操作某类型的一组值，并且知道这组值具有什么样的属性。在loggingIdentity例子中，想访问arg的length属性，但是编译器并不能证明每种类型都有length属性，所以就报错了。
+```js
+function loggingIdentity<T>(arg: T): T {
+    console.log(arg.length);  // Error: T doesn't have .length
+    return arg;
+}
+```
+相比于操作any所有类型，想要限制函数去处理任意带有.length属性的所有类型。 只要传入的类型有这个属性，就允许，就是说至少包含这一属性。 为此，需要列出对于T的约束要求。定义一个接口来描述约束条件。创建一个包含.length属性的接口，使用这个接口和extends关键字来实现约束：
+```js
+interface LengthDefine {
+    length: number;
+}
+
+function loggingIdentity<T extends LengthDefine>(arg: T): T {
+    console.log(arg.length);
+    return arg;
+}
+```
+
 ### keyof
 keyof 可以获取对象/接口的**可访问索引字符串**字面量类型
+
+在 TypeScript 中，keyof 是一个操作符，它返回一个对象类型的所有公开属性的联合类型。这与 JavaScript 中的 Object.keys 函数有些相似，但 Object.keys 返回的是一个包含所有属性名称的数组，而 keyof 返回的是一个类型。
 ```js
 interface User {
   id: number,
