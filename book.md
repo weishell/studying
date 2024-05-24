@@ -3,7 +3,7 @@
 		font-family: "Consolas", "topWebfont","宋体"
 	}
 	strong,b{
-		color:purple
+		color:#F97583
 	}
 	code{
 		color:green;
@@ -33,7 +33,7 @@
     - [如何理解html语义化](#如何理解html语义化)
     - [p标签里面不能嵌套ul、div等块级元素原因](#p标签里面不能嵌套uldiv等块级元素原因)
     - [src 和 href 的区别](#src-和-href-的区别)
-    - [说说常用的 meta 标签(☆)](#说说常用的-meta-标签)
+    - [说说常用的 meta 标签](#说说常用的-meta-标签)
     - [meta作用](#meta作用)
       - [HTML meta viewport属性](#html-meta-viewport属性)
     - [HTML5 为什么只需要写 !DOCTYPE HTML](#html5-为什么只需要写-doctype-html)
@@ -41,18 +41,18 @@
     - [H5新增属性](#h5新增属性)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
-    - [margin负值(☆)](#margin负值)
-    - [BFC(☆)](#bfc)
+    - [margin负值](#margin负值)
+    - [BFC](#bfc)
       - [margin重叠](#margin重叠)
     - [三栏布局](#三栏布局)
-    - [粘连布局(☆)](#粘连布局)
-    - [清除浮动(☆)](#清除浮动)
+    - [粘连布局](#粘连布局)
+    - [清除浮动](#清除浮动)
     - [盒模型](#盒模型)
-    - [响应式设计(☆)](#响应式设计)
-    - [元素水平垂直居中(☆)](#元素水平垂直居中)
+    - [响应式设计](#响应式设计)
+    - [元素水平垂直居中](#元素水平垂直居中)
     - [line-height继承](#line-height继承)
     - [css预处理语言](#css预处理语言)
-    - [flex布局(☆)](#flex布局)
+    - [flex布局](#flex布局)
     - [元素竖向的百分比设定是相对于容器的高度吗？](#元素竖向的百分比设定是相对于容器的高度吗)
     - [css选择器](#css选择器)
       - [css选择器读取顺序](#css选择器读取顺序)
@@ -60,7 +60,7 @@
     - [伪类和伪元素的区别](#伪类和伪元素的区别)
       - [伪类 伪元素有哪些](#伪类-伪元素有哪些)
     - [css元素隐藏](#css元素隐藏)
-    - [css画三角形(☆)](#css画三角形)
+    - [css画三角形](#css画三角形)
     - [css视差滚动实现方案](#css视差滚动实现方案)
     - [3D立体感绕x轴旋转](#3d立体感绕x轴旋转)
       - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
@@ -71,19 +71,19 @@
     - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
     - [js 类型转换机制](#js-类型转换机制)
-    - [let const var(☆)](#let-const-var)
+    - [let const var](#let-const-var)
     - [作用域的理解](#作用域的理解)
       - [词法作用域案例](#词法作用域案例)
       - [全局作用域诡异问题](#全局作用域诡异问题)
       - [作用域链](#作用域链)
     - [执行上下文和执行栈](#执行上下文和执行栈)
       - [执行上下文的生命周期](#执行上下文的生命周期)
-    - [闭包(☆)](#闭包)
+    - [闭包](#闭包)
       - [不要滥用闭包](#不要滥用闭包)
-      - [防抖和节流(☆)](#防抖和节流)
+      - [防抖和节流](#防抖和节流)
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
     - [内存泄漏](#内存泄漏)
-      - [垃圾回收机制GC(☆)](#垃圾回收机制gc)
+      - [垃圾回收机制GC](#垃圾回收机制gc)
       - [Mark-Sweep标记清除优缺点](#mark-sweep标记清除优缺点)
         - [优化方案：标记整理](#优化方案标记整理)
       - [V8对GC的优化:分代式垃圾回收](#v8对gc的优化分代式垃圾回收)
@@ -99,31 +99,31 @@
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
     - [Object.is() 与比较操作符 “===”、“==” 的区别？](#objectis-与比较操作符--的区别)
     - [判断对象是空对象](#判断对象是空对象)
-    - [深拷贝和浅拷贝(☆)](#深拷贝和浅拷贝)
+    - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
     - [数据类型](#数据类型)
       - [undefined和null的区别](#undefined和null的区别)
-      - [判断数据类型的方法(☆)](#判断数据类型的方法)
+      - [判断数据类型的方法](#判断数据类型的方法)
     - [数据结构](#数据结构)
       - [数组和链表的应用场景](#数组和链表的应用场景)
     - [字符串常用的方法](#字符串常用的方法)
       - [match matchAll](#match-matchall)
       - [substring slice字符串处理区别](#substring-slice字符串处理区别)
-    - [数组常用的方法(☆)](#数组常用的方法)
-      - [影响到原数组的方法(☆)](#影响到原数组的方法)
-      - [数组reduce方法应用场景(☆)](#数组reduce方法应用场景)
+    - [数组常用的方法](#数组常用的方法)
+      - [影响到原数组的方法](#影响到原数组的方法)
+      - [数组reduce方法应用场景](#数组reduce方法应用场景)
     - [函数缓存](#函数缓存)
-    - [event loop(☆)](#event-loop)
+    - [event loop](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
-    - [Class和实例的关系以及原型链(☆)](#class和实例的关系以及原型链)
+    - [Class和实例的关系以及原型链](#class和实例的关系以及原型链)
       - [函数的特殊性](#函数的特殊性)
-    - [js如何实现继承(☆)](#js如何实现继承)
-      - [继承的方案(☆)](#继承的方案)
+    - [js如何实现继承](#js如何实现继承)
+      - [继承的方案](#继承的方案)
     - [Promise](#promise)
       - [应用场景](#应用场景)
     - [async await](#async-await)
-      - [async await异步本质(☆)](#async-await异步本质)
+      - [async await异步本质](#async-await异步本质)
     - [Generator理解和应用](#generator理解和应用)
-    - [正则表达式(☆)](#正则表达式)
+    - [正则表达式](#正则表达式)
       - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
     - [new Object()和Object.cretate()以及Object.assign()区别](#new-object和objectcretate以及objectassign区别)
@@ -131,7 +131,7 @@
       - [for...of 对象适配](#forof-对象适配)
     - [this指向](#this指向)
       - [this隐式绑定丢失](#this隐式绑定丢失)
-      - [call appy bind的用法和区别(☆)](#call-appy-bind的用法和区别)
+      - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
     - [new操作做了什么](#new操作做了什么)
     - [JS基本类型的装箱与拆箱](#js基本类型的装箱与拆箱)
     - [new String 和String区别](#new-string-和string区别)
@@ -143,20 +143,21 @@
       - [阻止事件冒泡和默认事件](#阻止事件冒泡和默认事件)
     - [event.target和event.currentTarget二者含义](#eventtarget和eventcurrenttarget二者含义)
     - [判断一个元素是否在可视区](#判断一个元素是否在可视区)
-    - [监听一个div宽度变化(☆)](#监听一个div宽度变化)
+    - [监听一个div宽度变化](#监听一个div宽度变化)
     - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
     - [Js单线程详解](#js单线程详解)
-    - [本地存储和场景(☆)](#本地存储和场景)
-      - [cookie的修改注意(☆)](#cookie的修改注意)
-      - [localstorange本地过期时间(☆)](#localstorange本地过期时间)
-      - [cookie查看范围和跨域携带(☆)](#cookie查看范围和跨域携带)
+    - [本地存储和场景](#本地存储和场景)
+      - [cookie的修改注意](#cookie的修改注意)
+      - [使用js-cooke插件](#使用js-cooke插件)
+      - [cookie查看范围和跨域携带](#cookie查看范围和跨域携带)
+      - [localstorange本地过期时间](#localstorange本地过期时间)
     - [单点登录](#单点登录)
     - [跨域](#跨域)
-      - [解决方案(☆)](#解决方案)
-    - [web端常见的攻击方式(☆)](#web端常见的攻击方式)
+      - [解决方案](#解决方案)
+    - [web端常见的攻击方式](#web端常见的攻击方式)
     - [如何捕获js异常](#如何捕获js异常)
-    - [js计算精度丢失问题(☆)](#js计算精度丢失问题)
-    - [前端防护xss和xsrf攻击(☆)](#前端防护xss和xsrf攻击)
+    - [js计算精度丢失问题](#js计算精度丢失问题)
+    - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
     - [script异步加载顺序](#script异步加载顺序)
     - [ajax fetch axios](#ajax-fetch-axios)
   - [ES6](#es6)
@@ -171,7 +172,7 @@
     - [Map与Object和 Set与Array的区别](#map与object和-set与array的区别)
   - [Typescript](#typescript)
     - [never类型的应用场景](#never类型的应用场景)
-    - [联合类型的类型收窄操作(☆)](#联合类型的类型收窄操作)
+    - [联合类型的类型收窄操作](#联合类型的类型收窄操作)
     - [类型谓词is](#类型谓词is)
     - [unknow类型和any类型的区别](#unknow类型和any类型的区别)
     - [混入和类型拓展操作 交叉类型的应用](#混入和类型拓展操作-交叉类型的应用)
@@ -195,49 +196,49 @@
     - [抽象类的作用](#抽象类的作用)
     - [TS类的重写](#ts类的重写)
   - [Vue2](#vue2)
-    - [Vue 生命周期(☆)](#vue-生命周期)
+    - [Vue 生命周期](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
-    - [数据双向绑定(☆)](#数据双向绑定)
-    - [Vue双向绑定的原理(☆)](#vue双向绑定的原理)
-    - [Vue组件通信方式(☆)](#vue组件通信方式)
-    - [data的写法是函数不是对象的原因(☆)](#data的写法是函数不是对象的原因)
+    - [数据双向绑定](#数据双向绑定)
+    - [Vue双向绑定的原理](#vue双向绑定的原理)
+    - [Vue组件通信方式](#vue组件通信方式)
+    - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
     - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
     - [v-if和v-for的优先级](#v-if和v-for的优先级)
     - [计算属性computed和methods的区别](#计算属性computed和methods的区别)
-    - [v-show v-if的应用场景(☆)](#v-show-v-if的应用场景)
+    - [v-show v-if的应用场景](#v-show-v-if的应用场景)
     - [vue中key的原理](#vue中key的原理)
     - [Vue.extend 和 Vue.component](#vueextend-和-vuecomponent)
-    - [vue中mixin的理解和应用场景(☆)](#vue中mixin的理解和应用场景)
+    - [vue中mixin的理解和应用场景](#vue中mixin的理解和应用场景)
       - [mixin注意事项](#mixin注意事项)
-      - [mixins 和 composition api的优缺点(☆)](#mixins-和-composition-api的优缺点)
+      - [mixins 和 composition api的优缺点](#mixins-和-composition-api的优缺点)
     - [vue中的修饰符](#vue中的修饰符)
       - [注意修饰符顺序](#注意修饰符顺序)
-    - [vue中的$nextTick(☆)](#vue中的nexttick)
-      - [为什么要有$nextTick(☆)](#为什么要有nexttick)
+    - [vue中的$nextTick](#vue中的nexttick)
+      - [为什么要有$nextTick](#为什么要有nexttick)
       - [使用场景](#使用场景)
     - [v-model自定义组件实现](#v-model自定义组件实现)
       - [v-bind:sync](#v-bindsync)
       - [Vue3中的v-model不同之处](#vue3中的v-model不同之处)
-    - [diff算法(☆)](#diff算法)
+    - [diff算法](#diff算法)
       - [Vue中diff算法怎样降低时间复杂度](#vue中diff算法怎样降低时间复杂度)
     - [Vue中组件和插件有什么区别](#vue中组件和插件有什么区别)
     - [自定义指令的应用场景](#自定义指令的应用场景)
     - [vue过滤器](#vue过滤器)
     - [vue插槽slot](#vue插槽slot)
-    - [vue虚拟dom(☆)](#vue虚拟dom)
+    - [vue虚拟dom](#vue虚拟dom)
     - [Vue.observable](#vueobservable)
     - [vue处理错误](#vue处理错误)
       - [vue前端代码错误处理](#vue前端代码错误处理)
-    - [vue keep-alvie(☆)](#vue-keep-alvie)
+    - [vue keep-alvie](#vue-keep-alvie)
       - [缓存后如何获取数据](#缓存后如何获取数据)
     - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
-    - [Vue动态组件和异步组件(☆)](#vue动态组件和异步组件)
-    - [Vuex的使用(☆)](#vuex的使用)
+    - [Vue动态组件和异步组件](#vue动态组件和异步组件)
+    - [Vuex的使用](#vuex的使用)
     - [介绍Vue的模板编译](#介绍vue的模板编译)
-    - [SPA(☆)](#spa)
+    - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
       - [SPA首屏加载优化](#spa首屏加载优化)
-      - [hisotory路由404(☆)](#hisotory路由404)
+      - [hisotory路由404](#hisotory路由404)
     - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
   - [Vue3](#vue3)
     - [与Vue2的不同](#与vue2的不同)
@@ -253,12 +254,22 @@
       - [toRefs](#torefs)
       - [为何需要ref](#为何需要ref)
       - [为何需要.vuale](#为何需要vuale)
+    - [computed和methods](#computed和methods)
+      - [计算属性可写形式](#计算属性可写形式)
     - [Vue3中watch和watchEffect的区别](#vue3中watch和watcheffect的区别)
       - [监听ref](#监听ref)
       - [监听reactive](#监听reactive)
       - [Watch监听多个](#watch监听多个)
+    - [侦听器触发时机和停止](#侦听器触发时机和停止)
     - [Setup中如何获取组件实例](#setup中如何获取组件实例)
+    - [reactive() 的局限性](#reactive-的局限性)
+    - [ref作为作为 reactive 对象的属性注意](#ref作为作为-reactive-对象的属性注意)
+      - [数组和集合的注意事项](#数组和集合的注意事项)
+    - [ref在模板中解包的注意事项](#ref在模板中解包的注意事项)
+    - [script setup](#script-setup)
     - [Vue3中 script setup props emit 向父组件暴露数据用法](#vue3中-script-setup-props-emit-向父组件暴露数据用法)
+    - [事件参数](#事件参数)
+    - [vue3生命周期](#vue3生命周期)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [state 和 props 区别](#state-和-props-区别)
@@ -461,7 +472,7 @@ src 是 source 的缩写，它通常用于 img、video、audio、script 元素�
 
 href 是 hyper reference 的缩写，意味「超引用」，它通常用于 a、link 元素，通过 href 属性，`可以标识文档中引用的其他超文本。`
 
-### 说说常用的 meta 标签(☆)
+### 说说常用的 meta 标签
 meta 标签提供关于HTML文档的元数据。元数据不会显示在页面上，但是对于机器是可读的。它可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
 
 常用的 meta 标签的属性有：
@@ -579,7 +590,7 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各
 > offsetWidth 注意不同盒模型时结果，IE盒模型给的width已经包含了boder padding 故就是100
 
 
-### margin负值(☆)
+### margin负值
 1.	margin-top和margin-left为负值时，元素向上或者向左移动
 2.	margin-bottom为负值时，下方元素上移，自身不受影响
 3.	margin-right为负值时，右侧元素左移，自身不受影响(margin-right负值也可以理解为自身在越来越小，当不占width又是float时可以浮动上去，三栏布局可应用到)
@@ -663,7 +674,7 @@ k1和k2是两个div
 
 实际应用：`圣杯布局+粘连布局`
 
-### BFC(☆)
+### BFC
 在页面中元素都有一个隐含的属性叫作`Block Formatting Context`，即块级格式化上下文，简称BFC。该属性能够设置打开或关闭，默认是关闭的。页面上的一个`隔离渲染区域`，**容器里面的子元素不会在布局上影响到外面的元素**
 
 一旦开启元素的BFC后，元素将会具备如下特性：
@@ -921,7 +932,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 ```
 
-### 粘连布局(☆)
+### 粘连布局
 1. 为内容区域添加最小的高度
 	+ min-height
 	+ padding-bottom top元素
@@ -976,7 +987,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 2. flex布局：footer的flex设为0，这样footer获得其固有的高度;content的flex设为1
 
-### 清除浮动(☆)
+### 清除浮动
 1.	overflow:hidden
 2.	父级设置固定高度
 3.	clear:both;兼容性好，需要一个空div，语义化不好
@@ -1028,7 +1039,7 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ```
 
 
-### 响应式设计(☆)
+### 响应式设计
 适配不同尺寸屏幕
 
 + flex弹性盒子 grid 网格布局
@@ -1037,7 +1048,7 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 + vw/vh
 + rem
 
-### 元素水平垂直居中(☆)
+### 元素水平垂直居中
 + position 定位四个方向值一致，margin:auto
 + position + transform
 + position + margin负值(需知道宽高)
@@ -1391,7 +1402,7 @@ body {
 ```
 
 
-### flex布局(☆)
+### flex布局
 + flex-direction: 设置主轴的方向
 + **justify-content**: `设置主轴上的子元素排列方式`
 + flex-wrap: 设置子元素是否换行
@@ -1495,7 +1506,7 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 
 ![对比](book_files/18.jpg)
 
-### css画三角形(☆)
+### css画三角形
 可以看到,设置不同颜色的各个边框，就会发现边框是梯形，极限情况下，width height为0，其他边框颜色留一个边框就可以得到三角形
 
 ![三角形](book_files/19.jpg)
@@ -1762,7 +1773,7 @@ null+1 //1
 undefined+1//NaN
 ```
 
-### let const var(☆)
+### let const var
 + let: 块级作用域 无变量提升 暂时性死域
 + const: 块级作用域 定义后不可更改
 + var: 全局作用域，可重复定义
@@ -1833,7 +1844,7 @@ JavaScript中有三种类型的执行上下文：
 + 回收阶段：在这个阶段，JavaScript引擎会进行垃圾回收，释放不再需要的内存和对象，清理执行上下文，并将其从执行栈中弹出。
 
 
-### 闭包(☆)
+### 闭包
 ***函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。***
 
 ![闭包](book_files/36.jpg)
@@ -1910,7 +1921,7 @@ function funcTest(){
 ```
 > 当闭包不需要时，需要手动置为null，释放内存
 
-#### 防抖和节流(☆)
+#### 防抖和节流
 防抖（debounce）和节流（throttle）是两种常用的浏览器事件处理方法，它们的主要目的都是为了减少事件触发频率，优化性能。
 
 + 防抖：在一定时间内，事件处理函数只执行一次，如果在这个时间段内又触发了这个事件，则重新计算执行时间。***【搜索框自动补全、表单验证、按钮点击等】***
@@ -1959,7 +1970,7 @@ fn()
 ### 内存泄漏
 内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
 
-#### 垃圾回收机制GC(☆)
+#### 垃圾回收机制GC
 原理：垃圾收集器会定期找出不再继续使用的变量，然后释放其内存
 
 + 标记清除算法：
@@ -2230,7 +2241,7 @@ console.warn({} == !{})//false
 2. JSON.stringify():不能包含复杂的结构，如函数等
 3. for...in + **obj.hasOwnProperty(key)**
 
-### 深拷贝和浅拷贝(☆)
+### 深拷贝和浅拷贝
 
 ![深拷贝浅拷贝](book_files/24.jpg)
 
@@ -2275,7 +2286,7 @@ let hexNum1 = 0xA //16进制 10(0x开头)
 + 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的`低位字节`中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
 + 在两等情况下，二者相等，三等情况下则不相等
 
-#### 判断数据类型的方法(☆)
+#### 判断数据类型的方法
 + typeof可判断基础类型，函数类型和其他引用类型都返回object，注意null的特殊性
 + instanceOf可以用来测试构造函数的prototype属性是否出现在对象的`原型链`中的`任何位置`，它可以对引用类型准确判断，但是不能判断基础类型
 + Object.prototype.toString [object xxx]
@@ -2431,7 +2442,7 @@ console.log(...str.matchAll(/(hel)(lo)/g))
 + slice支持负值，就是字符串末尾开始计算，而substring遇到负值自动归为0
 
 
-### 数组常用的方法(☆)
+### 数组常用的方法
 + 增 push unshift splice `concat(只有它不影响原数组)`
 + 删 pop shift splice `slice(只有它不影响原数组)`
 + 改 splice
@@ -2449,7 +2460,7 @@ let a=arr.find(e=>{
 console.log(a)//7
 ```
 
-#### 影响到原数组的方法(☆)
+#### 影响到原数组的方法
 + vue2中重写了 `push pop unshift shift splice sort reverse`
 + fill copyWithin
 ```js
@@ -2462,7 +2473,7 @@ arr.copyWithin(-2,0,2)
 console.log(arr)//[1, 3, 5, 1, 3]
 ```
 
-#### 数组reduce方法应用场景(☆)
+#### 数组reduce方法应用场景
 求和
 ```js
 const arr = [10, 20, 30, 40, 50]
@@ -2530,7 +2541,7 @@ const memoize = function (func, content) {
 	console.warn(num1,num2)
 ```
 
-### event loop(☆)
+### event loop
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
 + 同步任务：都在主线程(这里的主线程就是JS引擎线程)上执行，会形成一个执行栈
@@ -2593,7 +2604,7 @@ setTimeout(() => {
 ![微任务执行](book_files/28.jpg)
 
 
-### Class和实例的关系以及原型链(☆)
+### Class和实例的关系以及原型链
 1.	每个class都有显示原型prototype【class还有constructor和`__proto__`】
 2.	每个实例都有隐式原型`__proto__`【实例无prototype，有constructor】
 3.	实例的`__proto__`指向对应class的prototype
@@ -2629,10 +2640,10 @@ console.log(Object.__proto__ === Function.prototype)// true
 console.log(Object.prototype.__proto__ === null)// true
 ```
 
-### js如何实现继承(☆)
+### js如何实现继承
 它允许创建一个新的类（或对象），该类（或对象）可以继承另一个类（或对象）的属性和方法。
 
-#### 继承的方案(☆)
+#### 继承的方案
 + 原型链继承：复用prototype方法，缺点：1.对象类型的属性会被其他实例修改2.打印无法直接看到继承的属性3.原型创建时无法传参
 ```js
 // 无法定制化传参
@@ -2806,7 +2817,7 @@ console.log( fn1() ) // 相当于 Promise.resolve(100)
 })()
 ```
 
-#### async await异步本质(☆)
+#### async await异步本质
 await是同步写法，但本质还是异步调用。即只要遇到了await ，**后面的代码都相当于放在callback里。**
 
 await虽然会异步调用，但是它后面的函数是立刻执行的。
@@ -2897,7 +2908,7 @@ console.warn(v1,v2,v3)
 
 > for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
 
-### 正则表达式(☆)
+### 正则表达式
 正则表达式使用一种特殊的语法来定义模式，这些模式可以被用来搜索、匹配或替换文本。
 
 ```js
@@ -3056,6 +3067,8 @@ Object.getOwnPropertySymbols(obj).forEach(el=>{
 5. for of也可以遍历有iterator接口的对象
 
 6. Reflect.ownKeys 方法返回一个由目标对象自身的属性键组成的数组。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
+
+![ownKeys](book_files/203.jpg)
 
 
 #### for...of 对象适配
@@ -3242,7 +3255,7 @@ obj1.fn(); //时间跳跃
 ```
 虽然丢失了 obj 的隐式绑定，但是在赋值的过程中，**又建立了新的隐式绑定**，这里this就指向了对象 obj1。
 
-#### call appy bind的用法和区别(☆)
+#### call appy bind的用法和区别
 都是JavaScript中用于改变函数执行上下文（即this的指向）的方法
 
 1. call、apply只是临时的修改一次，即只在call或apply方法的那一次有效；当再次调用原函数的时候，它的指向还是原来的指向。而bind方法创建的新函数会`永久性地绑定this值`。
@@ -3253,7 +3266,7 @@ obj1.fn(); //时间跳跃
 ### new操作做了什么
 1. 创建一个新的`空对象`
 2. 这个新对象内部的`[[prototype]]`特性被赋值为构造函数的`prototype`属性
-3. 构造函数内部的this被赋值为这个新对象(即this指向新对象)
+3. `构造函数内部的this被赋值为这个新对象(即this指向新对象)`
 4. 执行构造函数内部的代码:给对象`添加属性和方法`
 5. 如果构造函数返回 `一个对象` ，则返回`该对象`；否则返回**刚创建的对象**(如果return 1等数字/字符串/布尔值会被引擎忽略，然后返回刚创建的对象)
 
@@ -3530,7 +3543,7 @@ observeElement(myElement);
 
 + 滚动事件监听去判断 offsetTop scrollTop
 
-### 监听一个div宽度变化(☆)
+### 监听一个div宽度变化
 ```js
 const ro = new ResizeObserver((entries, observer) => {  
 	console.log(entries,observer)
@@ -3613,7 +3626,7 @@ GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线
 
 
 
-### 本地存储和场景(☆)
+### 本地存储和场景
 + Cookies：它是由服务器发送到浏览器，并保存在浏览器上的一小段数据。Cookies主要用于跟踪会话信息，但由于其大小限制（通常不超过`4KB`）和每次`请求`都会发送到服务器的特性，不适合`大量数据`的存储。【标记用户和跟踪用户行为】
 + Web Storage API：包括localStorage和sessionStorage。提供了更大的存储空间，并且数据只保存在客户端，不会发送到服务器。
 	- localStorage：数据没有过期时间，会一直保存在浏览器中，直到用户手动清除或通过JavaScript代码清除。它非常适合存储那些不需要经常变动的数据，如[用户设置、主题偏好、登录令牌]等。
@@ -3622,14 +3635,84 @@ GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线
 + WebSQL：WebSQL是一个基于SQL的数据库API，允许在浏览器中存储、查询和管理数据。[停止维护]
 + File API 和 FileSystem API：这些API允许Web应用程序在用户的本地文件系统中读取和写入文件。然而，出于安全和隐私的考虑，这些API的使用受到严格限制，并且需要用户的明确许可。
 
-#### cookie的修改注意(☆)
+#### cookie的修改注意
 cookie必须domain和path一致才是修改的同一个，否则就是新增的另外一个cookie
 ```js
 Set-Cookie:name=aa; domain=aa.net; path=/ #
 document.cookie =name=bb; domain=aa.net; path=/ #
 ```
 
-#### localstorange本地过期时间(☆)
+#### 使用js-cooke插件
+1. 设置Cookie：你可以使用js-cookie来设置一个cookie，包括它的名称、值、过期时间等。
+
+```js
+import Cookies from 'js-cookie'
+Cookies.set('username', 'John Doe');  
+Cookies.set('user', { name: 'John Doe', age: 30 }, { expires: 7 }); // expires 7 days from now
+```
+2. 获取Cookie：你可以使用js-cookie来获取之前设置的cookie的值。
+
+```js
+const username = Cookies.get('username');
+```
+
+3. 删除Cookie：你可以使用js-cookie来删除一个或多个cookie。
+
+```js
+Cookies.remove('username');
+```
+4. 检查Cookie是否存在：你可以检查一个cookie是否已经被设置。
+
+```js
+if (Cookies.get('username')) {  
+    // do something  
+}
+```
+
+5. 处理cookie的属性：你还可以设置cookie的属性，如路径（path）、域（domain）、安全（secure）等
+
+```js
+Cookies.set('username', 'John Doe', { secure: true }); // cookie will be sent only over HTTPS
+```
+
+#### cookie查看范围和跨域携带
+1. 一般来说，子域名可以读取上级域名的Cookie，但不能读取到下级域名的Cookie。这是因为Cookie的Domain属性指定了可以访问该Cookie的Web站点或域
+2. 跨域请求携带Cookie的方法主要涉及到前后端的配置。
+
+```js
+// 全局配置
+axios.defaults.withCredentials = true;//指示浏览器包含凭证信息 ,以允许携带跨站凭证（如cookie、HTTP认证及客户端SSL证明等 
+```
+```js
+//单个接口配置
+axios.get('http://example.com/api/data', { withCredentials: true })  
+  .then(response => {  
+    // 处理响应...  
+  })  
+  .catch(error => {  
+    console.error(error);  
+  });
+```
+后端配置：Access-Control-Allow-Credential配置
+```js
+const express = require('express');  
+const cors = require('cors');  
+const app = express();  
+  
+app.use(cors({  
+  origin: 'http://frontend.example.com', // 允许跨域的域名  
+  credentials: true, // 允许携带Credentials  
+}));  
+  
+// ... 其他中间件和路由 ...  
+  
+app.listen(3000, () => {  
+  console.log('Server running on port 3000');  
+});
+```
+
+
+#### localstorange本地过期时间
 
 ```js
 // 设置带有过期时间的数据  
@@ -3658,41 +3741,6 @@ function getWithExpiration(key) {
 } 
 ```
 
-#### cookie查看范围和跨域携带(☆)
-1. 一般来说，子域名可以读取上级域名的Cookie，但不能读取到下级域名的Cookie。这是因为Cookie的Domain属性指定了可以访问该Cookie的Web站点或域
-2. 跨域请求携带Cookie的方法主要涉及到前后端的配置。
-
-```js
-// 全局配置
-axios.defaults.withCredentials = true;//指示浏览器包含凭证信息  
-```
-```js
-//单个接口配置
-axios.get('http://example.com/api/data', { withCredentials: true })  
-  .then(response => {  
-    // 处理响应...  
-  })  
-  .catch(error => {  
-    console.error(error);  
-  });
-```
-后端配置
-```js
-const express = require('express');  
-const cors = require('cors');  
-const app = express();  
-  
-app.use(cors({  
-  origin: 'http://frontend.example.com', // 允许跨域的域名  
-  credentials: true, // 允许携带Credentials  
-}));  
-  
-// ... 其他中间件和路由 ...  
-  
-app.listen(3000, () => {  
-  console.log('Server running on port 3000');  
-});
-```
 
 ### 单点登录
 单点登录（Single Sign-On，简称SSO）是一种在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统的技术。
@@ -3727,7 +3775,7 @@ window.addEventListener('message', function (event) {
 
 一定要注意跨域是浏览器的限制，用抓包工具抓取接口数据，是可以看到接口已经把数据返回回来了，只是浏览器的限制，我们获取不到数据。
 
-#### 解决方案(☆)
+#### 解决方案
 + jsonp
 + websocket
 + 跨域资源共享
@@ -3870,11 +3918,12 @@ otherWindow.postMessage(message, targetOrigin, [transfer]);
 
 ![postMessage](book_files/50.jpg)
 
-### web端常见的攻击方式(☆)
+### web端常见的攻击方式
+
 + 跨站脚本攻击（XSS攻击），攻击者利用Web应用未对用户提交的数据进行过滤或转义的漏洞，向网页中注入恶意脚本代码。（xss两大要素：攻击者输入恶意代码，浏览器执行恶意代码）前端校验只能解决输入的，如果绕开前端请求，直接构造请求就需要额外处理了。
 	- 存储型：存储在数据库【论坛 私信】
 	- 反射型：存在url中【网站跳转 搜索】
-	- DOM型：有浏览器端完成
+	- DOM型：由浏览器端完成
 + 跨站请求伪造（CSRF攻击），`攻击者诱导受害者进入第三方网站，该网站向被攻击网站发送跨站请求。`由于请求携带了受害者的合法cookie，因此验证通过，攻击得以完成。
 + SQL注入攻击
 
@@ -3900,7 +3949,7 @@ XSRF流程
 
 全局还可以使用window.onerror进行检测，压缩后的代码需要配合sourceMap找出对应的行列（对第三方库的定位不会太准确）
 
-### js计算精度丢失问题(☆)
+### js计算精度丢失问题
 ```js
 0.1+0.2=== 0.3 false 
 ```
@@ -3925,7 +3974,7 @@ console.log(add(0.1,0.2))
 
 > Math.js BigDecimal.js
 
-### 前端防护xss和xsrf攻击(☆)
+### 前端防护xss和xsrf攻击
 【Cross Site Script】跨站脚本攻击 恶意攻击者往Web页面里插入恶意Script代码，当用户浏览该页之时，嵌入其中Web里面的Script代码会被执行，从而达到恶意攻击用户的目的。可以直接安装xss对应插件。
 ```js
 function escape(str) {
@@ -3986,7 +4035,8 @@ CSP: Content-Security-Policy 内容安全策略(白名单制度)
         <meta charset="utf-8">
         <title></title>
         <!-- 前端页面上设置，加了jquery就访问不了了-->
-        <meta http-equiv="Content-Security-Policy" content="form-action 'self';default-src 'self' http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js https://unpkg.com/vue@3/dist/vue.global.js;">
+        <meta http-equiv="Content-Security-Policy" 
+		content="form-action 'self';default-src 'self' http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js https://unpkg.com/vue@3/dist/vue.global.js;">
     </head>
     <body>
         <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
@@ -4045,11 +4095,14 @@ XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
 
 ### 扩展运算符 剩余运算符
 + 扩展运算符用三个点（...）表示，它可以用于将一个数组或对象的所有元素/属性**展开**到新的数组或对象中。`可实现浅拷贝`
+
 ```js
 const arr1 = [1, 2, 3];  
 const arr2 = [...arr1, 4, 5]; // [1, 2, 3, 4, 5]
 ```
+
 + 剩余运算符也用三个点（...）表示，但它用于将数组或对象的剩余元素/属性收集到一个新的变量中。
+
 ```js
 function sum(a, b, ...rest) {  
   let total = a + b;  
@@ -4072,6 +4125,7 @@ sum(1, 2, 3, 4, 5); // 返回 15
 1. Array.of
 2. new Array
 3. arr=[]确定length
+
 ```js
 console.log(Array.of(7)) //[7]
 console.log(Array.of(1, 2, 3))//[1,2,3]
@@ -4360,7 +4414,7 @@ console.timeEnd('set find')
 
 ### never类型的应用场景
 
-```ts
+```js
 interface Foo {
     type: 'foo'
   }
@@ -4391,7 +4445,7 @@ function handleValue(val: All) {
   }
 ```
 
-### 联合类型的类型收窄操作(☆)
+### 联合类型的类型收窄操作
 联合类型可以使用`typeof instanceof 等值 真值 in操作符 赋值语句`等进行收窄操作，帮助代码正常运行
 ```js
 function printId(id: number | string) {
@@ -5106,7 +5160,7 @@ class JsShuai extends Jspang{
 
 ## Vue2
 
-### Vue 生命周期(☆)
+### Vue 生命周期
 Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 
 ![生命周期](book_files/58.jpg)
@@ -5116,13 +5170,13 @@ Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 + 如果mounted有对dom处理，那需放在mounted处理
 + 如果考虑到SSR，SSR 不支持 beforeMount 、mounted 钩子函数，放在 created 中有助于一致性。
 
-### 数据双向绑定(☆)
+### 数据双向绑定
 模型Model的变动会改变视图View,View变动会影响Model
 
 ![1](book_files/60.jpg)
 ![2](book_files/61.jpg)
 
-### Vue双向绑定的原理(☆)
+### Vue双向绑定的原理
 
 ![数据双向绑定](book_files/59.jpg)
 
@@ -5133,7 +5187,7 @@ Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 ![vue基本实现方式](book_files/62.jpg)
 ![对应关系](book_files/63.jpg)
 
-### Vue组件通信方式(☆)
+### Vue组件通信方式
 1. props 和 $emit
 2. ref
 3. EventBus
@@ -5259,7 +5313,7 @@ this.$parent.on('add',this.add)
 this.$parent.emit('add')
 ```
 
-### data的写法是函数不是对象的原因(☆)
+### data的写法是函数不是对象的原因
 + 如果根实例对象，data可以使函数也可以是对象
 + 如果是组件实例对象，则必须是函数，目的是为了防止公用data会造成数据污染，使用函数返回一个全新的data对象
 
@@ -5289,7 +5343,7 @@ computed: {
 ![1](book_files/82.jpg)
 计算属性会基于它们的依赖关系进行**缓存**，提高性能；只有依赖的数据发生变化，计算属性才会重新进行计算。
 
-### v-show v-if的应用场景(☆)
+### v-show v-if的应用场景
 1. 都是从页面移除元素，v-show的原理是display:none，成为游离页面还可再用，v-if则是直接删除。
 2. 频繁切换用v-show
 3. v-show的切换只是css的变化，v-if切换会触发生命周期(true:beforeCreated=>...=>mounted,false:beforeDestory=>destoryed),事件监听器和子组件也会适当的销毁和重建
@@ -5323,7 +5377,7 @@ const instance = new MyComponent().$mount();
 
 Vue.component：在内部，它实际上也调用了 Vue.extend 来创建一个构造器，但随后它还进行了组件的注册和命名等额外操作。因此，你可以将 Vue.component 看作是 Vue.extend 和组件注册的结合体。
 
-### vue中mixin的理解和应用场景(☆)
+### vue中mixin的理解和应用场景
 Mixin是面向对象程序设计语言中的类，提供了方法实现。其他类可以访问mixin类的方法而不必成为其子类。
 
 Mixin类通常作为功能模块使用，在需要该功能时“混入”，有利于代码复用有避免多继承的复杂。
@@ -5410,7 +5464,7 @@ Mixins 在 Vue.js 中的实现原理主要基于 `JavaScript 的对象合并和�
 + 合并型:data 类似Object.assign(mixins.data,this.data)
 + 队列型:watch 生命周期 =>合并成一个数组，依次执行
 
-#### mixins 和 composition api的优缺点(☆)
+#### mixins 和 composition api的优缺点
 
 1. Mixins的优缺点
 + 优点：
@@ -5460,12 +5514,12 @@ func2(){
 + @click.prevent.self(阻止所有点击) 
 + @click.self.prevent(阻止当前元素的点击)
 
-### vue中的$nextTick(☆)
+### vue中的$nextTick
 在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM。
 
 nextTick的核心是利用了如 Promise、MutationObserver、setImmediate、setTimeout 的原生 JavaScript 方法来模拟对应的微/宏任务的实现，本质是为了利用JavaScript的这些异步回调任务队列来实现 Vue 框架中自己的异步回调队列。
 
-#### 为什么要有$nextTick(☆)
+#### 为什么要有$nextTick
 
 ```js
 {{num}}
@@ -5583,7 +5637,7 @@ vue3已废弃，vue3可以同时给一个组件加多个v-model，不需要再�
 
 ```
 
-### diff算法(☆)
+### diff算法
 diff 算法是一种通过同层的树节点进行比较的高效算法
 
 其有两个特点：
@@ -5755,7 +5809,7 @@ filters: {
 </child>
 ```
 
-### vue虚拟dom(☆)
+### vue虚拟dom
 真实dom的一个映射，在Javascript对象中，虚拟DOM 表现为一个 Object对象。并且最少包含标签名 (tag)、属性 (attrs) 和子元素对象 (children) 三个属性，不同框架对这三个属性的名命可能会有差别。
 
 作用：可描述dom，同时适用于**跨平台开发**，vue可以对这颗抽象树进行创建节点,删除节点以及修改节点的操作， 经过`diff算法`得出一些需要修改的`最小单位`,再更新视图，减少了dom操作，提高了性能.
@@ -5881,7 +5935,7 @@ Vue.component('kitten', {
 // info: render
 ```
 
-### vue keep-alvie(☆)
+### vue keep-alvie
 keep-alive是vue中的内置组件，能在组件切换过程中将状态保留在内存中，防止重复渲染DOM
 
 keep-alive 包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们
@@ -6045,7 +6099,7 @@ activated(){
 注意点：正常理解v-if会删除dom重新创建，但是组件外套keep-alive之后，虽然确实会移除dom（可以打开控制台发现dom确实被移除了），但是dom结构会保存在缓存中，当被v-if为true时候直接搬回来，并不会再重新绘制dom，就**不会激发mounted生命周期**。
 
 
-### Vue动态组件和异步组件(☆)
+### Vue动态组件和异步组件
 ```html
 <!-- 使用场景：tab切换，常配合keep-alive使用
 使用关键：内置组件 + is属性 -->
@@ -6062,7 +6116,7 @@ data(){
 ```
 Vue.js中的异步组件可以通过使用import()方法来实现。import()方法是ES2015中的一个语法，用于动态地加载JavaScript模块。在Vue.js中，可以使用import()方法来动态地加载和渲染组件。
 
-### Vuex的使用(☆)
+### Vuex的使用
 Mutations：处理原子操作
 
 Actions：可以处理多个Mutations和异步操作
@@ -6099,7 +6153,7 @@ new Vue({
 
 ![vue](book_files/96.jpg)
 
-### SPA(☆)
+### SPA
 单页应用，它通过动态重写当前页面来与用户交互，这种方法避免了页面之间切换打断用户体验在单页应用中
 
 ![SPA](book_files/85.jpg)
@@ -6151,7 +6205,7 @@ performance.getEntriesByName("first-contentful-paint")[0].startTime
 	+ 开启GZip压缩
 	+ 使用SSR
 
-#### hisotory路由404(☆)
+#### hisotory路由404
 nginx需要额外配置：只需要配置将任意页面都重定向到 index.html，把路由交由前端处理
 ```bash
 server {
@@ -6646,10 +6700,76 @@ export default {
 
 ![value](book_files/110.jpg)
 
+### computed和methods
+computed() 方法期望接收一个 getter 函数，返回值为一个计算属性 ref。和其他一般的 ref 类似，你可以通过 publishedBooksMessage.value 访问计算结果。计算属性 ref 也会在模板中自动解包，因此在模板表达式中引用时无需添加 .value。
+
+Vue 的计算属性会自动追踪响应式依赖。它会检测到 publishedBooksMessage 依赖于 author.books，所以当 author.books 改变时，任何依赖于 publishedBooksMessage 的绑定都会同时更新。
+```html
+<script setup>
+import { reactive, computed } from 'vue'
+
+const author = reactive({
+  name: 'John Doe',
+  books: [
+    'Vue 2 - Advanced Guide',
+    'Vue 3 - Basic Guide',
+    'Vue 4 - The Mystery'
+  ]
+})
+
+// 一个计算属性 ref
+const publishedBooksMessage = computed(() => {
+  return author.books.length > 0 ? 'Yes' : 'No'
+})
+</script>
+
+<template>
+  <p>Has published books:</p>
+  <span>{{ publishedBooksMessage }}</span>
+</template>
+```
+
+```js
+<p>{{ calculateBooksMessage() }}</p>
+
+// 组件中
+function calculateBooksMessage() {
+  return author.books.length > 0 ? 'Yes' : 'No'
+}
+```
+
+两种方式在结果上确实是完全相同的，然而，不同之处在于计算属性值会基于其响应式依赖被缓存。一个**计算属性仅会在其响应式依赖更新时才重新计算**。这意味着只要 author.books 不改变，无论多少次访问 publishedBooksMessage 都会立即返回先前的计算结果，而不用重复执行 getter 函数。
+
+#### 计算属性可写形式
+通过同时提供 getter 和 setter 来创建
+```html
+<script setup>
+import { ref, computed } from 'vue'
+
+const firstName = ref('John')
+const lastName = ref('Doe')
+
+const fullName = computed({
+  // getter
+  get() {
+    return firstName.value + ' ' + lastName.value
+  },
+  // setter
+  set(newValue) {
+    // 注意：我们这里使用的是解构赋值语法
+    [firstName.value, lastName.value] = newValue.split(' ')
+  }
+})
+</script>
+```
+
+
+
 ### Vue3中watch和watchEffect的区别
 1. 两者都可以监听data属性的变化
 2. Watch需要明确监听哪个属性，如果监听多个属性可第一个参数要写成数组形式，第二个处理函数的参数也要注意处理
 3. watchEffect会根据其中的属性，自动监听其变化
+4. watch 的第一个参数可以是不同形式的“数据源”：它可以是一个 ref (包括计算属性)、一个响应式对象、一个 getter 函数、或多个数据源组成的数组
 
 #### 监听ref
 ```js
@@ -6663,7 +6783,28 @@ watch(numberRef, (newNumber, oldNumber) => {
 ```
 
 #### 监听reactive
+注意，**不能**直接侦听**响应式对象**的属性值，例如:
 ```js
+const obj = reactive({ count: 0 })
+
+// 错误，因为 watch() 得到的参数是一个 number
+watch(obj.count, (count) => {
+  console.log(`Count is: ${count}`)
+})
+```
+这里需要用一个返回该属性的 getter 函数：
+```js
+// 提供一个 getter 函数
+watch(
+  () => obj.count,
+  (count) => {
+    console.log(`Count is: ${count}`)
+  }
+)
+```
+
+```js
+// getter函数
  watch(
     // 第一个参数，确定要监听哪个属性
     () => state.age,
@@ -6691,6 +6832,75 @@ watchEffect(() => {
     // 初始化时，一定会执行一次（收集要监听的数据）
     console.log('hello watchEffect')
 })
+```
+
+watchEffect，则会在副作用发生期间追踪依赖。它会在同步执行过程中，自动追踪所有能访问到的响应式属性。这更方便，而且代码往往更简洁，`但有时其响应性依赖关系会不那么明确。`
+
+> watchEffect() 允许自动跟踪回调的响应式依赖。如果你需要侦听一个嵌套数据结构中的几个属性，watchEffect() 可能会比深度侦听器更有效，因为它将只跟踪回调中被使用到的属性，而不是递归地跟踪所有的属性。
+
+### 侦听器触发时机和停止
+默认情况下，侦听器回调会在父组件更新 (如有) 之后、所属组件的 DOM 更新之前被调用。这意味着如果你尝试在侦听器回调中访问所属组件的 DOM，那么 DOM 将处于更新前的状态。
+
+如果想在侦听器回调中能访问被 Vue 更新之后的所属组件的 DOM
+```js
+watch(source, callback, {
+  flush: 'post'
+})
+
+watchEffect(callback, {
+  flush: 'post'
+})
+```
+后置刷新的 watchEffect() 有个更方便的别名 watchPostEffect()
+```js
+import { watchPostEffect } from 'vue'
+
+watchPostEffect(() => {
+  /* 在 Vue 更新后执行 */
+})
+```
+还可以创建一个同步触发的侦听器，它会在 Vue 进行任何更新之前触发
+```js
+watch(source, callback, {
+  flush: 'sync'
+})
+
+watchEffect(callback, {
+  flush: 'sync'
+})
+```
+同步触发的 watchEffect() 有个更方便的别名 watchSyncEffect()
+```js
+import { watchSyncEffect } from 'vue'
+
+watchSyncEffect(() => {
+  /* 在响应式数据变化时同步执行 */
+})
+```
+
+在 setup() 或 `<script setup>` 中用同步语句创建的侦听器，会自动绑定到宿主组件实例上，并且会在宿主组件卸载时自动停止。因此，在大多数情况下，你无需关心怎么停止一个侦听器。
+
+一个关键点是，侦听器必须用同步语句创建：如果用异步回调创建一个侦听器，那么它不会绑定到当前组件上，你必须手动停止它，以防内存泄漏。如下方这个例子：
+
+```html
+<script setup>
+import { watchEffect } from 'vue'
+
+// 它会自动停止
+watchEffect(() => {})
+
+// ...这个则不会！
+setTimeout(() => {
+  watchEffect(() => {})
+}, 100)
+</script>
+```
+要手动停止一个侦听器，请调用 watch 或 watchEffect 返回的函数：
+```js
+const unwatch = watchEffect(() => {})
+
+// ...当该侦听器不再需要时
+unwatch()
 ```
 
 ### Setup中如何获取组件实例
@@ -6727,6 +6937,128 @@ export default {
 }
 </script>
 ```
+
+### reactive() 的局限性
+1. 有限的值类型：它只能用于对象类型 (对象、数组和如 Map、Set 这样的集合类型)。它不能持有如 string、number 或 boolean 这样的原始类型。
+
+2. 不能替换整个对象：由于 Vue 的响应式跟踪是通过属性访问实现的，因此我们必须始终保持对响应式对象的相同引用。这意味着我们不能轻易地“替换”响应式对象，因为这样的话与第一个引用的响应性连接将丢失：
+
+```js
+let state = reactive({ count: 0 })
+
+// 上面的 ({ count: 0 }) 引用将不再被追踪
+// (响应性连接已丢失！)
+state = reactive({ count: 1 })
+```
+
+3. 对解构操作不友好：当我们将响应式对象的原始类型属性解构为本地变量时，或者将该属性传递给函数时，我们将丢失响应性连接：
+
+```js
+const state = reactive({ count: 0 })
+
+// 当解构时，count 已经与 state.count 断开连接
+let { count } = state
+// 不会影响原始的 state
+count++
+
+// 该函数接收到的是一个普通的数字
+// 并且无法追踪 state.count 的变化
+// 必须传入整个对象以保持响应性
+callSomeFunction(state.count)
+```
+
+由于这些限制，建议使用 **ref()** 作为声明响应式状态的主要 API。
+
+
+### ref作为作为 reactive 对象的属性注意
+一个 ref 会在作为响应式对象的属性被访问或修改时自动解包。换句话说，它的行为就像一个普通的属性：
+```js
+const count = ref(0)
+const state = reactive({
+  count
+})
+
+console.log(state.count) // 0
+
+state.count = 1
+console.log(count.value) // 1
+```
+如果将一个新的 ref 赋值给一个关联了已有 ref 的属性，那么它会**替换掉旧的 ref**：
+```js
+const otherCount = ref(2)
+
+state.count = otherCount
+console.log(state.count) // 2
+// 原始 ref 现在已经和 state.count 失去联系
+console.log(count.value) // 1
+```
+
+#### 数组和集合的注意事项
+与 reactive 对象不同的是，当 ref 作为响应式数组或原生集合类型 (如 Map) 中的元素被访问时，它**不会被解包**：
+
+```js
+const books = reactive([ref('Vue 3 Guide')])
+// 这里需要 .value
+console.log(books[0].value)
+
+const map = reactive(new Map([['count', ref(0)]]))
+// 这里需要 .value
+console.log(map.get('count').value)
+```
+
+
+### ref在模板中解包的注意事项
+在模板渲染上下文中，只有顶级的 ref 属性才会被解包。
+
+在下面的例子中，count 和 object 是顶级属性，但 object.id 不是：
+```js
+const count = ref(0)
+const object = { id: ref(1) }
+```
+因此，这个表达式按预期工作：
+```js
+{{ count + 1 }}
+```
+...但这个不会：
+```js
+{{ object.id + 1 }}
+```
+渲染的结果将是 [object Object]1，因为在计算表达式时 object.id 没有被解包，仍然是一个 ref 对象。为了解决这个问题，我们可以将 id 解构为一个顶级属性：
+```js
+const { id } = object
+
+{{ id + 1 }}
+```
+现在渲染的结果将是 2。
+
+另一个需要注意的点是，如果 `ref 是文本插值的最终计算值` (即 {{ }} 标签)，那么它将被解包，因此以下内容将渲染为 1：
+```js
+{{ object.id }}
+```
+该特性仅仅是文本插值的一个便利特性，等价于 {{ object.id.value }}。
+
+
+### script setup
+可以使用 `<script setup>` 来大幅度地简化代码
+
+```html
+<script setup>
+import { ref } from 'vue'
+
+const count = ref(0)
+
+function increment() {
+  count.value++
+}
+</script>
+
+<template>
+  <button @click="increment">
+    {{ count }}
+  </button>
+</template>
+```
+
 
 ### Vue3中 script setup props emit 向父组件暴露数据用法
 + 定义属性 defineProps
@@ -6785,6 +7117,32 @@ onMounted(() => {
 </script>
 ```
 
+### 事件参数
+有时需要在内联事件处理器中访问原生 DOM 事件。可以向该处理器方法传入一个特殊的 $event 变量，或者使用内联箭头函数：
+```html
+<!-- 使用特殊的 $event 变量 -->
+<button @click="warn('Form cannot be submitted yet.', $event)">
+  Submit
+</button>
+
+<!-- 使用内联箭头函数 -->
+<button @click="(event) => warn('Form cannot be submitted yet.', event)">
+  Submit
+</button>
+```
+```js
+function warn(message, event) {
+  // 这里可以访问原生事件
+  if (event) {
+    event.preventDefault()
+  }
+  alert(message)
+}
+```
+
+### vue3生命周期
+
+![生命周期](book_files/204.jpg)
 
 
 ## React
@@ -12515,3 +12873,4 @@ add(firstOp,secondOp);
 接着，我们对所有的 CallExpression 和 IDentifier 进行检测。因为 CallExpression 代表了一次函数调用，因此在该 if 条件分支内，将相关函数节点调用情况推入到calledDecls数组中，同时我们对于该函数的参数变量也推入到calledDecls数组。因为 IDentifier 代表了一个变量的取值，我们也推入到calledDecls数组。
 
 经过整个 AST 遍历，我们就可以只遍历calledDecls数组，并从decls变量中获取使用到的变量和函数声明，最终使用concat方法合并带入code变量中，使用join方法转化为字符串类型。
+
