@@ -24,6 +24,9 @@
 	.markdown-body blockquote{
 		border-left:3px solid red !important
 	}
+	p{
+		text-indent:2em
+	}
 </style>
 
 
@@ -270,6 +273,8 @@
     - [Vue3中 script setup props emit 向父组件暴露数据用法](#vue3中-script-setup-props-emit-向父组件暴露数据用法)
     - [事件参数](#事件参数)
     - [vue3生命周期](#vue3生命周期)
+    - [defineModel() V3.4](#definemodel-v34)
+    - [vue2和vue3的依赖注入区别](#vue2和vue3的依赖注入区别)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [state 和 props 区别](#state-和-props-区别)
@@ -7143,6 +7148,95 @@ function warn(message, event) {
 ### vue3生命周期
 
 ![生命周期](book_files/204.jpg)
+
+### defineModel() V3.4
+```html
+<script setup>
+import Child from './Child.vue'
+import { ref } from 'vue'
+
+const msg = ref('Hello World!')
+</script>
+
+<template>
+  <h1>{{ msg }}</h1>
+  <Child v-model="msg" />
+</template>
+```
+```html
+//child
+<script setup>
+const model = defineModel()
+</script>
+
+<template>
+  <span>My input</span> <input v-model="model">
+</template>
+```
+
+![图](book_files/206.jpg)
+
+
+defineModel() 返回的值是一个 ref。它可以像其他 ref 一样被访问以及修改，不过它能起到在父组件和当前变量之间的双向绑定的作用：
+
++ 它的 .value 和父组件的 v-model 的值同步；
++ 当它被子组件变更了，**会触发父组件绑定的值一起更新。**
+
+defineModel 是一个便利宏。编译器将其展开为以下内容：
+
+1. 一个名为 modelValue 的 prop，本地 ref 的值与其同步；
+2. 一个名为 update:modelValue 的事件，当本地 ref 的值发生变更时触发。
+
+![图](book_files/205.jpg)
+
+### vue2和vue3的依赖注入区别
+
+***在Vue 2中，provide 和 inject 的绑定本身并不是可响应的*** 。这是因为Vue 2的响应式系统是基于 Object.defineProperty 实现的，它只能检测到对象属性的读写操作，但不能检测到新属性的添加或旧属性的删除。因此，如果你使用 provide 提供了一个对象，并在后续修改了该对象的属性，这个变化是不会自动传递给通过 inject 接收该对象的子组件的。
+
+
+如果想要响应式，可以通过一些方法间接地实现响应式的效果。
+
+一种常见的方法是，使用 Vue 的响应式系统（例如 Vue.observable 或 Vue 实例的 data 属性）来包装你想要提供的数据，并在 provide 中提供这个响应式对象的引用。
+```js
+export default {  
+  data() {  
+    return {  
+      // 这是一个响应式数据  
+      sharedData: {  
+        message: 'Hello from Parent'  
+      }  
+    };  
+  },  
+  provide() {  
+    // 提供 sharedData 的一个属性或整个对象  
+    return {  
+      // 你可以直接提供整个对象，但这样可能会暴露过多的内部状态  
+      // sharedData: this.sharedData,  
+  
+      // 或者只提供你需要的属性，这样更加安全  
+      sharedMessage: this.sharedData.message  
+    };  
+  },  
+  // ... 其他选项  
+}
+```
+```js
+export default {  
+  inject: ['sharedMessage'],  
+  // ... 其他选项  
+  mounted() {  
+    console.log(this.sharedMessage); // 输出: Hello from Parent  
+  
+    // 注意：这里你不能直接修改 this.sharedMessage，因为它只是一个值引用  
+    // 如果你想要修改原始数据，你需要另外提供修改数据的方法  
+  },  
+  // ... 其他选项  
+}
+```
+
+***在Vue 3中，provide 和 inject 的行为并没有改变，它们本身仍然不是可响应的*** 。但是，由于Vue 3采用了基于Proxy的响应式系统，这个系统可以检测到对象属性的添加、删除和修改。因此，如果你提供了一个可响应的对象（**例如使用 ref 或 reactive 创建的对象** ）作为 provide 的值，那么该对象的属性变化将会自动传递给通过 inject 接收该对象的子组件。
+
+注意的是，不能直接修改通过 inject 接收到的对象。因为 provide 的值在组件树中是共享的.为了避免这种情况，你可以使用 readonly 函数来创建一个只读版本的对象，并将其作为 provide 的值。这样，你就可以确保组件不会意外地修改到 provide 的值。
 
 
 ## React
