@@ -167,6 +167,7 @@
     - [文件上传下载，原生js的实现原理](#文件上传下载原生js的实现原理)
       - [文件上传](#文件上传)
       - [文件下载](#文件下载)
+    - [文件传输前后端](#文件传输前后端)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -331,6 +332,7 @@
     - [说说 Real DOM 和 Virtual DOM 的区别？优缺点？](#说说-real-dom-和-virtual-dom-的区别优缺点)
     - [Window.onload和 DOMContentLoaded（即ready）区别](#windowonload和-domcontentloaded即ready区别)
     - [服务端返回xml](#服务端返回xml)
+    - [前端图片转base64](#前端图片转base64)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -4211,11 +4213,386 @@ request();
 静态内容则受限于预先定义的文件集合，这些文件在服务器上是固定的，不能在运行时更改。
 
 ### 文件传输前后端
-获取文件控件input
+1. 获取文件控件input
 ```html
 <input type="file" class="upload_inp" accept=".png,.jpg,.jpeg">
 ```
 ![input](book_files/209.jpg)
+
+2. 使用FormData上传
+3. 也可以转base64上传，可以避免不同人传重复的多占据存储空间(需后端转图片对比hash)
+
+![图片](book_files/210.jpg)
+
+4. 配置缩略图
+	+ 基于获取的base64，可以直接给src
+	+ window.URL.createObjectURL
+
+```js
+const file = e.target.files[0];
+document.getElementById("k").src=window.URL.createObjectURL(file)
+```
+
+5. 前端配置hash，后台对比后，避免不同名字的同一张图片上传，也避免同名的图片不同的内容的被阻止上传
+	- fileReader.readAsArrayBuffer(file);获取buffer
+	- SparkMD5.ArrayBuffer读取，生动对应hash
+```js
+/* 文件缩略图 & 自动生成名字 */
+(function () {
+   
+    let _file = null;
+    // 把选择的文件读取成为BASE64
+    const changeBASE64 = file => {
+        return new Promise(resolve => {
+            let fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = ev => {
+                resolve(ev.target.result);
+            };
+        });
+    };
+    const changeBuffer = file => {
+        return new Promise(resolve => {
+            let fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(file);
+            fileReader.onload = ev => {
+                let buffer = ev.target.result,
+                    spark = new SparkMD5.ArrayBuffer(),
+                    HASH,
+                    suffix;
+                spark.append(buffer);
+                HASH = spark.end();//结束操作返回hash
+                suffix = /\.([a-zA-Z0-9]+)$/.exec(file.name)[1];
+                resolve({
+                    buffer,
+                    HASH,
+                    suffix,
+                    filename: `${HASH}.${suffix}`
+                });
+            };
+        });
+    };
+
+    upload_button_upload.addEventListener('click', async function () {
+        // 生成文件的HASH名字
+        let {
+            filename
+        } = await changeBuffer(_file);
+        let formData = new FormData();
+        formData.append('file', _file);
+        formData.append('filename', filename);
+        instance.post('/upload_single_name', formData).then(data => {
+            if (+data.code === 0) {
+                alert(`文件已经上传成功~~,您可以基于 ${data.servicePath} 访问这个资源~~`);
+                return;
+            }
+            return Promise.reject(data.codeText);
+        }).catch(reason => {
+            alert('文件上传失败，请您稍后再试~~');
+        }).finally(() => {
+            upload_abbre.style.display = 'none';
+            upload_abbre_img.src = '';
+            _file = null;
+        });
+    });
+
+
+    // 文件预览，就是把文件对象转换为BASE64，赋值给图片的SRC属性即可
+    upload_inp.addEventListener('change', async function () {
+        let file = upload_inp.files[0],
+            BASE64;
+        if (!file) return;
+        _file = file;
+        upload_button_select.classList.add('disable');
+        BASE64 = await changeBASE64(file);
+        upload_abbre.style.display = 'block';
+        upload_abbre_img.src = BASE64;
+        upload_button_select.classList.remove('disable');
+    });
+    upload_button_select.addEventListener('click', function () {
+        upload_inp.click();
+    });
+})();
+```
+
+6. 上传进度条
+
+```js
+await instance.post('/upload_single', formData, {
+		// 文件上传中的回调函数 xhr.upload.onprogress
+		onUploadProgress(ev) {
+			let {
+				loaded,
+				total
+			} = ev;
+			upload_progress.style.display = 'block';
+			upload_progress_value.style.width = `${loaded/total*100}%`;
+		}
+});
+```
+
+7. 多文件上传：请求循环处理
+
+```html
+<input type="file" class="upload_inp" multiple>
+```
+```js
+      _files = _files.map(item => {
+            let fm = new FormData,
+                curLi = upload_list_arr.find(liBox => liBox.getAttribute('key') === item.key),
+                curSpan = curLi ? curLi.querySelector('span:nth-last-child(1)') : null;
+            fm.append('file', item.file);
+            fm.append('filename', item.filename);
+            return instance.post('/upload_single', fm, {
+                onUploadProgress(ev) {
+                    // 检测每一个的上传进度
+                    if (curSpan) {
+                        curSpan.innerHTML = `${(ev.loaded/ev.total*100).toFixed(2)}%`;
+                    }
+                }
+            }).then(data => {
+                if (+data.code === 0) {
+                    if (curSpan) {
+                        curSpan.innerHTML = `100%`;
+                    }
+                    return;
+                }
+                return Promise.reject();
+            });
+        });
+
+        // 等待所有处理的结果
+        Promise.all(_files).then(() => {
+            alert('恭喜您，所有文件都上传成功~~');
+        }).catch(() => {
+            alert('很遗憾，上传过程中出现问题，请您稍后再试~~');
+        }).finally(() => {
+            changeDisable(false);
+            _files = [];
+            upload_list.innerHTML = '';
+            upload_list.style.display = 'none';
+        });
+```
+
+8. 拖拽上传:ev.dataTransfer.files
+
+```js
+/* 拖拽上传 */
+(function () {
+    let upload = document.querySelector('#upload6'),
+        upload_inp = upload.querySelector('.upload_inp'),
+        upload_submit = upload.querySelector('.upload_submit'),
+        upload_mark = upload.querySelector('.upload_mark');
+    let isRun = false;
+
+    // 实现文件上传
+    const uploadFile = async file => {
+        if (isRun) return;
+        isRun = true;
+        upload_mark.style.display = 'block';
+        try {
+            let fm = new FormData,
+                data;
+            fm.append('file', file);
+            fm.append('filename', file.name);
+            data = await instance.post('/upload_single', fm);
+            if (+data.code === 0) {
+                alert(`恭喜您，文件上传成功，您可以基于 ${data.servicePath} 访问该文件~~`);
+                return;
+            }
+            throw data.codeText;
+        } catch (err) {
+            alert(`很遗憾，文件上传失败，请您稍后再试~~`);
+        } finally {
+            upload_mark.style.display = 'none';
+            isRun = false;
+        }
+    };
+
+    // 拖拽获取 dragenter dragleave dragover drop
+    /* upload.addEventListener('dragenter', function () {
+        console.log('进入');
+    });
+    upload.addEventListener('dragleave', function () {
+        console.log('离开');
+    }); */
+    upload.addEventListener('dragover', function (ev) {
+        ev.preventDefault();
+    });
+    upload.addEventListener('drop', function (ev) {
+        ev.preventDefault();
+        let file = ev.dataTransfer.files[0];
+        if (!file) return;
+        uploadFile(file);
+    });
+
+    // 手动选择
+    upload_inp.addEventListener('change', function () {
+        let file = upload_inp.files[0];
+        if (!file) return;
+        uploadFile(file);
+    });
+    upload_submit.addEventListener('click', function () {
+        upload_inp.click();
+    });
+})();
+```
+
+9. 大文件上传：断点续传
+
+思想：切割分片，当中断或者错误后重传，后端返回分片中哪些已经传过了，前端过滤掉这些。
+
+后端需要保存所有分片，当前端统计发现传完后，告诉后端去拼接成完成文件。
+
+![1](book_files/211.jpg)
+
+![2](book_files/212.jpg)
+
+```js
+(function () {
+    let upload = document.querySelector('#upload7'),
+        upload_inp = upload.querySelector('.upload_inp'),
+        upload_button_select = upload.querySelector('.upload_button.select'),
+        upload_progress = upload.querySelector('.upload_progress'),
+        upload_progress_value = upload_progress.querySelector('.value');
+
+    const checkIsDisable = element => {
+        let classList = element.classList;
+        return classList.contains('disable') || classList.contains('loading');
+    };
+
+    const changeBuffer = file => {
+        return new Promise(resolve => {
+            let fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(file);
+            fileReader.onload = ev => {
+                let buffer = ev.target.result,
+                    spark = new SparkMD5.ArrayBuffer(),
+                    HASH,
+                    suffix;
+                spark.append(buffer);
+                HASH = spark.end();
+                suffix = /\.([a-zA-Z0-9]+)$/.exec(file.name)[1];
+                resolve({
+                    buffer,
+                    HASH,
+                    suffix,
+                    filename: `${HASH}.${suffix}`
+                });
+            };
+        });
+    };
+
+    upload_inp.addEventListener('change', async function () {
+        let file = upload_inp.files[0];
+        if (!file) return;
+        upload_button_select.classList.add('loading');
+        upload_progress.style.display = 'block';
+
+        // 获取文件的HASH
+        let already = [],
+            data = null,
+            {
+                HASH,
+                suffix
+            } = await changeBuffer(file);
+
+        // 获取已经上传的切片信息
+        try {
+            data = await instance.get('/upload_already', {
+                params: {
+                    HASH
+                }
+            });
+            if (+data.code === 0) {
+                already = data.fileList;
+                console.warn(`already`,already)
+            }
+        } catch (err) {}
+
+        // 实现文件切片处理 「固定数量 & 固定大小」
+        let max = 1024 * 100,
+            count = Math.ceil(file.size / max),
+            index = 0,
+            chunks = [];
+        if (count > 100) {
+            max = file.size / 100;
+            count = 100;
+        }
+        while (index < count) {
+            chunks.push({
+                file: file.slice(index * max, (index + 1) * max),
+                filename: `${HASH}_${index+1}.${suffix}`
+            });
+            index++;
+        }
+
+        // 上传成功的处理
+        index = 0;
+        const clear = () => {
+            upload_button_select.classList.remove('loading');
+            upload_progress.style.display = 'none';
+            upload_progress_value.style.width = '0%';
+        };
+        const complate = async () => {
+            // 管控进度条
+            index++;
+            upload_progress_value.style.width = `${index/count*100}%`;
+
+            // 当所有切片都上传成功，我们合并切片
+            if (index < count) return;
+            upload_progress_value.style.width = `100%`;
+            try {
+                data = await instance.post('/upload_merge', {
+                    HASH,
+                    count
+                }, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                if (+data.code === 0) {
+                    alert(`恭喜您，文件上传成功，您可以基于 ${data.servicePath} 访问该文件~~`);
+                    clear();
+                    return;
+                }
+                throw data.codeText;
+            } catch (err) {
+                alert('切片合并失败，请您稍后再试~~');
+                clear();
+            }
+        };
+
+        // 把每一个切片都上传到服务器上
+        chunks.forEach(chunk => {
+            // 已经上传的无需在上传
+            if (already.length > 0 && already.includes(chunk.filename)) {
+                console.warn('已上传过了此部分')
+                complate();
+                return;
+            }
+            let fm = new FormData;
+            fm.append('file', chunk.file);
+            fm.append('filename', chunk.filename);
+            instance.post('/upload_chunk', fm).then(data => {
+                if (+data.code === 0) {
+                    complate();
+                    return;
+                }
+                return Promise.reject(data.codeText);
+            }).catch(() => {
+                alert('当前切片上传失败，请您稍后再试~~');
+                clear();
+            });
+        });
+    });
+
+    upload_button_select.addEventListener('click', function () {
+        if (checkIsDisable(this)) return;
+        upload_inp.click();
+    });
+})();
+```
 
 
 
@@ -9744,6 +10121,36 @@ xhr.send();
 <ul id="itemList">  
     <!-- 数据将通过JavaScript动态填充到这里 -->  
 </ul>
+```
+
+### 前端图片转base64
+1. 使用HTML `<img>` 标签
+	+ 通过创建一个img标签，并监听其load事件，可以在图片加载完成后获取Base64编码。
+	+ 使用JavaScript的`toDataURL()`方法将图片转换为Base64编码的Data URL。
+
+```js
+<img id="image" src="path/to/your/image.jpg" />  
+<script>  
+document.getElementById('image').onload = function() {  
+    var base64 = this.toDataURL('image/jpeg');  
+    console.log(base64); // 输出Base64编码的图片数据  
+};  
+</script>
+```
+2. 使用File API（特别是FileReader对象）
+	+ 如果有一个File对象或Blob对象（通常来自文件输入元素或拖放API），可以使用FileReader API来读取文件内容并转换为Base64。
+	+ 实例化FileReader对象，并调用其readAsDataURL()方法以Data URL的方式读取文件内容。
+	+ 在onload事件处理函数中，通过e.target.result获取到转换后的Base64编码字符串。
+
+```js
+const reader = new FileReader();  
+reader.onload = function(e) {  
+	// 加载完成后获取对应的数据
+    const base64 = e.target.result; // 这就是Base64编码的图片数据  
+    console.log(base64);  
+};  
+// file就是该文件
+reader.readAsDataURL(file); // file是File或Blob对象
 ```
 
 
