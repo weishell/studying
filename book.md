@@ -114,6 +114,7 @@
     - [数组常用的方法](#数组常用的方法)
       - [影响到原数组的方法](#影响到原数组的方法)
       - [数组reduce方法应用场景](#数组reduce方法应用场景)
+    - [数组中对象的排序](#数组中对象的排序)
     - [函数缓存](#函数缓存)
     - [event loop](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
@@ -163,6 +164,9 @@
     - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
     - [script异步加载顺序](#script异步加载顺序)
     - [ajax fetch axios](#ajax-fetch-axios)
+    - [文件上传下载，原生js的实现原理](#文件上传下载原生js的实现原理)
+      - [文件上传](#文件上传)
+      - [文件下载](#文件下载)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -326,6 +330,7 @@
     - [property 和attribute使用](#property-和attribute使用)
     - [说说 Real DOM 和 Virtual DOM 的区别？优缺点？](#说说-real-dom-和-virtual-dom-的区别优缺点)
     - [Window.onload和 DOMContentLoaded（即ready）区别](#windowonload和-domcontentloaded即ready区别)
+    - [服务端返回xml](#服务端返回xml)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -2520,6 +2525,42 @@ console.log(str)
 ```
 去重等等……
 
+### 数组中对象的排序
+根据value从小到大排序
+```js
+	let arr1 = [
+		{
+			key:'z',
+			value:3
+		},
+		{
+			key:'t',
+			value:5
+		},
+		{
+			key:'sbxg',
+			value:2
+		},
+		{
+			key:'hrsm',
+			value:1
+		},
+		{
+			key:"zzdx",
+			value:4
+		}
+	]
+	
+	let arr = arr1.sort(change)
+	function change(v1,v2){
+		return v1.value-v2.value
+	}
+	
+	console.log(arr)
+```
+
+![排序](book_files/208.jpg)
+
 
 ### 函数缓存
 
@@ -4095,6 +4136,88 @@ XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
 	+ 取消请求
 	+ **自动转换 json 数据**
 	+ **客户端支持抵御 XSRF 攻击**	
+
+### 文件上传下载，原生js的实现原理
+文件上传和下载在原生JavaScript中的实现原理主要涉及到HTML表单的`<input type="file">`元素，用于用户选择文件，以及XMLHttpRequest（或现代的fetch API）或FormData对象用于发送文件到服务器，还有Blob和URL.createObjectURL用于处理和下载文件。
+
+#### 文件上传
+HTML表单：使用`<input type="file">`元素允许用户选择一个或多个文件。
+```html
+<input type="file" id="fileInput" name="file">  
+<button onclick="uploadFile()">上传</button>
+```
+JavaScript处理：当用户选择一个文件后，JavaScript可以通过监听change事件来获取文件对象。然后，可以使用FormData对象来构建包含文件的请求体，并通过XMLHttpRequest或fetch API将文件发送到服务器。
+```js
+function uploadFile() {  
+    var fileInput = document.getElementById('fileInput');  
+    var file = fileInput.files[0]; // 获取用户选择的第一个文件  
+  
+    var formData = new FormData();  
+    formData.append('file', file);  
+  
+    var xhr = new XMLHttpRequest();  
+    xhr.open('POST', '/upload-url', true);  
+    xhr.upload.onprogress = function(e) {  
+        // 处理上传进度  
+    };  
+    xhr.onload = function() {  
+        if (this.status === 200) {  
+            // 上传成功处理  
+        }  
+    };  
+    xhr.send(formData);  
+}
+```
+
+![额外参数](book_files/207.jpg)
+
+#### 文件下载
+文件下载通常是通过服务器返回一个包含文件内容的HTTP响应来完成的。客户端可以通过创建一个新的`<a>`元素，并设置其href属性为文件的URL（可以是Blob URL或服务器上的URL），然后模拟点击该链接来触发下载。
+
+服务器响应：服务器返回文件内容，并设置适当的Content-Type和Content-Disposition头。
+
+JavaScript处理：如果文件是动态生成的（如Blob对象），可以使用URL.createObjectURL来创建一个指向Blob对象的URL，然后使用该URL来触发下载。
+
+```js
+function request () {
+    const req = new XMLHttpRequest();
+    req.open('POST', '<接口地址>', true);
+    req.responseType = 'blob';
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = function() {
+      const data = req.response;
+      const a = document.createElement('a');
+      const blob = new Blob([data]);
+      const blobUrl = window.URL.createObjectURL(blob);
+      download(blobUrl) ;
+    };
+    req.send('<请求参数：json字符串>');
+  };
+ 
+function download(blobUrl) {
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.download = '<文件名>';
+  a.href = blobUrl;
+  a.click();
+  document.body.removeChild(a);
+}
+ 
+request();
+```
+
+使用Blob对象进行下载允许你在运行时动态生成文件内容，这使得你可以根据用户输入、计算结果或其他动态数据来创建文件。
+
+静态内容则受限于预先定义的文件集合，这些文件在服务器上是固定的，不能在运行时更改。
+
+### 文件传输前后端
+获取文件控件input
+```html
+<input type="file" class="upload_inp" accept=".png,.jpg,.jpeg">
+```
+![input](book_files/209.jpg)
+
+
 
 ## ES6
 
@@ -9527,6 +9650,103 @@ JSX 通过 babel 的方式转化成 React.createElement 执行，返回值是一
 如非必要，优先使用DOMContentLoaded（jquery采用），体验感更好
 
 ![load](book_files/57.jpg)
+
+### 服务端返回xml
+1. **DOMParser** 可以将存储在字符串中的 XML 或 HTML 源代码解析为一个 DOM Document。
+2. xhr.responseXML拿到XML数据
+
+```js
+var xhr = new XMLHttpRequest();  
+xhr.open('GET', 'your-xml-url.xml', true);  
+xhr.onreadystatechange = function () {  
+    if (xhr.readyState === 4 && xhr.status === 200) {  
+        var xmlString = xhr.responseText; // 获取 XML 字符串  
+        var parser = new DOMParser();  
+        var xmlDoc = parser.parseFromString(xmlString, "text/xml"); // 解析 XML 字符串  
+  
+        // 现在你可以使用 xmlDoc 来访问和操作 XML 数据了  
+        // 例如，获取根元素的第一个子元素的文本内容：  
+        var rootElement = xmlDoc.documentElement; // 获取根元素  
+        var firstChild = rootElement.firstChild; // 获取根元素的第一个子元素  
+        var textContent = firstChild.textContent || firstChild.innerText; // 获取文本内容  
+        console.log(textContent);  
+    }  
+};  
+xhr.send();
+```
+```js
+fetch('your-xml-url.xml')  
+    .then(response => response.text()) // 获取 XML 字符串  
+    .then(xmlString => {  
+        var parser = new DOMParser();  
+        var xmlDoc = parser.parseFromString(xmlString, "text/xml"); // 解析 XML 字符串  
+  
+        // 现在你可以使用 xmlDoc 来访问和操作 XML 数据了  
+        // ...  
+    })  
+    .catch(error => {  
+        console.error('Error fetching and parsing the XML:', error);  
+    });
+```
+
+```xml
+<items>  
+    <item>  
+        <id>1</id>  
+        <name>Item 1</name>  
+    </item>  
+    <item>  
+        <id>2</id>  
+        <name>Item 2</name>  
+    </item>  
+    <!-- 更多的item -->  
+</items>
+```
+```js
+// 假设你的XML URL是'data.xml'  
+var xmlUrl = 'data.xml';  
+  
+var xhr = new XMLHttpRequest();  
+xhr.open('GET', xmlUrl, true);  
+xhr.onload = function() {  
+    if (xhr.status === 200) {  
+        // 解析XML  
+        var xmlDoc = xhr.responseXML;  
+        var items = []; // 创建一个空数组来存储解析后的数据  
+  
+        // 获取所有的<item>元素  
+        var itemNodes = xmlDoc.getElementsByTagName('item');  
+        for (var i = 0; i < itemNodes.length; i++) {  
+            var itemId = itemNodes[i].getElementsByTagName('id')[0].textContent;  
+            var itemName = itemNodes[i].getElementsByTagName('name')[0].textContent;  
+  
+            // 将每个item的数据添加到数组中  
+            items.push({ id: itemId, name: itemName });  
+        }  
+  
+        // 假设你有一个ID为'itemList'的列表元素  
+        var listElement = document.getElementById('itemList');  
+  
+        // 清空列表  
+        listElement.innerHTML = '';  
+  
+        // 填充列表  
+        items.forEach(function(item) {  
+            var listItem = document.createElement('li');  
+            listItem.textContent = item.name; // 或者你可以添加更复杂的HTML结构  
+            listElement.appendChild(listItem);  
+        });  
+    }  
+};  
+xhr.send();
+```
+```html
+<ul id="itemList">  
+    <!-- 数据将通过JavaScript动态填充到这里 -->  
+</ul>
+```
+
+
 
 ## BOM
 
