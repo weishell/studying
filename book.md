@@ -8225,6 +8225,8 @@ export default function C2() {
 }
 ```
 
+![usecontext createtext](book_files/214.jpg)
+
 ### react高阶组件的理解和应用
 在React中，高阶组件即接受一个或多个组件作为参数并且返回一个组件，本质也就是一个函数，并不是一个组件
 ```js
@@ -9387,6 +9389,8 @@ export default function Counter() {
   );  
 }
 ```
+
+![useReducer](book_files/213.jpg)
 
 #### hooks作用
 hooks能够更容易解决状态相关的重用的问题：
