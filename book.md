@@ -221,6 +221,7 @@
       - [mixins 和 composition api的优缺点](#mixins-和-composition-api的优缺点)
     - [vue中的修饰符](#vue中的修饰符)
       - [注意修饰符顺序](#注意修饰符顺序)
+    - [v-bind:value.sync](#v-bindvaluesync)
     - [vue中的$nextTick](#vue中的nexttick)
       - [为什么要有$nextTick](#为什么要有nexttick)
       - [使用场景](#使用场景)
@@ -345,6 +346,17 @@
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
   - [小程序](#小程序)
+    - [uniapp 工程配置](#uniapp-工程配置)
+    - [pages.json](#pagesjson)
+    - [tabBar](#tabbar)
+    - [rpx](#rpx)
+    - [static文件夹作用](#static文件夹作用)
+    - [常用的组件](#常用的组件)
+    - [常用的API](#常用的api)
+    - [uniapp换肤](#uniapp换肤)
+    - [uni.switchTab uni.navigateTo uni.redirectTo  uni.reLaunch  的区别](#uniswitchtab-uninavigateto-uniredirectto--unirelaunch--的区别)
+    - [easycom组件](#easycom组件)
+    - [路由跳转传参的获取](#路由跳转传参的获取)
   - [node](#node)
     - [为什么拼接目录不用相对目录要用path处理](#为什么拼接目录不用相对目录要用path处理)
     - [koa洋葱模型](#koa洋葱模型)
@@ -373,7 +385,7 @@
     - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
     - [堆和二叉树的关系](#堆和二叉树的关系)
   - [算法](#算法)
-    - [f](#f)
+    - [复杂度](#复杂度)
     - [递归](#递归)
       - [递归和尾递归](#递归和尾递归)
   - [write](#write)
@@ -5992,10 +6004,16 @@ Mixins 在 Vue.js 中的实现原理主要基于 `JavaScript 的对象合并和�
 修饰符处理更多的dom细节，专注做逻辑方面操作
 
 1. 表单 v-model.lazy v-model.trim v-model.number(如果输入值无法被parseFloat解析则返回原值)
-2. 事件 @click.stop(等于event.stopPropagation) @submit.prevent(等于event.preventDefalut) @click.self(对当前元素自身触发函数) @click.capture(捕获方式) @scroll.passvie(lazy模式，减少触发频率) @click.native(让组件像html一样可以监听根元素的原生事件,加在原生标签不生效)
+2. 事件 @click.stop(等于event.stopPropagation) @submit.prevent(等于event.preventDefalut) @click.self(对当前元素自身触发函数) @click.capture(捕获方式) @scroll.passvie(lazy模式，减少触发频率) `@click.native(让组件像html一样可以监听根元素的原生事件,加在原生标签不生效)`
 3. 鼠标键盘：@keyup.keyCode @click.middle...
 4. v-bind修饰符：async props camel
 
+#### 注意修饰符顺序
++ @click.prevent.self(阻止所有点击) 
++ @click.self.prevent(阻止当前元素的点击)
+
+### v-bind:value.sync
+简易写法，这样子组件需要通知父组件改变值时，只需简单触发事件即可，不过vue3由于加强了v-model，不需要.sync这种用法。
 ```html
 //
 <comp :myMessage.sync="bar"></comp>
@@ -6015,9 +6033,6 @@ func2(){
 }
 ```
 
-#### 注意修饰符顺序
-+ @click.prevent.self(阻止所有点击) 
-+ @click.self.prevent(阻止当前元素的点击)
 
 ### vue中的$nextTick
 在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM。
@@ -10471,6 +10486,331 @@ window.onresize = setAppropriateImageSrc;
 
 ![小程序](book_files/173.jpg)
 
+### uniapp 工程配置
+```
+┌─uniCloud              云空间目录，支付宝小程序云为uniCloud-alipay，阿里云为uniCloud-aliyun，腾讯云为uniCloud-tcb（详见uniCloud）
+│─components            符合vue组件规范的uni-app组件目录
+│  └─comp-a.vue         可复用的a组件
+├─utssdk                存放uts文件
+├─pages                 业务页面文件存放的目录
+│  ├─index
+│  │  └─index.vue       index页面
+│  └─list
+│     └─list.vue        list页面
+├─static                存放应用引用的本地静态资源（如图片、视频等）的目录，注意：静态资源都应存放于此目录
+├─uni_modules           存放uni_module 详见
+├─platforms             存放各平台专用页面的目录，详见
+├─nativeplugins         App原生语言插件 详见
+├─nativeResources       App端原生资源目录
+│  ├─android            Android原生资源目录 详见
+|  └─ios                iOS原生资源目录 详见
+├─hybrid                App端存放本地html文件的目录，详见
+├─wxcomponents          存放小程序组件的目录，详见
+├─unpackage             非工程代码，一般存放运行或发行的编译结果
+├─main.js               Vue初始化入口文件
+├─App.vue               应用配置，用来配置App全局样式以及监听 应用生命周期
+├─pages.json            配置页面路由、导航条、选项卡等页面类信息，详见
+├─manifest.json         配置应用名称、appid、logo、版本等打包信息，详见
+├─AndroidManifest.xml   Android原生应用清单文件 详见
+├─Info.plist            iOS原生应用配置文件 详见
+└─uni.scss              内置的常用样式变量
+```
+
+### pages.json
+```json
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "uni-app"
+			}
+		}
+	    ,{
+            "path" : "pages/list/list",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
+```
+
+### tabBar
+在 pages.json 中提供 tabBar 配置，不仅仅是为了方便快速开发导航，更重要的是在App和小程序端提升性能。在这两个平台，底层原生引擎在启动时无需等待js引擎初始化，即可直接读取 pages.json 中配置的 tabBar 信息，渲染原生tab。
+```json
+"tabBar": {
+	"color": "#7A7E83",
+	"selectedColor": "#3cc51f",
+	"borderStyle": "black",
+	"backgroundColor": "#ffffff",
+	"list": [{
+		"pagePath": "pages/component/index",
+		"iconPath": "static/image/icon_component.png",
+		"selectedIconPath": "static/image/icon_component_HL.png",
+		"text": "组件"
+	}, {
+		"pagePath": "pages/API/index",
+		"iconPath": "static/image/icon_API.png",
+		"selectedIconPath": "static/image/icon_API_HL.png",
+		"text": "接口"
+	}]
+}
+```
+
+> 如果不考虑兼容微信小程序，可用iconfont代替iconPath
+
+### rpx
+750rpx = 屏幕宽度，小程序设计稿按750px设计（最初的iPhone6尺寸），是个相对单位
+
+### static文件夹作用
+为什么需要static这样的目录？
+
+uni-app编译器根据pages.json扫描需要编译的页面，并根据页面引入的js、css合并打包文件。
+
+对于本地的图片、字体、视频、文件等资源，如果可以直接识别，那么也会把这些资源文件打包进去，但如果这些资源以变量的方式引用， 比如：`<image :src="url"></image>`，甚至可能有更复杂的函数计算，此时编译器无法分析。
+
+那么有了static目录，编译器就会把这个目录整体复制到最终编译包内。这样只要运行时确实能获取到这个图片，就可以显示。
+
+当然这也带来一个注意事项，如果static里有一些没有使用的废文件，也会被打包到编译包里，造成体积变大。
+
+另外注意，static目录支持特殊的平台子目录，比如web、app、mp-weixin等，这些目录存放专有平台的文件，这些平台的文件在打包其他平台时不会被包含。
+
+`非 static 目录下的文件（vue组件、js、css 等）只有被引用时，才会被打包编译。`
+
+**css、less/scss 等资源不要放在 static 目录下，建议这些公用的资源放在自建的 common 目录下。**
+
+static目录和App原生资源目录有关系吗？
+
+uni-app支持App原生资源目录nativeResources，下面有assets、res等目录。但和static目录没有关系。
+
+static目录下的文件，在app第一次启动时，解压到了app的外部存储目录（external-path）。（uni-app x 从3.99+不再解压）
+
+所以注意控制static目录的大小，`太大的static目录和太多文件，会造成App安装后第一次启动变慢`。
+
+### 常用的组件
+
+```
+<view> 容器
+<text> 文本
+<scroll-view> 滚动区
+<swiper> 轮播图
+<image> 图片，注意mode不同设置的图形会有所不同，与原生的img标签有所不同
+<video> autopaly在muted(静音模式)下可以生效
+<navigator> 路由跳转，注意open-type不同模式
+<form> 表单
+<picker> 下方弹出选择框
+```
+
+![image](book_files/216.jpg)
+
+![navagitor](book_files/218.jpg)
+
+```js
+<template>
+	<view>
+		<view class="page-body">
+			<view class="btn-area">
+				<navigator url="navigate/navigate?title=navigate" hover-class="navigator-hover">
+					<button type="default">跳转到新页面</button>
+				</navigator>
+				<navigator url="redirect/redirect?title=redirect" open-type="redirect" hover-class="other-navigator-hover">
+					<button type="default">在当前页打开</button>
+				</navigator>
+				<navigator url="/pages/tabBar/extUI/extUI" open-type="switchTab" hover-class="other-navigator-hover">
+					<button type="default">跳转tab页面</button>
+				</navigator>
+			</view>
+		</view>
+	</view>
+</template>
+<script>
+// navigate.vue页面接受参数
+export default {
+	onLoad: function (option) { //option为object类型，会序列化上个页面传递的参数
+		console.log(option.id); //打印出上个页面传递的参数。
+		console.log(option.name); //打印出上个页面传递的参数。
+	}
+}
+</script>
+```
+
+url有长度限制，太长的字符串会传递失败，可使用窗体通信、全局变量，或encodeURIComponent等多种方式解决，如下为encodeURIComponent示例。
+```html
+<navigator :url="'/pages/navigate/navigate?item='+ encodeURIComponent(JSON.stringify(item))"></navigator>
+```
+```js
+// navigate.vue页面接受参数
+onLoad: function (option) {
+	const item = JSON.parse(decodeURIComponent(option.item));
+}
+```
+
+注意绑定在form上的`@submit = formSubmit`事件，它可以获取我们输入的所有值，对应选项加上`name`即可。
+
+数据在`e.detail.value`中可见
+
+```html
+<!-- 本示例未包含完整css，获取外链css请参考上文，在hello uni-app项目中查看 -->
+<template>
+	<view>
+		<view>
+			<form @submit="formSubmit" @reset="formReset">
+				<view class="uni-form-item uni-column">
+					<view class="title">switch</view>
+					<view>
+						<switch name="switch" />
+					</view>
+				</view>
+				<view class="uni-form-item uni-column">
+					<view class="title">checkbox</view>
+					<checkbox-group name="checkbox">
+						<label>
+							<checkbox value="checkbox1" /><text>选项一</text>
+						</label>
+						<label>
+							<checkbox value="checkbox2" /><text>选项二</text>
+						</label>
+					</checkbox-group>
+				</view>
+				<view class="uni-btn-v">
+					<button form-type="submit">Submit</button>
+					<button type="default" form-type="reset">Reset</button>
+				</view>
+			</form>
+		</view>
+	</view>
+</template>
+```
+```html
+<script>
+	export default {
+		data() {
+			return {
+			}
+		},
+		methods: {
+			formSubmit: function(e) {
+				console.log('form发生了submit事件，携带数据为：' + JSON.stringify(e.detail.value))
+				var formdata = e.detail.value
+				uni.showModal({
+					content: '表单数据内容：' + JSON.stringify(formdata),
+					showCancel: false
+				});
+			},
+			formReset: function(e) {
+				console.log('清空数据')
+			}
+		}
+	}
+</script>
+```
+
+### 常用的API
+```
+uni.navigateTo(OBJECT) 路由相关
+uni.showToast(OBJECT) 提示框
+uni.showModal(OBJECT) 可交互提示操作框
+uni.showActionSheet(OBJECT)底部弹出菜单
+uni.setNavigationBarTitle(OBJECT) 对导航条标题设置
+uni.setNavigationBarColor(OBJECT) 对导航条颜色设置 【换肤】
+uni.showNavigationBarLoading(OBJECT) 导航条title前加loading
+uni.setTabBarItem(OBJECT) 动态设置tabbar的某一项 【管理员与普通用户】【vip动态权限调整】
+uni.setTabBarStyle(OBJECT) 动态设置 tabBar 的整体样式 【换肤】
+uni.request(OBJECT) 请求处理
+```
+setNavigationBarColor参数
+
+![导航条颜色设置](book_files/217.jpg)
+
+```js
+uni.setTabBarItem({
+  index: 0,
+  text: 'text',
+  iconPath: '/path/to/iconPath',
+  selectedIconPath: '/path/to/selectedIconPath'
+})
+```
+
+> 注意: 设置 iconfont 属性时，pages.json iconfontSrc 需要指定字体文件
+
+### uniapp换肤
+1. 主题部分配置css变量 
+2. API 调整头部和底部 【uni.setNavigationBarTitleText】【uni.setNavigationBarColor】【uni.setTabBarStyle】【uni.setTabBarItem】
+3. 存储主题【uni.setStorageSync】【uni.getStorageSync】
+
+### uni.switchTab uni.navigateTo uni.redirectTo  uni.reLaunch  的区别
+1. uni.switchTab(OBJECT)
+	+ 用途：用于跳转到 tabBar 页面，`并关闭其他非 tabBar 页面`。
+	+ 行为：跳转到应用内的某个 tabBar 页面，并关闭其他非 tabBar 页面。tabBar 页面之间的跳转。
+	+ 注意：`只能在 app.json 中注册的 tabBar 页面中使用。`
+2. uni.navigateTo(OBJECT)
+	+ 用途：保留当前页面，跳转到应用内的某个页面。**但是不能跳到 tabBar 页面。**
+	+ 行为：使用 uni.navigateTo 跳转后，当前页面会保留在内存中，并显示在跳转页面的左上角（左上角会有一个返回按钮）。
+	+ 返回：用户可以通过点击左上角的返回按钮，返回到上一个页面。
+	+ 限制：非 tabBar 页面最多可以打开 5 个，当打开第 6 个页面时，第 1 个页面将被关闭。
+3. uni.redirectTo(OBJECT)
+	+ 用途：关闭当前页面，跳转到应用内的某个页面。**但是不允许跳转到 tabBar 页面。**
+	+ 行为：与 uni.navigateTo 类似，但关闭当前页面。
+	+ 注意：不允许跳转到 tabBar 页面。
+4. uni.reLaunch(OBJECT)
+	+ 用途：**关闭所有页面，打开到应用内的某个页面。**
+	+ 行为：关闭所有页面，然后打开到应用内的某个页面。
+	+ 用途：可以从一个页面直接跳转到另一个页面，并清空之前的页面栈。
+
+总结
+1. uni.switchTab：用于 tabBar 页面之间的跳转。
+2. uni.navigateTo：保留当前页面，跳转到其他页面。
+3. uni.redirectTo：关闭当前页面，跳转到其他页面（但不能是 tabBar 页面）。
+4. uni.reLaunch：关闭所有页面，打开到应用内的某个页面。
+
+### easycom组件
+传统vue组件，需要安装、引用、注册，三个步骤后才能使用组件。easycom将其精简为一步。
+
+只要组件路径符合规范（具体见下），就可以不用引用、注册，直接在页面中使用。
+
+路径规范指：
+1. 安装在项目根目录的components目录下，并符合components/组件名称/组件名称.vue
+2. 安装在uni_modules下，路径为uni_modules/插件ID/components/组件名称/组件名称.vue
+
+```
+┌─components
+│  └─comp-a
+│    └─comp-a.vue      符合easycom规范的组件
+└─uni_modules          [uni_module](/plugin/uni_modules.md)中符合easycom规范的组件
+   └─uni_modules
+     └─uni-list
+       └─components
+         └─uni-list
+           └─ uni-list.vue
+```
+
+> 在组件名完全一致的情况下，easycom引入的优先级低于手动引入（区分连字符形式与驼峰形式）。
+
+### 路由跳转传参的获取
+```js
+//在起始页面跳转到test.vue页面并传递参数
+uni.navigateTo({
+	url: 'test?id=1&name=uniapp'
+});
+```
+当在H5中，可以直接使用$route.query.id获取，但是为了兼容微信小程序,通过onLoad生命周期可以获取参数
+```js
+onLoad(val){
+	console.log(val)
+}
+```
+
+
 
 ## node
 
@@ -10689,7 +11029,6 @@ npm unlink
 6. 根据Render Tree渲染页面
 7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
 8. 直至整个Render 渲染完成
-
 
 ### http状态码
 
@@ -13665,4 +14004,3 @@ add(firstOp,secondOp);
 接着，我们对所有的 CallExpression 和 IDentifier 进行检测。因为 CallExpression 代表了一次函数调用，因此在该 if 条件分支内，将相关函数节点调用情况推入到calledDecls数组中，同时我们对于该函数的参数变量也推入到calledDecls数组。因为 IDentifier 代表了一个变量的取值，我们也推入到calledDecls数组。
 
 经过整个 AST 遍历，我们就可以只遍历calledDecls数组，并从decls变量中获取使用到的变量和函数声明，最终使用concat方法合并带入code变量中，使用join方法转化为字符串类型。
-
