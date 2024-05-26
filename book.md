@@ -9391,6 +9391,25 @@ export default function Counter() {
 ```
 
 ![useReducer](book_files/213.jpg)
+![reducer](book_files/215.jpg)
+
+useMemo类似vue computed
+```js
+const doubleCount = useMemo(() => {  
+	console.log('Calculating doubleCount');  
+	return count * 2;  
+  }, [count]);  
+```
+
+useCallback
+```js
+// 使用 useCallback 创建一个记忆化的回调函数  
+  // 依赖项数组中包含所有可能导致回调函数内部逻辑变化的变量  
+  const handleClick = useCallback(() => {  
+    console.log('handleClick called with value:', value);  
+    // 你可以在这里执行任何需要记忆化引用的操作  
+  }, [value]);
+```
 
 #### hooks作用
 hooks能够更容易解决状态相关的重用的问题：
@@ -9436,7 +9455,7 @@ export default CounterComponent;
 ```
 
 ### react 性能优化
-当我们想要更新一个子组件的时候，如下图绿色部分：
+当想要更新一个子组件的时候，如下图绿色部分：
 
 ![1](book_files/87.jpg)
 
@@ -9496,6 +9515,54 @@ export default class InlineFunctionComponent extends React.Component {
       </div>
     )
   }
+}
+```
+
+使用Reac.memo，只有当前props发生变化才重新渲染，注意：根据需求考虑使用
+```jsx
+import { useMemo,memo } from "react";
+
+type XC1Props = {  
+    count: number;  
+  };  
+export default  memo(function XC1({count}:XC1Props){
+    console.log('xc1')
+
+    const doubleCount = useMemo(() => {  
+        console.log('Calculating doubleCount');  
+        return count * 2;  
+      }, [count]);  
+    console.warn('doubleCount',doubleCount)
+    return (
+        <div>11111</div>
+    )
+})
+```
+使用PureComponent:同上
+```js
+import React from 'react'
+type XC1Props = {  
+    count: number;  
+  };  
+export default class XC2 extends React.PureComponent<XC1Props,any> {
+    constructor(props:XC1Props){
+        super(props)
+        console.log(props.count)
+        this.state = {
+            myval : this.props.count
+        }
+    }
+    componentDidMount(): void {
+        console.log('xc2','componentDidMount')
+    }
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<{}>, snapshot?: any): void {
+        console.log('xc2','componentDidUpdate')
+    }
+    render(): React.ReactNode {
+        return (
+            <div>2222---{ this.state.myval } ---{this.props.count}</div>
+        )
+    }
 }
 ```
 
@@ -10977,7 +11044,7 @@ export function createLinkList(arr: number[]): ILinkListNode {
 
 ## 算法
 
-### f
+### 复杂度
 程序执行时需要的计算量和内存空间（和代码是否简洁无关），复杂度是个数量级，不是具体的数字
 + 时间复杂度：程序执行是所需要的计算量（CPU）
 + 空间复杂度：程序执行时需要的内存空间
