@@ -168,6 +168,7 @@
       - [文件上传](#文件上传)
       - [文件下载](#文件下载)
     - [文件传输前后端](#文件传输前后端)
+    - [token无感刷新](#token无感刷新)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -346,17 +347,26 @@
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
   - [小程序](#小程序)
+    - [登录](#登录)
+      - [不同的登录方式](#不同的登录方式)
+    - [小程序头像获取](#小程序头像获取)
+    - [微信小程序使用微信的wx.openid 和自己的账号密码登录有什么区别](#微信小程序使用微信的wxopenid-和自己的账号密码登录有什么区别)
+    - [小程序分包](#小程序分包)
     - [uniapp 工程配置](#uniapp-工程配置)
+    - [uniapp获取openid](#uniapp获取openid)
     - [pages.json](#pagesjson)
     - [tabBar](#tabbar)
     - [rpx](#rpx)
     - [static文件夹作用](#static文件夹作用)
     - [常用的组件](#常用的组件)
     - [常用的API](#常用的api)
+    - [吸附顶部兼容](#吸附顶部兼容)
     - [uniapp换肤](#uniapp换肤)
     - [uni.switchTab uni.navigateTo uni.redirectTo  uni.reLaunch  的区别](#uniswitchtab-uninavigateto-uniredirectto--unirelaunch--的区别)
     - [easycom组件](#easycom组件)
     - [路由跳转传参的获取](#路由跳转传参的获取)
+    - [vue和nvue区别](#vue和nvue区别)
+    - [uniapp兼容各端编译](#uniapp兼容各端编译)
   - [node](#node)
     - [为什么拼接目录不用相对目录要用path处理](#为什么拼接目录不用相对目录要用path处理)
     - [koa洋葱模型](#koa洋葱模型)
@@ -388,6 +398,8 @@
     - [复杂度](#复杂度)
     - [递归](#递归)
       - [递归和尾递归](#递归和尾递归)
+    - [将一个数组旋转k步](#将一个数组旋转k步)
+    - [判断字符串括号匹配](#判断字符串括号匹配)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -464,6 +476,9 @@
     - [AST](#ast)
       - [acorn 解析](#acorn-解析)
       - [基于acorn实现简单的tree-shaking](#基于acorn实现简单的tree-shaking)
+  - [数据可视化](#数据可视化)
+    - [echarts使用](#echarts使用)
+    - [echarts基本配置](#echarts基本配置)
 
 
 ## html
@@ -4606,6 +4621,9 @@ await instance.post('/upload_single', formData, {
 })();
 ```
 
+### token无感刷新
+1. token
+2. refresh token
 
 
 ## ES6
@@ -10486,6 +10504,247 @@ window.onresize = setAppropriateImageSrc;
 
 ![小程序](book_files/173.jpg)
 
+
+### 登录
+小程序登录是通过微信官方提供的登录能力, 获取微信提供的用户身份标识。通俗一点，	`也就是获取openId, unionId。`
+
+1.登录流程
+整体小程序登录可以分为两个阶段
+
+第一阶段：是小程序 & 开发服务器 & 微信服务器三端交互，获取微信的相关登录凭证。
+
+第二阶段：小程序 & 开发服务器交互，获取自定义的登录态，如cookie, 或者JWT等。
+
+![login](book_files/221.jpg)
+
+code: 当前用户的临时登录凭证code。
+
+session_key: 会话密钥，是对用户数据加密签名的密钥。用于服务端解析微信加密回传的用户数据。用于解析前端通过小程序 api 获取的encryptedData。
+
+从流程图中我们可以看出，因为前端只调用了wx.login这个 api，且这个 api 的调用不要用户授权，所以其实在不依赖于其他账号体系的情况下，当前这种流程就可以获取用户微信的登录状态。而用户也是无感知的（没有授权弹窗弹起）。
+
+```js
+// 前端代码
+<button @tap="handleWxLogin">openid：wxLogin</button>
+
+...
+
+handleWxLogin() {
+  wx.login({
+    success(res) {
+      if (res.code) {
+        // 发送code临时登录凭证到后端
+        wx.request({
+          url: 'http://localhost:3000/wxLogin',
+          data: {
+            code: res.code
+          }
+        });
+      } else {
+        console.log('登录失败！' + res.errMsg);
+      }
+    }
+  });
+}
+
+// 后端代码
+async wxLogin(code) {
+    // 这里我们请求了微信服务器登录凭证校验接口，
+    const res = await axios.get('https://api.weixin.qq.com/sns/jscode2session', {
+      params: {
+        appid: this.appid,
+        secret: this.secret,
+        js_code: code,
+        grant_type: 'authorization_code',
+      },
+    });
+    return res.data.openid;
+}
+
+// jscode2session接口返回示例如下
+{
+ "openid":"xxxxxx",
+ "session_key":"xxxxx",
+ "unionid":"xxxxx",
+ "errcode":0,
+ "errmsg":"xxxxx"
+}
+```
+
+#### 不同的登录方式
+![方案](book_files/222.jpg)
+
+左边的小程序，它需要获取手机号，来关联用户在 58 平台上的账号体系，所以这种情况下，会用到手机号登录。
+
+右边的小程序，它虽然不用关联平台数据，但是在使用场景中，还是需要用户头像和昵称来给用户一个清晰的认知，告诉用户已经登录成功，如果直接放一个openid串，或者使用随机昵称，体验上会很不友好。
+
+获取手机号有两种方式：
+1. 前端通过wx.login获取用户的session_key, 并通过button组件，open-type=getPhoneNumber获取加密数据传给后端，后端通过解密，获取用户数据。
+
+我们传给后端的加密数据，就是下图标注的部分：
+
+![图](book_files/223.jpg)
+
+```js
+// 前端代码
+<button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">电话号码：解析加密数据</button>
+
+...
+
+getPhoneNumber(e) {
+  wx.request({
+    url: 'http://localhost:3000/getUserProfile',
+    data: {
+      encryptedData: e.$wx.detail.encryptedData,
+      iv: e.$wx.detail.iv
+    }
+  });
+}
+
+// 后端代码
+async getUserProfile(encryptedData, iv) {
+    // 根据小程序appid、当前登录用户的sessionKey、前端获取的加密数据encryptedData、和向量iv解密获得手机号
+    const pc = new WXBizDataCrypt(this.appid, this.sessionKey);
+
+    const data = pc.decryptData(encryptedData, iv);
+
+    return data;
+}
+
+// 解密方法
+function WXBizDataCrypt(appId, sessionKey) {
+  this.appId = appId;
+  this.sessionKey = sessionKey;
+}
+
+WXBizDataCrypt.prototype.decryptData = function (encryptedData, iv) {
+  // base64 decode
+  const sessionKey = Buffer.from(this.sessionKey, 'base64');
+  encryptedData = Buffer.from(encryptedData, 'base64');
+  iv = Buffer.from(iv, 'base64');
+
+  try {
+    // 解密
+    const crypto = require('crypto');
+    const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
+    decipher.setAutoPadding(true);
+    var decoded = decipher.update(encryptedData, 'binary', 'utf8');
+    decoded += decipher.final('utf8');
+
+    decoded = JSON.parse(decoded);
+  } catch (err) {
+    throw new Error('Illegal Buffer');
+  }
+
+  return decoded;
+};
+
+module.exports = WXBizDataCrypt;
+```
+
+> 因为解密时需要用到登录时获取的sessionKey，所以这个方法一定要在wx.login服务端获取了session_key的情况才能使用。
+
+2. 方案二：前端通过button组件，**open-type=getPhoneNumber**获取code传给后端，后端通过调用凭据（access_token）和 code 去微信服务器请求。
+
+![code](book_files/224.jpg)
+
+```js
+// 前端代码
+<button open-type="getPhoneNumber" @getphonenumber="getPhoneNumberByCode">电话号码：code换取</button>
+
+...
+
+getPhoneNumberByCode(e) {
+  wx.request({
+    url: 'http://localhost:3000/getUserProfileByCode',
+    data: {
+      code: e.$wx.detail.code
+    }
+  });
+}
+
+// 后端代码
+async getUserProfileByCode(code) {
+    // 首先获取服务端与微信服务器交互的 接口调用凭证
+    if (!this.accessToken) {
+      const accessTokenRes = await axios.get(
+        `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${this.appid}&secret=${this.secret}`,
+      );
+      this.accessToken = accessTokenRes.data.access_token;
+    }
+
+    // 然后根据前端获取的code去微信服务器做解析
+    const res = (await axios.post(
+      `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${this.accessToken}`,
+      {
+        code,
+      },
+    )) as any;
+
+    return res.data.phone_info;
+}
+
+// 正常返回数据结构如下
+{
+    "errcode":0,
+    "errmsg":"ok",
+    "phone_info": {
+        "phoneNumber":"xxxxxx",
+        "purePhoneNumber": "xxxxxx",
+        "countryCode": 86,
+        "watermark": {
+            "timestamp": 1637744274,
+            "appid": "xxxx"
+        }
+    }
+}
+```
+
+### 小程序头像获取
+1. 通过 getUserInfo 获取。
+2. 回收 getUserInfo，通过 getUserProfile 获取[1]。
+
+getUserInfo会记录之前授权的状态，导致如果用户点击过不允许，那小程序后续就不会再调起微信授权，导致用户使用流程中断。所以提供了getUserProfile方法，每一次都会调起授权。下图为两个方法的流程图：
+
+![流程图](book_files/225.jpg)
+
+```html
+<button @tap="getUserInfo">getUserInfo_获取用户信息</button>
+<button @tap="getUserProfile">getUserProfile_获取用户信息</button>
+<button open-type="chooseAvatar" @chooseavatar="getUserAvatar">获取用户头像</button>
+<image class="avatar" src="{{avatarUrl}}" />
+<input type="nickname" placeholder="请输入昵称"/>
+```
+
+> 微信官方在2022年10月回收了getUserInfo和getUserProfile这两个接口获取用户信息的能力。
+> 头像选择:需要将 button 组件 open-type 的值设置为 chooseAvatar，当用户选择需要使用的头像之后，可以通过 bindchooseavatar 事件回调获取到头像信息的临时路径。
+
+
+### 微信小程序使用微信的wx.openid 和自己的账号密码登录有什么区别
+微信小程序使用微信的wx.openid和自己的账号密码登录在多个方面存在显著的区别。以下是这些区别的详细解释：
+
+1. 认证机制
+	+ wx.openid：当用户使用微信小程序并通过微信授权登录时，小程序会调用wx.login()接口获取一个临时的登录凭证code。这个code会被发送到开发者服务器，并与小程序的AppID和AppSecret结合，向微信服务器请求换取用户的openid和`session_key`。openid是用户在小程序中的唯一标识，而`session_key`则是会话密钥，用于加密和解密用户数据。
+	+ 自己的账号密码：这种方式依赖于小程序自己维护的用户账号和密码系统。用户需要在小程序中输入自己的账号和密码进行登录，然后小程序会将这些信息与自己的数据库中的信息进行比对验证。
+2. 安全性
+	+ wx.openid：由于openid和session_key是由微信服务器颁发的，因此具有较高的安全性。`session_key`可用于加密用户敏感数据，进一步提升了用户数据的安全性。
+	+ 自己的账号密码：安全性取决于小程序自己实现的账号密码管理系统的强度。如果小程序没有采用足够的安全措施，比如明文存储密码、简单的密码验证逻辑等，那么用户账号和密码的安全性就会受到威胁。
+3. 用户体验
+	+ wx.openid：用户无需在小程序中输入额外的账号和密码信息，只需点击授权登录即可，因此用户体验较为流畅。
+	+ 自己的账号密码：用户需要在小程序中输入自己的账号和密码，这可能会增加用户的操作步骤和登录时间，降低用户体验。
+4. 关联性和唯一性
+	+ wx.openid：openid是用户在微信生态中的唯一标识，可以用于在不同的小程序之间关联用户身份。如果开发者拥有多个小程序或公众号，可以通过openid来识别同一个用户在不同应用中的身份。
+	+ 自己的账号密码：用户在小程序中的账号是独立的，与其他应用或平台无关。如果用户在不同的应用中都有账号，需要分别进行登录和管理。
+5. 数据同步和共享
+	+ wx.openid：由于openid是微信生态中的统一标识，因此可以方便地实现用户数据在不同应用之间的同步和共享。
+	+ 自己的账号密码：用户数据需要在小程序自己的系统中进行管理和维护，与其他应用之间难以实现数据的同步和共享。
+	
+综上所述，微信小程序使用微信的wx.openid和自己的账号密码登录在认证机制、安全性、用户体验、关联性和唯一性以及数据同步和共享等方面都存在显著的区别。开发者在选择使用哪种登录方式时，需要根据自己的业务需求和实际情况进行权衡和选择。
+
+### 小程序分包
+![开启](book_files/226.jpg)
+![配置](book_files/227.jpg)
+
 ### uniapp 工程配置
 ```
 ┌─uniCloud              云空间目录，支付宝小程序云为uniCloud-alipay，阿里云为uniCloud-aliyun，腾讯云为uniCloud-tcb（详见uniCloud）
@@ -10514,6 +10773,17 @@ window.onresize = setAppropriateImageSrc;
 ├─AndroidManifest.xml   Android原生应用清单文件 详见
 ├─Info.plist            iOS原生应用配置文件 详见
 └─uni.scss              内置的常用样式变量
+```
+
+### uniapp获取openid
+小程序会调用wx.login()接口获取一个临时的登录凭证code。这个code会被发送到开发者服务器，并与小程序的AppID和AppSecret结合，向微信服务器请求换取用户的openid和`session_key`。openid是用户在小程序中的唯一标识，而`session_key`则是会话密钥，用于加密和解密用户数据。
+```js
+uni.login({
+	 provider: 'weixin', //使用微信登录
+	  success: function (loginRes) {
+		console.log(loginRes);
+	  }
+})
 ```
 
 ### pages.json
@@ -10571,6 +10841,13 @@ window.onresize = setAppropriateImageSrc;
 
 ### rpx
 750rpx = 屏幕宽度，小程序设计稿按750px设计（最初的iPhone6尺寸），是个相对单位
+```
+750 * 元素在设计稿中的宽度 / 设计稿基准宽度
+```
+举例说明：
+
+1. 若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 640，结果为：117rpx。
+2. 若设计稿宽度为 375px，元素 B 在设计稿上的宽度为 200px，那么元素 B 在 uni-app 里面的宽度应该设为：750 * 200 / 375，结果为：400rpx。
 
 ### static文件夹作用
 为什么需要static这样的目录？
@@ -10609,11 +10886,14 @@ static目录下的文件，在app第一次启动时，解压到了app的外部�
 <navigator> 路由跳转，注意open-type不同模式
 <form> 表单
 <picker> 下方弹出选择框
+<rich-text> 富文本，v-html兼容型不好，使用富文本，推荐数据Array，如要使用 HTML String，某些小程序不支持，则需自己将 HTML String 转化为 nodes 数组，可使用 html-parser 转换
 ```
 
 ![image](book_files/216.jpg)
 
 ![navagitor](book_files/218.jpg)
+
+![富文本问题](book_files/220.jpg)
 
 ```js
 <template>
@@ -10727,6 +11007,7 @@ uni.showNavigationBarLoading(OBJECT) 导航条title前加loading
 uni.setTabBarItem(OBJECT) 动态设置tabbar的某一项 【管理员与普通用户】【vip动态权限调整】
 uni.setTabBarStyle(OBJECT) 动态设置 tabBar 的整体样式 【换肤】
 uni.request(OBJECT) 请求处理
+uni.setStorage(OBJECT) 缓存，可存储对象，不需要转字符串
 ```
 setNavigationBarColor参数
 
@@ -10742,6 +11023,11 @@ uni.setTabBarItem({
 ```
 
 > 注意: 设置 iconfont 属性时，pages.json iconfontSrc 需要指定字体文件
+
+### 吸附顶部兼容
+uni-app 提供内置 CSS 变量
+
+![css变量](book_files/219.jpg)
 
 ### uniapp换肤
 1. 主题部分配置css变量 
@@ -10810,6 +11096,152 @@ onLoad(val){
 }
 ```
 
+### vue和nvue区别
+uni-app App 端内置了一个基于 weex 改进的原生渲染引擎，提供了原生渲染能力。
+
+在 App 端，如果使用 vue 页面，则使用 `webview 渲染`；如果使用 nvue 页面(native vue 的缩写)，则使用`原生渲染`。一个 App 中可以同时使用两种页面，比如首页使用 nvue，二级页使用 vue 页面。
+
+虽然 nvue 也可以多端编译，输出 H5 和小程序，**但 nvue 的 css 写法受限**，`所以如果你不开发 App，那么不需要使用 nvue。`
+
+
+### uniapp兼容各端编译
+uni-app 是一个使用 Vue.js 开发所有前端应用的框架，它允许开发者编写一次代码，发布到多个平台，包括 iOS、Android、H5、以及各种小程序（如微信、支付宝、百度等）。为了兼容各端编译，uni-app 提供了一些条件编译和平台特有的API或组件。
+
+```html
+<template>  
+    <view>  
+        <!-- 只在H5平台上显示 -->  
+        <view v-if="process.env.VUE_APP_PLATFORM === 'h5'">这是H5平台</view>  
+  
+        <!-- 只在微信小程序上显示 -->  
+        <view v-if="process.env.VUE_APP_PLATFORM === 'mp-weixin'">这是微信小程序</view>  
+  
+        <!-- 通用代码 -->  
+        <view>这是通用代码</view>  
+    </view>  
+</template>  
+  
+<script>  
+export default {  
+    // ...  
+    created() {  
+        // 这里可以通过uni.getSystemInfoSync().platform来判断当前平台  
+        // 但为了兼容编译，我们通常使用环境变量来判断  
+        console.log(process.env.VUE_APP_PLATFORM); // 输出当前平台，如 'h5', 'mp-weixin' 等  
+    }  
+    // ...  
+}  
+</script>
+```
+```html
+<template>  
+    <view>  
+        <!-- 在App和小程序中使用原生导航栏 -->  
+        <view v-if="isAppOrMpPlatform">  
+            <!-- 使用平台特有的API或组件 -->  
+        </view>  
+  
+        <!-- 在H5中使用自定义导航栏 -->  
+        <view v-else>  
+            <!-- 使用H5的样式和布局 -->  
+        </view>  
+    </view>  
+</template>  
+  
+<script>  
+export default {  
+    computed: {  
+        isAppOrMpPlatform() {  
+            // 假设我们有一个方法来判断当前是否是App或小程序平台  
+            return /mp-/.test(process.env.VUE_APP_PLATFORM) || process.env.VUE_APP_PLATFORM === 'app-plus';  
+        }  
+    },  
+    // ...  
+}  
+</script>
+```
+```html
+<template>  
+    <view class="container">  
+        <!-- 内容 -->  
+    </view>  
+</template>  
+  
+<style scoped>  
+.container {  
+    /* 通用样式 */  
+    width: 100%;  
+    height: 100vh;  
+    display: flex;  
+    flex-direction: column;  
+}  
+  
+/* 只在H5上生效的样式 */  
+/* #ifdef H5 */  
+.container {  
+    background-color: #f0f0f0;  
+}  
+/* #endif */  
+  
+/* 只在微信小程序上生效的样式 */  
+/* #ifdef MP-WEIXIN */  
+.container {  
+    background-color: #eee;  
+}  
+/* #endif */  
+</style>
+```
+```html
+<script>  
+export default {  
+    data() {  
+        return {  
+            // ...  
+        };  
+    },  
+    methods: {  
+        // 通用方法  
+        commonMethod() {  
+            // ...  
+        },  
+  
+        // 条件编译方法，仅在小程序或App中执行  
+        // #ifdef MP || APP  
+        platformSpecificMethod() {  
+            // 这里可以调用小程序或App特有的API  
+            // 例如，调用uni.getSystemInfoSync()获取系统信息  
+            const systemInfo = uni.getSystemInfoSync();  
+            console.log('当前平台:', systemInfo.platform);  
+        },  
+        // #endif  
+  
+        // 仅在H5中执行的方法  
+        // #ifdef H5  
+        h5OnlyMethod() {  
+            // 这里可以编写H5特有的代码  
+            // 例如，使用window对象  
+            console.log('这是H5平台');  
+        },  
+        // #endif  
+  
+        onLoad() {  
+            // 通用加载逻辑  
+            // ...  
+  
+            // 根据平台调用对应的方法  
+            // #ifdef MP || APP  
+            this.platformSpecificMethod();  
+            // #endif  
+  
+            // #ifdef H5  
+            this.h5OnlyMethod();  
+            // #endif  
+        }  
+    },  
+    // ...  
+}  
+</script>
+```
 
 
 ## node
@@ -11353,6 +11785,9 @@ li {
 
 ## 数据结构
 
+栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。
+
+
 ### 把一个数组改成一个单向链表
 ```js
 export function createLinkList(arr: number[]): ILinkListNode {
@@ -11421,6 +11856,103 @@ function factorial(n, total) {
 }
 factorial(5, 1) // 120
 ```
+
+### 将一个数组旋转k步
+输入一个数组[1,2,3,4,5,6,7] k=3,即旋转3步 输出[5,6,7,1,2,3,4]
+
+思路1：将数组尾部的元素 pop，然后 unshift 到头部
+
+思路2：将数组拆分成两段，然后通过 concat 拼接在一起
+
+思路1，时间复杂度最坏的情况 O(n^2)，空间复杂度O(1)【unshift把最后一位提到第一位的话，会造成一次for循环的代价】
+
+思路2，时间复杂度为 O(1)，空间复杂度O(n)
+```js
+/**
+ * 旋转数组 k 步 - 使用 pop 和 unshift
+ * @param arr arr
+ * @param k k
+ * @returns arr
+ */
+export function rotate1(arr: number[], k: number): number[] {
+    const length = arr.length
+    if (!k || length === 0) return arr
+    const step = Math.abs(k % length) // abs 取绝对值
+
+    // O(n^2)
+    for (let i = 0; i < step; i++) {
+        const n = arr.pop()
+        if (n != null) {
+            arr.unshift(n) 
+// 数组是一个有序结构，unshift 操作非常慢！！！ O(n)
+        }
+    }
+    return arr
+}
+```
+```js
+/**
+ * 旋转数组 k 步 - 使用 concat
+ * @param arr arr
+ * @param k k
+*/
+ export function rotate2(arr: number[], k: number): number[] {
+    const length = arr.length
+    if (!k || length === 0) return arr
+    const step = Math.abs(k % length) // abs 取绝对值
+
+    // O(1)
+    const part1 = arr.slice(-step) // O(1)
+    const part2 = arr.slice(0, length - step)
+    const part3 = part1.concat(part2)
+    return part3
+}
+```
+
+### 判断字符串括号匹配
+一个字符串s可能包括{}() [] 三种括号判断s是否是括号匹配的如(a{b}c)匹配， 而{a(b 或 {a(b}c}就不匹配
+思路：遇到左括号就压栈 ，压栈的意思就是把括号push到数组的操作，这就叫压栈或者进栈；遇到右括号就判断栈顶，匹配则出栈；最后判断length是否为0。
+
+**栈：先进后出**
+
+![栈](book_files/228.jpg)
+
+时间复杂度O（n）,空间复杂度O（n）
+```js
+function matchBracket (str: string): boolean {
+  const len = str.length
+  if (len === 0) return true;
+
+  const leftBracket = '({['
+  const rightBracket = ')}]'
+  const stack = []
+for ( let i = 0; i < len; i++) {
+const s = str[i]
+// includes遍历本来也是O(n),但是它遍历的不是该字符串而且是个很短的固定值所以忽略不计
+    if (leftBracket.includes(s)) {
+      // 左括号压栈 
+	   // 空间复杂度O(n),虽然长度不如字符串
+      stack.push(s)
+    } else if (rightBracket.includes(s)) {
+      // 获取左括号的栈顶元素
+      const top = stack[stack.length -1]
+      if (
+        (top === '(' && s === ')') ||
+        (top === '{' && s === '}') || 
+        (top === '[' && s === ']')
+      ) {
+        // 右括号出栈
+        stack.pop()
+      } else {
+        // 不成对匹配，匹配失败
+        return false;
+      }
+    }
+  }
+  return stack.length === 0
+}
+```
+
 
 
 ## write
@@ -14004,3 +14536,144 @@ add(firstOp,secondOp);
 接着，我们对所有的 CallExpression 和 IDentifier 进行检测。因为 CallExpression 代表了一次函数调用，因此在该 if 条件分支内，将相关函数节点调用情况推入到calledDecls数组中，同时我们对于该函数的参数变量也推入到calledDecls数组。因为 IDentifier 代表了一个变量的取值，我们也推入到calledDecls数组。
 
 经过整个 AST 遍历，我们就可以只遍历calledDecls数组，并从decls变量中获取使用到的变量和函数声明，最终使用concat方法合并带入code变量中，使用join方法转化为字符串类型。
+
+## 数据可视化
+
+### echarts使用
+使用步骤：
+
+1. 引入echarts 插件文件到html页面中
+2. 准备一个具备大小的DOM容器
+
+```html
+<div id="main" style="width: 600px;height:400px;"></div>
+```
+
+3.  初始化echarts实例对象
+
+```js
+var myChart = echarts.init(document.getElementById('main'));
+```
+
+4. 指定配置项和数据(option)
+
+```js
+var option = {
+    xAxis: {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+        type: 'value'
+    },
+    series: [{
+        data: [820, 932, 901, 934, 1290, 1330, 1320],
+        type: 'line'
+    }]
+};
+```
+
+5. 将配置项设置给echarts实例对象
+
+```js
+myChart.setOption(option);
+```
+
+### echarts基本配置
+> 需要了解的主要配置：`series` `xAxis` `yAxis` `grid` `tooltip` `title` `legend` `color` 
+
+- series
+
+  - 系列列表。每个系列通过 `type` 决定自己的图表类型
+  - 大白话：图标数据，指定什么类型的图标，可以多个图表重叠。
+
+- xAxis：直角坐标系 grid 中的 x 轴
+
+  - boundaryGap: 坐标轴两边留白策略 true，这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间。
+
+- yAxis：直角坐标系 grid 中的 y 轴
+
+- grid：直角坐标系内绘图网格。 
+
+- title：标题组件
+
+- tooltip：提示框组件
+
+- legend：图例组件
+
+- color：调色盘颜色列表
+
+  数据堆叠，同个类目轴上系列配置相同的`stack`值后 后一个系列的值会在前一个系列的值上相加。
+
+~~~javascript
+option = {
+    // color设置我们线条的颜色 注意后面是个数组
+    color: ['pink', 'red', 'green', 'skyblue'],
+    // 设置图表的标题
+    title: {
+        text: '折线图堆叠123'
+    },
+    // 图表的提示框组件 
+    tooltip: {
+        // 触发方式
+        trigger: 'axis'
+    },
+    // 图例组件
+    legend: {
+       // series里面有了 name值则 legend里面的data可以删掉
+    },
+    // 网格配置  grid可以控制线形图 柱状图 图表大小
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        // 是否显示刻度标签 如果是true 就显示 否则反之
+        containLabel: true
+    },
+    // 工具箱组件  可以另存为图片等功能
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    // 设置x轴的相关配置
+    xAxis: {
+        type: 'category',
+        // 是否让我们的线条和坐标轴有缝隙
+        boundaryGap: false,
+        data: ['星期一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+     // 设置y轴的相关配置
+    yAxis: {
+        type: 'value'
+    },
+    // 系列图表配置 它决定着显示那种类型的图表
+    series: [
+        {
+            name: '邮件营销',
+            type: 'line',
+           
+            data: [120, 132, 101, 134, 90, 230, 210]
+        },
+        {
+            name: '联盟广告',
+            type: 'line',
+
+            data: [220, 182, 191, 234, 290, 330, 310]
+        },
+        {
+            name: '视频广告',
+            type: 'line',
+          
+            data: [150, 232, 201, 154, 190, 330, 410]
+        },
+        {
+            name: '直接访问',
+            type: 'line',
+          
+            data: [320, 332, 301, 334, 390, 330, 320]
+        }
+    ]
+};
+
+~~~
