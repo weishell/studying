@@ -400,6 +400,7 @@
       - [递归和尾递归](#递归和尾递归)
     - [将一个数组旋转k步](#将一个数组旋转k步)
     - [判断字符串括号匹配](#判断字符串括号匹配)
+    - [最近的请求次数](#最近的请求次数)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -11785,7 +11786,12 @@ li {
 
 ## 数据结构
 
-栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。
++ 栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。
++ 队列：先进先出，js中没有队列这个数据结构，不过Array可以实现栈的所有功能。
+
+![任务队列](book_files/229.jpg)
+
++ 链表：多个数据的集合的列表
 
 
 ### 把一个数组改成一个单向链表
@@ -11951,6 +11957,35 @@ const s = str[i]
   }
   return stack.length === 0
 }
+```
+
+### 最近的请求次数
+写一个 RecentCounter 类来计算特定时间范围内最近的请求。
+
+```
+输入：
+["RecentCounter", "ping", "ping", "ping", "ping"]
+[[], [1], [100], [3001], [3002]]
+输出：
+[null, 1, 2, 3, 3]
+```
+队列的应用
+```js
+var RecentCounter = function() {
+    this.q =[]
+};
+
+/** 
+ * @param {number} t
+ * @return {number}
+ */
+RecentCounter.prototype.ping = function(t) {
+    this.q.push(t)
+    while(this.q[0]<t-3000){
+        this.q.shift()
+    }
+    return this.q.length
+};
 ```
 
 
