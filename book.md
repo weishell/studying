@@ -11791,7 +11791,36 @@ li {
 
 ![任务队列](book_files/229.jpg)
 
-+ 链表：多个数据的集合的列表
++ 链表：多个数据的集合的列表，js没链表结构，可以利用object实现
+
+![链表](book_files/230.jpg)
+
+```js
+let a ={val:'a'}
+let b ={val:'b'}
+let c ={val:'c'}
+let d ={val:'d'}
+
+a.next = b 
+b.next = c
+c.next = d
+// 遍历列表
+let p = a
+while(p){
+	console.log(p)
+	p=p.next
+}
+// 添加元素
+let e ={val:'e'}
+b.next = e
+e.next = c
+console.log(a)
+
+// 删除元素
+c.next = null
+console.log(a)
+```
+
 
 
 ### 把一个数组改成一个单向链表
@@ -11969,6 +11998,7 @@ const s = str[i]
 输出：
 [null, 1, 2, 3, 3]
 ```
+
 队列的应用
 ```js
 var RecentCounter = function() {
@@ -11985,9 +12015,27 @@ RecentCounter.prototype.ping = function(t) {
         this.q.shift()
     }
     return this.q.length
-};
+}
 ```
 
+### 链表删除某一项（非最后一项）
+```js
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+/**
+ * @param {ListNode} node
+ * @return {void} Do not return anything, modify node in-place instead.
+ */
+var deleteNode = function(node) {
+    node.val =node.next.val
+    node.next =node.next.next
+};
+```
 
 
 ## write
