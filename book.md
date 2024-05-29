@@ -27,6 +27,10 @@
 	p{
 		text-indent:2em
 	}
+	.markdown-body h2{
+		border-top:2px solid purple !important;
+		padding-top:10px !important
+	}
 </style>
 
 
@@ -169,6 +173,7 @@
       - [文件下载](#文件下载)
     - [文件传输前后端](#文件传输前后端)
     - [token无感刷新](#token无感刷新)
+    - [js for 循环中break和return区别](#js-for-循环中break和return区别)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -387,6 +392,8 @@
       - [协商缓存](#协商缓存)
     - [http头部字段](#http头部字段)
       - [if-match的用法](#if-match的用法)
+    - [https加密方式和证书](#https加密方式和证书)
+      - [加密算法有哪几种](#加密算法有哪几种)
   - [性能优化](#性能优化)
     - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
     - [浅谈前端性能优化](#浅谈前端性能优化)
@@ -394,6 +401,9 @@
   - [数据结构](#数据结构-1)
     - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
     - [堆和二叉树的关系](#堆和二叉树的关系)
+    - [两个数组选找交集](#两个数组选找交集)
+    - [两数之和](#两数之和)
+    - [获取最长子串](#获取最长子串)
   - [算法](#算法)
     - [复杂度](#复杂度)
     - [递归](#递归)
@@ -401,6 +411,11 @@
     - [将一个数组旋转k步](#将一个数组旋转k步)
     - [判断字符串括号匹配](#判断字符串括号匹配)
     - [最近的请求次数](#最近的请求次数)
+    - [链表删除某一项（非最后一项）](#链表删除某一项非最后一项)
+    - [反转链表](#反转链表)
+    - [链表相加案例](#链表相加案例)
+    - [删除排序链表中的重复元素](#删除排序链表中的重复元素)
+    - [环形链表判断](#环形链表判断)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -579,6 +594,9 @@ DTD 规定了标记语言的规则，这样浏览器才能正确地呈现内容�
 7. Web Worker
 8. Web Storage
 9. WebSocket
+
+
+
 
 
 ## css
@@ -1731,6 +1749,10 @@ PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。�
 它支持的功能可以通过添加各类插件得到实现。
 
 ![图](book_files/137.jpg)
+
+
+
+
 
 ## js
 
@@ -4626,6 +4648,41 @@ await instance.post('/upload_single', formData, {
 1. token
 2. refresh token
 
+### js for 循环中break和return区别
+在JavaScript中，for 循环中的 break 和 return 语句有着显著的区别，它们的行为和用途完全不同。
+
+break:break 语句用于立即终止最内层的循环（for, while, do-while 或 label 语句）的执行。
+
+它只影响包含它的循环结构，对其他代码没有影响。当 break 语句被执行时，程序会立即跳出循环，继续执行循环之后的代码。
+```js
+for (let i = 0; i < 10; i++) {  
+  if (i === 5) {  
+    break; // 当 i 等于 5 时，终止循环  
+  }  
+  console.log(i); // 只会打印 0 到 4  
+}  
+console.log('Loop ended.'); // 这条语句会被执行
+```
+return 语句用于从函数中返回一个值，并立即终止函数的执行。
+
+**如果 return 语句出现在一个函数中，那么它会导致函数立即停止执行，并将控制权返回给调用该函数的代码。**
+
+如果 return 语句出现在全局作用域或不在函数内部的任何地方，那么它通常会导致语法错误。
+```js
+function findFirstFive() {  
+  for (let i = 0; i < 10; i++) {  
+    if (i === 5) {  
+      return i; // 当 i 等于 5 时，返回 i 并终止函数  
+    }  
+  }  
+  console.log('Function ended.'); // 这条语句不会被执行，因为函数已经返回了
+}  
+console.log(findFirstFive()); // 输出 5  
+```
+
+
+
+
 
 ## ES6
 
@@ -4944,6 +5001,9 @@ console.timeEnd('set find')
 ```
 
 ![arr](book_files/71.jpg)
+
+
+
 
 
 ## Typescript
@@ -5693,6 +5753,10 @@ class JsShuai extends Jspang{
   }
 }
 ```
+
+
+
+
 
 ## Vue2
 
@@ -6810,6 +6874,10 @@ module.exports = {
 
 ![解决思路](book_files/167.jpg)
 
+
+
+
+
 ## Vue3
 vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
 
@@ -7771,6 +7839,9 @@ export default {
 ***在Vue 3中，provide 和 inject 的行为并没有改变，它们本身仍然不是可响应的*** 。但是，由于Vue 3采用了基于Proxy的响应式系统，这个系统可以检测到对象属性的添加、删除和修改。因此，如果你提供了一个可响应的对象（**例如使用 ref 或 reactive 创建的对象** ）作为 provide 的值，那么该对象的属性变化将会自动传递给通过 inject 接收该对象的子组件。
 
 注意的是，不能直接修改通过 inject 接收到的对象。因为 provide 的值在组件树中是共享的.为了避免这种情况，你可以使用 readonly 函数来创建一个只读版本的对象，并将其作为 provide 的值。这样，你就可以确保组件不会意外地修改到 provide 的值。
+
+
+
 
 
 ## React
@@ -9861,7 +9932,13 @@ Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redu
 ```
 
 
+
+
+
 ## Angular
+
+
+
 
 
 ## DOM
@@ -10260,6 +10337,8 @@ reader.readAsDataURL(file); // file是File或Blob对象
 
 
 
+
+
 ## BOM
 
 ### BOM的含义
@@ -10344,6 +10423,10 @@ function query(name) {
     }
 console.log( query('b') )
 ```
+
+
+
+
 
 ## 移动端
 
@@ -10498,6 +10581,9 @@ window.onload = setAppropriateImageSrc;
 // 如果需要监听窗口大小变化，可以添加以下事件监听器  
 window.onresize = setAppropriateImageSrc;
 ```
+
+
+
 
 
 ## 小程序
@@ -11245,6 +11331,9 @@ export default {
 ```
 
 
+
+
+
 ## node
 
 ### 为什么拼接目录不用相对目录要用path处理
@@ -11344,6 +11433,7 @@ function compose(middleware) {
 由上图可知，当 middleware 数组中的中间件都开始执行之后，如果调度时未显式地设置 next 参数的值，则会开始返回 next 函数之后的语句继续往下执行。当第三个中间件执行完成后，就会返回第二中间件 next 函数之后的语句继续往下执行，直到所有中间件中定义的语句都执行完成。
 
 > 每个中间件是一个async (ctx, next) => {}, 执行后返回的是一个promise, 第二个参数 next的值为 dispatch.bind(null, i + 1) , 用于传递”中间件“的执行，一个个中间件向里执行，直到最后一个中间件执行完，resolve 掉，它前一个”中间件“接着执行 await next() 后的代码，然后 resolve 掉，在不断向前直到第一个”中间件“ resolve掉，最终使得最外层的promise resolve掉。
+
 
 
 
@@ -11658,6 +11748,22 @@ axios({
 });
 ```
 
+### https加密方式和证书
+https采用的是：结合`对称加密+非对称加密`这两种方式，可以用非对称加密的方式来传输对称加密过程中的密钥，之后可以采取对称加密的方式来传输数据了。
+
+证书为了避免中间人攻击。
+
+![1](book_files/241.jpg)
+![2](book_files/242.jpg)
+
+#### 加密算法有哪几种
+1. 对称加密算法也叫共享密钥加密算法、单密钥加密算法。采用单密钥的加密方法，同一个密钥可以同时用作信息的加密和解密，即解密算法为加密算法的逆算法。因此在知道了加密算法后也就知道了解密算法。对称加密算法有DES、3DES、AES等。
+2. 非对称加密算法又叫公开密钥算法。采用的是公钥和私钥相结合的加密方法。公钥和私钥是两个完全不同的密钥，一个用于加密，一个用于解密。同时这两个密钥在数学上是关联的。即解密算法不是加密算法的逆算法，因此在知道了加密算法后也无法知道解密算法，保证了安全性。有RSA、ECC等。
+3. 数字摘要算法又称哈希算法、散列算法，是一种单向算法，它通过对数据内容进行散列得到一个固定长度的密文信息（信息是任意长度，而摘要是定长）。即用户可以通过哈希算法对目标信息生成一段特定长度的唯一的Hash值，却不能通过这个Hash值重新获得目标信息。该算法不可逆。哈希算法有MD5、SHA-1、SHA-256等。
+
+
+
+
 
 ## 性能优化
 ![性能优化](book_files/101.jpg)
@@ -11784,6 +11890,10 @@ li {
 
 2.  IntersectionObserver API 交叉视口器
 
+
+
+
+
 ## 数据结构
 
 + 栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。
@@ -11821,6 +11931,8 @@ c.next = null
 console.log(a)
 ```
 
++ 集合：一种无需且唯一的数据结构，Set就是集合。常用于去重/交集/元素是否存在
++ 字典：是一种存储唯一值的数据结构，但是它以`键值对`的形式来存储，ES6中的Map就是字典
 
 
 ### 把一个数组改成一个单向链表
@@ -11849,6 +11961,96 @@ export function createLinkList(arr: number[]): ILinkListNode {
 ![1](book_files/107.jpg)
 ![2](book_files/108.jpg)
 堆的使用场景：堆的数据，都是在栈中引用的，不需想BST要从root遍历，堆恰巧是数组形式，根据栈的地址，可用O(1)找到目标。
+
+### 两个数组选找交集
+```js
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[]}
+ */
+
+// 利用集合实现
+var intersection = function(nums1, nums2) {
+    return [... new Set(nums1.filter(item => nums2.includes(item)))]
+};
+
+// 利用字典实现
+var intersection = function(nums1, nums2) {
+  const map1= new Map()
+    const arr = []
+    nums1.forEach(el=>{
+        map1.set(el,el)
+    })
+    nums2.forEach((el)=>{
+        if(map1.has(el)){
+            arr.push(el)
+            map1.delete(el)
+        }
+    })
+    return arr 
+};
+```
+
+### 两数之和
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
+
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+```
+输入：nums = [2,7,11,15], target = 9
+输出：[0,1]
+解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+```
+```js
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    let map =new Map()
+    map.set(nums[0],0)
+    let len =nums.length
+    for(let i=1;i<len;i++){
+        const tem = target - nums[i]
+        if(map.has(tem)){
+            return [map.get(tem),i]
+        }else{
+            map.set(nums[i],i)
+        }
+    }
+};
+```
+
+### 获取最长子串
+
+```js
+ let lengthOfLongestSubstring = function (s) {
+		let minIndex = 0
+		let count = 0
+		for (let i = 0; i < s.length; i++) {
+			//indexOf方法返回的是元素第一次出现的索引
+			if (s.indexOf(s[i], minIndex) < i) {
+				// 如果遇到重复的字符，会进入判断
+				minIndex = s.indexOf(s[i], minIndex) + 1
+				// 令索引从下一位开始查找，判断接下来的字符串是否与之前一样
+			}
+			else {
+				// 获得最长字符串的长度
+				// 比如'ababc' , minIndex = 2 , i = 4 , count = 2
+				count = Math.max(count , i - minIndex + 1)
+			}
+		}
+
+		return count
+	}
+console.log(lengthOfLongestSubstring('ababc')) 
+```
+
+![方案二](book_files/245.jpg)
+
+[](https://blog.csdn.net/qq_42999949/article/details/118884816)
+
 
 
 ## 算法
@@ -11987,6 +12189,17 @@ const s = str[i]
   return stack.length === 0
 }
 ```
+```js
+// 利用字典去实现
+const map = new Map()
+map.set("(",")")
+map.set("[","]")
+map.set("{","}")
+
+if(map.has(s))...
+
+if(map.get(top) === s)...
+```
 
 ### 最近的请求次数
 写一个 RecentCounter 类来计算特定时间范围内最近的请求。
@@ -12036,6 +12249,217 @@ var deleteNode = function(node) {
     node.next =node.next.next
 };
 ```
+
+### 反转链表
+![例子](book_files/231.jpg)
+
+递归实现
+```js
+function ListNode(val, next) {
+        this.val = (val===undefined ? 0 : val)
+        this.next = (next===undefined ? null : next)
+     }
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head){
+    // 只存在一个头节点返回本身
+    if(head == null || head.next == null){
+        return head;
+    }
+    // 进行反转
+    // 递归实现
+    var res = reverseList(head.next);
+    head.next.next = head;
+    head.next = null;
+    return res;
+}
+```
+迭代实现
+```js
+var reverseList = function(head) {
+    // 使用迭代实现
+    let prev = null;
+    let curr = head;
+    while(curr){
+    const next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+    }
+    return prev
+};
+```
+
+![1](book_files/232.jpg)
+
+next：调整头节点的下一节点之前，先记录其先前的下一节点（next = head->next），以防止链表断开后找不到其之前的下一节点
+
+![2](book_files/233.jpg)
+
+头节点断开与其下一节点的连接（head->next = pre），并反转（指向 NULL）
+
+![3](book_files/234.jpg)
+
+不断遍历，直到头节点指向链表的尾节点的下一节点（空节点）pre = head
+
+![4](book_files/235.jpg)
+
+head 右移，head = next
+
+![5](book_files/236.jpg)
+
+next 指向当前head的下一节点
+
+![6](book_files/237.jpg)
+
+head 指向 pre 指向的节点，实现 1->2 之间反转
+
+![7](book_files/238.jpg)
+
+以此类推......
+
+### 链表相加案例
+给你两个 非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。
+
+请你将两个数相加，并以相同形式返回一个表示和的链表。
+
+你可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+```
+输入：l1 = [2,4,3], l2 = [5,6,4]
+输出：[7,0,8]
+解释：342 + 465 = 807.
+```
+
+![案例](book_files/239.jpg)
+
+```js
+	/**
+	 * Definition for singly-linked list.
+	 * function ListNode(val, next) {
+	 *     this.val = (val===undefined ? 0 : val)
+	 *     this.next = (next===undefined ? null : next)
+	 * }
+	 */
+	/**
+	 * @param {ListNode} l1
+	 * @param {ListNode} l2
+	 * @return {ListNode}
+	 */
+	
+	function ListNode(val, next) {
+	    this.val = (val===undefined ? 0 : val)
+	     this.next = (next===undefined ? null : next)
+	}
+	
+	let a1 ={val:2}
+	let a2 ={val:4}
+	let a3 ={val:3}
+	a1.next=a2
+	a2.next=a3
+	
+	let b1 ={val:5}
+	let b2 ={val:6}
+	let b3 ={val:4}
+	b1.next=b2
+	b2.next=b3
+	
+	let l1 =a1 
+	let l2 =b1
+	
+	var addTwoNumbers = function(l1, l2) {
+	    let l3 = new ListNode(0)
+	    let p1 = l1
+	    let p2 = l2
+	    let p3 = l3
+	    let curry = 0 
+	    while(p1 || p2){
+	        let v1 = p1?.val ?? 0 
+	        let v2 = p2?.val ?? 0
+	        let val = v1+v2+curry
+	        curry = Math.floor(val/10)
+	        p3.next = new ListNode(val%10)
+	        if(p1) p1 = p1.next
+	        if(p2) p2 = p2.next
+	        p3 =p3.next
+	    }
+	    if(curry){
+	       p3.next = new ListNode(curry) 
+	    }
+		console.warn(l3)
+	    return l3.next
+	};
+	addTwoNumbers(l1,l2)
+```
+
+### 删除排序链表中的重复元素
+```js
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteDuplicates = function(head) {
+    let p = head
+    while (p && p.next) {
+    	// 只有当前节点的值和下个节点的值不相同，才移动指针
+        if(p.val === p.next.val){
+            p.next = p.next.next
+        }else{
+            p = p.next
+        }       
+    }
+    return head
+};
+```
+
+### 环形链表判断
+![如图](book_files/240.jpg)
+
+> 普通哈希表算法：存储每个数据，直到next是null，如果对比没有重复，即为不环，有的话就是环形链表
+
+> Floyd的循环检测算法（也被称为“龟兔赛跑”算法）是一种用于检测链表中是否存在环的算法。该算法使用了两个指针，一个快指针（通常称为“兔子”）和一个慢指针（通常称为“乌龟”），它们以不同的速度遍历链表。
+
+![复杂度](book_files/244.jpg)
+
+![快慢指针](book_files/243.jpg)
+
+1. slow 指针每次移动一个节点。
+2. fast 指针每次移动两个节点。
+3. 检查 fast 和 fast.next 是否为 null（或在某些语言中为 None），如果是，则链表中不存在环，算法结束。
+4. 检查 slow 和 fast 是否相等，如果相等，则链表中存在环，算法结束。
+
+```js
+function ListNode(val) {
+  this.val = val;
+  this.next = null;
+}
+function hasCycle(head) {
+  if (head === null || head.next === null) {
+    return false;
+  }
+  let slow = head;
+  let fast = head.next;
+  while (slow !== fast) {
+    if (fast === null || fast.next === null) {
+      return false;
+    }
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  return true;
+}
+```
+
+
+
 
 
 ## write
@@ -12538,6 +12962,9 @@ function getDefaultAdapter() {
   return adapter;
 }
 ```
+
+
+
 
 
 ## webpack
@@ -13431,6 +13858,10 @@ new HtmlWebpackPlugin({
 })
 ```
 
+
+
+
+
 ## Vite
 它主要由两部分组成：
 
@@ -13906,6 +14337,9 @@ export default (options)=>{
 ![client](book_files/160.jpg)
 
 ![HMR](book_files/159.jpg)
+
+
+
 
 
 ## 代码维护和兼容
@@ -14620,6 +15054,10 @@ add(firstOp,secondOp);
 
 经过整个 AST 遍历，我们就可以只遍历calledDecls数组，并从decls变量中获取使用到的变量和函数声明，最终使用concat方法合并带入code变量中，使用join方法转化为字符串类型。
 
+
+
+
+
 ## 数据可视化
 
 ### echarts使用
@@ -14688,7 +15126,7 @@ myChart.setOption(option);
 
   数据堆叠，同个类目轴上系列配置相同的`stack`值后 后一个系列的值会在前一个系列的值上相加。
 
-~~~javascript
+```js
 option = {
     // color设置我们线条的颜色 注意后面是个数组
     color: ['pink', 'red', 'green', 'skyblue'],
@@ -14735,28 +15173,23 @@ option = {
         {
             name: '邮件营销',
             type: 'line',
-           
             data: [120, 132, 101, 134, 90, 230, 210]
         },
         {
             name: '联盟广告',
             type: 'line',
-
             data: [220, 182, 191, 234, 290, 330, 310]
         },
         {
             name: '视频广告',
             type: 'line',
-          
             data: [150, 232, 201, 154, 190, 330, 410]
         },
         {
             name: '直接访问',
             type: 'line',
-          
             data: [320, 332, 301, 334, 390, 330, 320]
         }
     ]
 };
-
-~~~
+```
