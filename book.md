@@ -12022,7 +12022,7 @@ var twoSum = function(nums, target) {
 };
 ```
 
-### 获取最长子串
+### 获取不重复最长子串长度
 
 ```js
  let lengthOfLongestSubstring = function (s) {
@@ -12047,9 +12047,29 @@ var twoSum = function(nums, target) {
 console.log(lengthOfLongestSubstring('ababc')) 
 ```
 
-![方案二](book_files/245.jpg)
+双指针滑动窗口
+```js
+function lengthOfLongestSubstring(s){
+    let l=0;//左指针
+    let res=0;
+    let map=new Map();// 存储信息
+    for(let r=0;r<s.length;r++){//r右指针
+        if(map.has(s[r])&&map.get(s[r])>=l){//存在映射且在窗口范围内
+            l=map.get(s[r])+1;
+        }
+        //console.log(s.slice(l,r+1))
+        res=Math.max(res,r-l+1);
+        map.set(s[r],r);
+        //console.log("map",map)
+    }
+    return res;
+}
 
-[](https://blog.csdn.net/qq_42999949/article/details/118884816)
+console.log(lengthOfLongestSubstring("abbcdea"))
+
+```
+
+  
 
 
 
