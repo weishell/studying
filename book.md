@@ -79,6 +79,7 @@
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
     - [js 类型转换机制](#js-类型转换机制)
     - [let const var](#let-const-var)
+    - [函数和变量提升](#函数和变量提升)
     - [作用域的理解](#作用域的理解)
       - [词法作用域案例](#词法作用域案例)
       - [全局作用域诡异问题](#全局作用域诡异问题)
@@ -89,6 +90,7 @@
       - [不要滥用闭包](#不要滥用闭包)
       - [防抖和节流](#防抖和节流)
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
+      - [闭包案例](#闭包案例)
     - [内存泄漏](#内存泄漏)
       - [垃圾回收机制GC](#垃圾回收机制gc)
       - [Mark-Sweep标记清除优缺点](#mark-sweep标记清除优缺点)
@@ -108,8 +110,8 @@
     - [判断对象是空对象](#判断对象是空对象)
     - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
     - [数据类型](#数据类型)
-      - [undefined和null的区别](#undefined和null的区别)
       - [判断数据类型的方法](#判断数据类型的方法)
+    - [undefined和null的区别](#undefined和null的区别)
     - [数据结构](#数据结构)
       - [数组和链表的应用场景](#数组和链表的应用场景)
     - [字符串常用的方法](#字符串常用的方法)
@@ -140,6 +142,7 @@
     - [this指向](#this指向)
       - [this隐式绑定丢失](#this隐式绑定丢失)
       - [this的案例](#this的案例)
+    - [bind和new的优先级问题以及箭头函数的指向](#bind和new的优先级问题以及箭头函数的指向)
       - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
     - [new操作做了什么](#new操作做了什么)
     - [JS基本类型的装箱与拆箱](#js基本类型的装箱与拆箱)
@@ -423,6 +426,9 @@
     - [环形链表判断](#环形链表判断)
     - [二叉树的最大深度](#二叉树的最大深度)
     - [二叉树的最小深度](#二叉树的最小深度)
+    - [二叉树层序遍历](#二叉树层序遍历)
+    - [二叉树的中序遍历](#二叉树的中序遍历)
+    - [路径之和](#路径之和)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -502,6 +508,10 @@
   - [数据可视化](#数据可视化)
     - [echarts使用](#echarts使用)
     - [echarts基本配置](#echarts基本配置)
+  - [其他构建工具](#其他构建工具)
+  - [koa express](#koa-express)
+  - [css预编译语言](#css预编译语言)
+  - [微前端](#微前端)
 
 
 ## html
@@ -1847,6 +1857,71 @@ undefined+1//NaN
 + const: 块级作用域 定义后不可更改
 + var: 全局作用域，可重复定义
 
+```js
+function foo(arg1) {
+   let arg1 // SyntaxError: Identifier 'arg1' has already been declared
+   // var arg1 //no error
+}
+
+foo('arg1')
+```
+
+当你使用 let 试图重新声明一个已经作为函数参数存在的变量 arg1 时，JavaScript解释器会抛出一个错误，因为 let 不允许在同一作用域内重复声明同一个变量。因为函数参数名会出现在其「执行上下文/作用域」当中。
+
+在函数的第一行，便已经声明了 arg1 这个变量，函数体再用 let 声明，会报错.
+
+### 函数和变量提升
+```js
+var bar = function () {  
+  console.log('bar2');  
+};  
+  
+function bar() {  
+  console.log('bar1');  
+}  
+  
+bar(); // bar2
+```
+首先，function bar() {...} 被提升到代码块的顶部。
+
+然后，var bar;（这是var bar = function() {...};的变量提升部分）也被提升到代码块的顶部，但它位于函数声明之后。
+
+由于变量提升只提升了变量的声明，而没有提升其赋值，所以在函数声明之后，var bar; 仅仅是声明了一个变量，但没有给它赋值。
+
+接下来，当执行到var bar = function() {...};时，bar变量被赋予了一个新的函数值，这个值覆盖了之前通过函数声明创建的bar函数。
+
+> 总结：在JavaScript中，函数声明会覆盖同名的变量声明，`但变量赋值（特别是函数表达式赋值）会覆盖同名的函数声明`。这就是为什么输出是bar2的原因。
+
+```js
+foo(10);
+function foo(num) {
+  console.log(foo);
+  foo = num;
+  console.log(foo);
+  var foo;
+}
+
+console.log(foo);
+foo = 1;
+console.log(foo);
+
+// undefined
+// 10
+// ƒ foo (num) {
+//    console.log(foo)
+//    foo = num     
+//    console.log(foo)
+//    var foo
+// }
+// 1
+```
+在 foo(10) 执行时，函数体内进行变量提升后，函数体内第一行输出 undefined，函数体内第三行输出 foo。接着运行代码，到了整体第 8 行，console.log(foo) 输出 foo 函数内容（因为 foo 函数内的 foo = num，将 num 赋值给的是函数作用域内的 foo 变量。）
+
+> 结论　作用域在预编译阶段确定，但是作用域链是在执行上下文的创建阶段完全生成的。因为函数在调用时，才会开始创建对应的执行上下文。执行上下文包括了：变量对象、作用域链以及 this 的指向
+
+![执行上下问](book_files/42.jpg)
+
+
 ### 作用域的理解
 作用域（Scope）指的是变量和函数`可访问的区域或范围`。
 
@@ -1856,7 +1931,7 @@ undefined+1//NaN
 
 #### 词法作用域案例
 
-词法作用域，也被称为`静态作用域`，是定义在词法阶段的作用域，即在写代码时就已经**确定了变量和函数**的作用范围。词法作用域关注的是函数在`何处声明`，而不是从何处调用。
+词法作用域，也被称为`静态作用域`，是定义在词法阶段的作用域，即在**写代码时**就已经**确定了变量和函数**的作用范围。词法作用域关注的是函数在`何处声明`，而不是从何处调用。
 ```js
 var a = 2;
 function foo(){
@@ -2035,6 +2110,78 @@ fn()
 ![图](book_files/39.jpg)
 ![图](book_files/40.jpg)
 
+#### 闭包案例
+```js
+const foo = () => {
+   var arr = []
+   var i
+
+   for (i = 0; i < 10; i++) {
+       arr[i] = function () {
+           console.log(i)
+       }
+   }
+   return arr[0]
+}
+
+foo()()
+```
+答案：10，这时自由变量为 i，foo() 执行返回的是 arr[0], arr[0] 此时是函数：
+```js
+function () {    console.log(i) }
+```
+变量 i 值为 10。
+
+```js
+var fn = null
+const foo = () => {
+   var a = 2
+   function innerFoo() {
+       console.log(a)
+   }
+   fn = innerFoo    
+}
+
+const bar = () => {
+   fn()
+}
+
+foo()
+bar()
+```
+正常来讲，根据调用栈的知识，foo 函数执行完毕之后，其执行环境生命周期会结束，所占内存被垃圾收集器释放，上下文消失。
+
+但是通过 innerFoo 函数赋值给 fn，fn 是全局变量，这就导致了 foo 的变量对象 a 也被保留了下来。所以函数 fn 在函数 bar 内部执行时，依然可以访问这个被保留下来的变量对象，输出结果为 2。
+
+```js
+var fn = null
+const foo = () => {
+   var a = 2
+   function innerFoo() {
+       console.log(c)            
+       console.log(a)
+   }
+   fn = innerFoo
+}
+
+const bar = () => {
+   var c = 100
+   fn()    
+}
+
+foo()
+bar()
+//Uncaught ReferenceError: c is not defined
+```
+在 bar 中执行 fn() 时，fn() 已经被复制为 innerFoo，变量 c 并不在其作用域链上，c 只是 bar 函数的内部变量。因此报错 ReferenceError: c is not defined。
+
+![c](book_files/256.jpg)
+
+在谷歌浏览器V8最新引擎执行上述代码，会发现value没有被引用
+
+加上引用后，会发现生成了闭包
+
+![闭包](book_files/257.jpg)
 
 ### 内存泄漏
 内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
@@ -2349,12 +2496,6 @@ let intNum = 55 // 10进制 55
 let num1 = 070 // 8进制 56 (0开头)
 let hexNum1 = 0xA //16进制 10(0x开头)
 ```
-
-#### undefined和null的区别
-+ undefined是声明后未赋值，而null通常表示一个空的对象引用(空指针)
-+ 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的`低位字节`中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
-+ 在两等情况下，二者相等，三等情况下则不相等
-
 #### 判断数据类型的方法
 + typeof可判断基础类型，函数类型和其他引用类型都返回object，注意null的特殊性
 + instanceOf可以用来测试构造函数的prototype属性是否出现在对象的`原型链`中的`任何位置`，它可以对引用类型准确判断，但是不能判断基础类型
@@ -2377,6 +2518,14 @@ console.log(f1.constructor) //不注释的话为F1,注释的话为F2
 console.log(f1 instanceof F1)//true
 console.log(f1 instanceof F2)//true
 ```
+
+### undefined和null的区别
++ undefined是声明后未赋值，而null通常表示一个空的对象引用(空指针)
++ 在早期的 JavaScript 引擎中，为了性能优化，`变量类型信息`被存储在一个变量的`低位字节`中。这些类型标签被用来快速判断变量的类型。由于当时的设计决策，null 和某些对象类型`共享`了相同的低位字节表示，这导致了 typeof null 返回 "object"。而undefined的typeof就是undefined
++ 在两等情况下，二者相等，三等情况下则不相等
++ `null+1 =>1 undefined+1+1 =>NaN(null运算Number(null)=>0)`
++ `传参时，如果function fun(arg1=arg2,arg2),此时fun(null,xxx)不会报错，而fun(undefined,xxx)会报arg还未赋值就引用的错误`
+
 
 ### 数据结构
 数据结构是计算机存储和组织数据的方式，它研究的是数据的`逻辑结构和物理结构`以及它们之间的相互关系
@@ -3413,7 +3562,7 @@ console.log(o2.fn()); // o2
 ```
 以上方法同样应用了那个重要的结论：this 指向最后调用它的对象。在上面的代码中，我们提前进行了赋值操作，将函数 fn 挂载到 o2对象上，fn 最终作为 o2 对象的方法被调用。
 
-### 1
+### bind和new的优先级问题以及箭头函数的指向
 ```js
 function foo(a) {
 	this.a = a
@@ -3431,6 +3580,56 @@ console.log(obj1.a)
 //2
 ```
 > bar 函数本身是通过 bind 方法构造的函数，其内部已经将 this 绑定为 obj1，当它再次作为构造函数通过 new 被调用时，返回的实例就已经与obj1解绑了。也就是说，new 绑定修改了 bind 绑定中的 this 指向，因此 new 绑定的优先级比显式 bind 绑定的更高。
+
+```js
+function foo() {  
+  return a => {  
+    console.log(this.a); // 这里的this.a引用的是obj1.a，因为箭头函数捕获了foo函数执行时的this值  
+  };  
+}  
+  
+const obj1 = { a: 2 };  
+const obj2 = { a: 3 };  
+  
+const bar = foo.call(obj1); // bar现在是一个箭头函数，它捕获了obj1作为this的值  
+bar.call(obj2); // 打印2，因为this.a引用的是obj1.a，忽略obj2  
+```
+
+在您调用 foo.call(obj1) 时，foo 函数内部的 this 被绑定到了 obj1。然后，foo 函数返回了一个箭头函数，这个箭头函数捕获了 foo 函数执行时的 this 值，即 obj1。
+
+因此，当您调用 bar.call(obj2) 时，您试图改变 bar 函数内部的 this 值，但这是不可能的，因为 bar 是一个箭头函数。箭头函数忽略 call、apply 或 bind 方法传入的 this 值。
+
+由于 bar 内部的 console.log(this.a) 仍然引用的是 obj1.a（因为 bar 是一个捕获了 foo 函数 this 值的箭头函数），所以它会打印 2。
+
+```js
+var a = 123
+const foo = () => a => {
+	console. log(this.a)
+}
+
+const obj1 = { a: 2 }
+
+const obj2 = { a: 3 }
+
+const bar = foo.call(obj1)
+bar.call(obj2)//123
+```
+在返回的箭头函数中，您试图访问 this.a。但是，由于这是一个箭头函数，它不会绑定自己的 this 值，而是捕获其定义时所在上下文的 this 值。在这种情况下，this 指向全局对象（在浏览器中是 window），而全局对象上有一个 a 属性，其值为 123。
+
+```js
+let a = 123
+const foo = () => a => {
+	console. log(this.a)
+}
+
+const obj1 = { a: 2 }
+
+const obj2 = { a: 3 }
+
+const bar = foo.call(obj1)
+bar.call(obj2)//undefined
+```
+> 使用 const let声明的变量不会挂载到 window 全局对象上。因此，this 指向 windows 时，自然也找不到 a 变量了
 
 #### call appy bind的用法和区别
 都是JavaScript中用于改变函数执行上下文（即this的指向）的方法
@@ -12858,6 +13057,60 @@ var minDepth = function(root) {
 };
 ```
 
+### 二叉树层序遍历
+给你二叉树的根节点 root ，返回其节点值的 层序遍历 。 （即逐层地，从左到右访问所有节点）。
+![0](book_files/255.jpg)
+
+输入：root = [3,9,20,null,null,15,7]
+
+输出：[[3],[9,20],[15,7]]
+ 
+![1](book_files/253.jpg)
+
+![2](book_files/254.jpg)
+
+
+### 二叉树的中序遍历
+![图](book_files/258.jpg)
+
+```
+输入：root = [1,null,2,3]
+输出：[1,3,2]
+```
+
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var inorderTraversal = function(root) {
+    const arr = []
+    const fun = function(tree){
+        if(!tree) return []
+        if(tree.left) fun(tree.left)
+        arr.push(tree.val)
+        if(tree.right) fun(tree.right)
+    }
+    fun(root)
+    return arr
+};
+```
+
+![迭代实现](book_files/259.jpg)
+
+### 路径之和
+![路径之和](book_files/261.jpg)
+
+![如图所示](book_files/260.jpg)
+
 
 
 
@@ -15593,3 +15846,11 @@ option = {
     ]
 };
 ```
+
+## 其他构建工具
+
+## koa express
+
+## css预编译语言
+
+## 微前端
