@@ -139,6 +139,7 @@
       - [for...of 对象适配](#forof-对象适配)
     - [this指向](#this指向)
       - [this隐式绑定丢失](#this隐式绑定丢失)
+      - [this的案例](#this的案例)
       - [call appy bind的用法和区别](#call-appy-bind的用法和区别)
     - [new操作做了什么](#new操作做了什么)
     - [JS基本类型的装箱与拆箱](#js基本类型的装箱与拆箱)
@@ -399,11 +400,15 @@
     - [浅谈前端性能优化](#浅谈前端性能优化)
     - [长列表虚拟列表](#长列表虚拟列表)
   - [数据结构](#数据结构-1)
+    - [树的遍历](#树的遍历)
+    - [二叉树先中后序遍历](#二叉树先中后序遍历)
+      - [非递归实现先中后序遍历](#非递归实现先中后序遍历)
     - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
     - [堆和二叉树的关系](#堆和二叉树的关系)
     - [两个数组选找交集](#两个数组选找交集)
     - [两数之和](#两数之和)
-    - [获取最长子串](#获取最长子串)
+    - [获取不重复最长子串长度](#获取不重复最长子串长度)
+    - [最小覆盖子串(滑动窗口解法)](#最小覆盖子串滑动窗口解法)
   - [算法](#算法)
     - [复杂度](#复杂度)
     - [递归](#递归)
@@ -416,6 +421,8 @@
     - [链表相加案例](#链表相加案例)
     - [删除排序链表中的重复元素](#删除排序链表中的重复元素)
     - [环形链表判断](#环形链表判断)
+    - [二叉树的最大深度](#二叉树的最大深度)
+    - [二叉树的最小深度](#二叉树的最小深度)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -3192,6 +3199,8 @@ for (let [key, value] of objectEntries(jane)) {
 
 
 ### this指向
+![this](book_files/252.jpg)
+
 this是一个关键字，它引用的是`当前执行上下文中`的对象。this的值取决于函数是如何被调用的，而不是函数被定义的位置。
 
 第一种是函数调用模式，当一个函数不是一个对象的属性时，直接作为函数来调用时，this 指向全局对象。【在严格模式环境中，默认绑定的this指向undefined】
@@ -3352,6 +3361,76 @@ obj1.fn = obj.fn;
 obj1.fn(); //时间跳跃
 ```
 虽然丢失了 obj 的隐式绑定，但是在赋值的过程中，**又建立了新的隐式绑定**，这里this就指向了对象 obj1。
+
+#### this的案例
+
+```js
+const o1 = {
+  text: 'o1',
+  fn: function() {
+		return this.text
+  }
+}
+
+const o2 = {
+  text: 'o2',
+  fn: function() {
+		return o1.fn();
+  }
+}
+
+const o3 = {
+  text: 'o3',
+  fn: function() {
+    var fn = o1.fn;
+    return fn();
+  }
+}
+
+console.log(o1.fn()); // o1
+console.log(o2.fn()); // o1
+console.log(o3.fn()); // undefined
+```
+如果需要让 console.log( o2.fn() ) 语句输出 o2，该怎么做?
+
+一般面试者可能会想到使用 bind，clll，apply 来对 this 的指向进行干预，这确实是一种思路。 但是面试官可能还会接着问:如果不能使用 bind，call， apply，还有别的方法吗?
+
+ 这个问题可以考在面试者对基础知识的掌程深度及随机应变的思维能力。答案是，当然还有别的方法，如下。
+```js
+const o1 = {
+  text: 'o1',
+  fn: function() {
+		return this.text
+  }
+}
+
+const o2 = {
+  text: 'o2',
+  fn: o1.fn
+}
+
+console.log(o2.fn()); // o2
+```
+以上方法同样应用了那个重要的结论：this 指向最后调用它的对象。在上面的代码中，我们提前进行了赋值操作，将函数 fn 挂载到 o2对象上，fn 最终作为 o2 对象的方法被调用。
+
+### 1
+```js
+function foo(a) {
+	this.a = a
+}
+
+const obj1 = {}
+var bar = foo.bind(obj1)
+bar(2)
+console.log(obj1.a)
+var baz = new bar(3)
+console.log(baz.a)
+console.log(obj1.a)
+//2
+//3
+//2
+```
+> bar 函数本身是通过 bind 方法构造的函数，其内部已经将 this 绑定为 obj1，当它再次作为构造函数通过 new 被调用时，返回的实例就已经与obj1解绑了。也就是说，new 绑定修改了 bind 绑定中的 this 指向，因此 new 绑定的优先级比显式 bind 绑定的更高。
 
 #### call appy bind的用法和区别
 都是JavaScript中用于改变函数执行上下文（即this的指向）的方法
@@ -11933,7 +12012,203 @@ console.log(a)
 
 + 集合：一种无需且唯一的数据结构，Set就是集合。常用于去重/交集/元素是否存在
 + 字典：是一种存储唯一值的数据结构，但是它以`键值对`的形式来存储，ES6中的Map就是字典
++ 树：一种分层的数据抽象模型，如DOM树，级联菜单，树型控件，JS中没有树的结构，不过可以用Object和Array来实现
 
+### 树的遍历
+1. 深度优先遍历
+2. 广度优先遍历
+
+![深度广度](book_files/246.jpg)
+
+![1](book_files/245.jpg)
+
+![2](book_files/247.jpg)
+
+```js
+let  tree= {
+	name:"a",
+	children:[
+		{
+			name:"b",
+			children:[
+				{
+					name:"d",
+					children:[
+						{
+							name:'h'
+						}
+					]
+				},
+				{
+					name:"e"
+				}
+			]
+		},
+		{
+			name:"c",
+			children:[
+				{
+					name:"f"
+				},
+				{
+					name:"g"
+				}
+			]
+		}
+	]
+}
+
+//深度
+function dfs(tree){
+	const root =tree.name
+	console.log(root)
+	tree?.children?.forEach(dfs)
+}
+// dfs(tree)
+
+// 广度 需要一个队列
+function bfs(tree){
+	const q = [tree]
+	while(q.length){
+		const n = q.shift()
+		console.warn(n.name)
+		n?.children?.forEach((el)=>{
+			q.push(el)
+		})
+	}
+}
+
+bfs(tree)
+```
+
+### 二叉树先中后序遍历
+
+![先序遍历](book_files/248.jpg)
+
+![中序遍历](book_files/249.jpg)
+
+![后序遍历](book_files/250.jpg)
+
+```js
+const bs = {
+	val:1,
+	left:{
+		val:2,
+		left:{
+			val:4,
+			left:null,
+			right:null
+		},
+		right:{
+			val:5,
+			left:null,
+			right:null
+		}
+	},
+	right:{
+		val:3,
+		left:{
+			val:6,
+			left:null,
+			right:null
+		},
+		right:{
+			val:7,
+			left:null,
+			right:null
+		}
+	}
+}
+function left(bs){
+	console.log(bs?.val)
+	if(bs.left)left(bs.left)
+	if(bs.right)left(bs.right)
+}
+left(bs)
+// 1 2 4 5 3 6 7
+```
+```
+   1
+ 2   3
+4 5 6 7
+```
+```js
+// 中序遍历
+function inorder(root){
+	if(!root) return
+	inorder(root.left)
+	console.log(root.val)
+	inorder(root.right)
+}
+inorder(bs)// 4 2 5 1 6 3 7
+```
+```js
+function postorder(root){
+	if(!root) return
+	postorder(root.left)
+	postorder(root.right)
+	console.log(root.val)
+}
+postorder(bs)// 4 5 2 6 7 3 1
+```
+
+#### 非递归实现先中后序遍历
+先序遍历
+```js
+function preorder(root){
+	if(!root) return 
+	const stack = [root]
+	while(stack.length){
+		const data= stack.pop()
+		console.log(data.val)
+		data.right && stack.push(data.right)
+		data.left && stack.push(data.left)
+	}
+}
+preorder(bs)
+```
+```
+   1
+ 2   3
+4 5 6 7
+```
+中序遍历
+```js
+function inorder(root){
+	if(!root) return
+	const stack = []
+	let p = root
+	while(stack.length || p){
+		while(p){ 
+			stack.push(p)
+			p = p.left
+		}
+		const n = stack.pop()
+		console.log(n.val)
+		p =n.right
+	}
+}
+inorder(bs) //4 2 5 1 6 3 7
+```
+后序遍历
+```js
+function postorder(root){
+	if(!root) return
+	const stack = [root]
+	const nextStack = []
+	while(stack.length){
+		const data= stack.pop()
+		nextStack.push(data)
+		data.left && stack.push(data.left)
+		data.right && stack.push(data.right)
+	}
+	while(nextStack.length){
+		const n =nextStack.pop()
+		console.log(n.val)
+	}
+}
+postorder(bs)// 4 5 2 6 7 3 1
+```
 
 ### 把一个数组改成一个单向链表
 ```js
@@ -12066,9 +12341,47 @@ function lengthOfLongestSubstring(s){
 }
 
 console.log(lengthOfLongestSubstring("abbcdea"))
-
 ```
 
+### 最小覆盖子串(滑动窗口解法)
+```js
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {string}
+ */
+var minWindow = function (s, t) {
+  let l = 0;
+  let r = 0;
+  let res = "";
+  const m = new Map();
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    // 放入字典表
+    m.set(c, m.has(c) ? m.get(c) + 1 : 1);
+  }
+  let needType = m.size;
+  while (r < s.length) {
+    const c = s[r];
+    if (m.has(c)) {
+      m.set(c, m.get(c) - 1);
+      if (m.get(c) === 0) needType -= 1;
+    }
+    while (needType === 0) {
+      const c2 = s[l];
+      let newRes = s.slice(l, r + 1);
+      if (!res || newRes.length < res.length) res = newRes;
+      if (m.has(c2)) {
+        m.set(c2, m.get(c2) + 1);
+        if (m.get(c2) === 1) needType += 1;
+      }
+      l++;
+    }
+    r++;
+  }
+  return res;
+};
+```
   
 
 
@@ -12476,6 +12789,73 @@ function hasCycle(head) {
   }
   return true;
 }
+```
+
+### 二叉树的最大深度
+给定一个二叉树 root ，返回其最大深度。
+
+二叉树的 最大深度 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+![二叉树](book_files/251.jpg)
+
+深度优先
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+   let res =0 
+   const dfs = (n,l) =>{
+    if(!n) return 
+	// 检查当前节点 n 是否没有左子节点（!n.left）且没有右子节点（!n.right）。
+	// 换句话说，它检查当前节点 n 是否是一个叶子节点（即没有子节点的节点）。
+    if(!n.left && !n.right){
+        res = Math.max(res , l)
+    }
+    dfs(n.left,l+1)
+    dfs(n.right,l+1)
+   }
+   dfs(root,1)
+   return res
+};
+```
+
+### 二叉树的最小深度
+广度优先
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDepth = function(root) {
+   if(!root) return 0 
+   const q =[[root,1]]
+   while(q.length){
+    const [n,l] = q.shift()
+    if(!n.left && !n.right){
+        return l
+    }
+    if(n.left) q.push([n.left,l+1])
+    if(n.right) q.push([n.right,l+1])
+   }
+};
 ```
 
 
