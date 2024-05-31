@@ -3,10 +3,10 @@
 		font-family: "Consolas", "topWebfont","宋体"
 	}
 	strong,b{
-		color:#F97583
+		color:#E74C3C
 	}
 	code{
-		color:green;
+		color:#9400D3;
 		font-family:"楷体" !important;
 		font-size:16px !important;
 	}
@@ -16,10 +16,11 @@
 		/* text-decoration: underline; */
 		font-weight:normal;
 		display:inline-block;
-		border-bottom: 1px solid green
+		border-bottom: 1px dashed red;
+		text-indent:0em
 	}
 	a{
-		color:purple !important;
+		color:#20B2AA !important;
 	}
 	.markdown-body blockquote{
 		border-left:3px solid red !important
@@ -27,8 +28,11 @@
 	p{
 		text-indent:2em
 	}
+	blockquote p,li p{
+		text-indent:0em
+	}
 	.markdown-body h2{
-		border-top:2px solid purple !important;
+		border-top:2px solid #20B2AA !important;
 		padding-top:10px !important
 	}
 </style>
@@ -43,7 +47,9 @@
     - [说说常用的 meta 标签](#说说常用的-meta-标签)
     - [meta作用](#meta作用)
       - [HTML meta viewport属性](#html-meta-viewport属性)
+    - [DOCTYPE的作用？严格模式和混杂模式的区别？](#doctype的作用严格模式和混杂模式的区别)
     - [HTML5 为什么只需要写 !DOCTYPE HTML](#html5-为什么只需要写-doctype-html)
+      - [SGML](#sgml)
     - [iframe有哪些优点和缺点](#iframe有哪些优点和缺点)
     - [H5新增属性](#h5新增属性)
   - [css](#css)
@@ -66,6 +72,7 @@
       - [可继承](#可继承)
     - [伪类和伪元素的区别](#伪类和伪元素的区别)
       - [伪类 伪元素有哪些](#伪类-伪元素有哪些)
+    - [first-child和first-of-type/nth-child和nth-of-type](#first-child和first-of-typenth-child和nth-of-type)
     - [css元素隐藏](#css元素隐藏)
     - [css画三角形](#css画三角形)
     - [css视差滚动实现方案](#css视差滚动实现方案)
@@ -75,7 +82,7 @@
     - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
     - [postcss](#postcss)
   - [js](#js)
-    - [window.getComputedStyle(element) 获取伪类中的内容](#windowgetcomputedstyleelement-获取伪类中的内容)
+    - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
     - [js 类型转换机制](#js-类型转换机制)
     - [let const var](#let-const-var)
@@ -106,6 +113,7 @@
     - [== 和 ===](#-和-)
       - [==的注意之处](#的注意之处)
       - [\[\]==!\[\] {}==!{}的结果](#-的结果)
+    - [实现a==1\&\&a==2\&\&a==3](#实现a1a2a3)
     - [Object.is() 与比较操作符 “===”、“==” 的区别？](#objectis-与比较操作符--的区别)
     - [判断对象是空对象](#判断对象是空对象)
     - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
@@ -120,6 +128,7 @@
     - [数组常用的方法](#数组常用的方法)
       - [影响到原数组的方法](#影响到原数组的方法)
       - [数组reduce方法应用场景](#数组reduce方法应用场景)
+      - [数组扁平化实现方案](#数组扁平化实现方案)
     - [数组中对象的排序](#数组中对象的排序)
     - [函数缓存](#函数缓存)
     - [event loop](#event-loop)
@@ -344,6 +353,7 @@
     - [Window.onload和 DOMContentLoaded（即ready）区别](#windowonload和-domcontentloaded即ready区别)
     - [服务端返回xml](#服务端返回xml)
     - [前端图片转base64](#前端图片转base64)
+    - [如何获取文档中任意一个元素距离文档 document 顶部的距离？](#如何获取文档中任意一个元素距离文档-document-顶部的距离)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -545,7 +555,7 @@ src 是 source 的缩写，它通常用于 img、video、audio、script 元素�
 href 是 hyper reference 的缩写，意味「超引用」，它通常用于 a、link 元素，通过 href 属性，`可以标识文档中引用的其他超文本。`
 
 ### 说说常用的 meta 标签
-meta 标签提供关于HTML文档的元数据。元数据不会显示在页面上，但是对于机器是可读的。它可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
+meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页面上，但是对于机器是可读的。它可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
 
 常用的 meta 标签的属性有：
 1. content ，设置或返回 meta 元素的 content 属性的值 。
@@ -574,7 +584,18 @@ meta 标签提供关于HTML文档的元数据。元数据不会显示在页面�
 3. minimum-scale和maximum-scale：设置允许用户进行缩放的最小和最大比例
 4. user-scalable：设置用户是否可以手动缩放网，可以设置为yes或no，通过设置不同的meta viewport属性值，开发者可以实现响应式设计，使网页在不同设备上呈现出最佳的显示效果
 
+### DOCTYPE的作用？严格模式和混杂模式的区别？
+！DOCTYPE告诉浏览器以HTML5标准解析页面，如果不写，则进入混杂模式
+
+严格模式（标准模式）：`以w3c标准解析代码`
+
+混杂模式（怪异模式）：`浏览器用自己的方式解析代码`，混杂模式通常模拟老式浏览器的行为，以防止老站点无法工作
+
+HTML5 没有 DTD ，因此也就没有严格模式与混杂模式的区别，HTML5 有相对宽松的方法，实现时，已经尽可能大的实现了向后兼容(`HTML5 没有严格和混杂之分`)。
+
 ### HTML5 为什么只需要写 !DOCTYPE HTML
+HTML（HyperText Markup Language）是人们从SGML中提取出来的一个微小子集。
+
 是因为 HTML5 不基于 SGML，所以不需要引用 DTD。
 
 在 HTML 4.01 中，<!DOCTYPE> 声明引用 DTD，因为 HTML 4.01 基于 SGML。
@@ -584,10 +605,13 @@ DTD 规定了标记语言的规则，这样浏览器才能正确地呈现内容�
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 ```
 
+#### SGML
+Standard Generalized Markup language，标准通用标记语言
+
 ### iframe有哪些优点和缺点
 1. 优点：
 	+ 灵活性
-	+ 代码复用(header和aside等可以不考虑)
+	+ **代码复用**(header和aside等可以不考虑)
 	+ 独立性
 	+ 展现嵌入的网页
 	+ 加载速度较慢的内容，如广告
@@ -595,17 +619,37 @@ DTD 规定了标记语言的规则，这样浏览器才能正确地呈现内容�
 
 2. 缺点：
 	+ **iframe会阻塞主页面onload事件（可考虑iframe异步代码）**
-	+ 不利于搜索引擎识别
-	+ 增加http请求
+	+ **不利于搜索引擎识别**
+	+ **增加http请求**
 	+ 会增加页面的加载时间和渲染复杂度
 	+ 嵌入的内容可能来自不受信任的第三方网站，这可能会导致一些安全风险
 	+ 响应性问题：iframe内容的大小通常是固定的，这可能导致响应性问题，特别是在移动设备上
+
+```js
+// 比如动态添加一个广告弹窗
+window.onload = function() {  
+    console.log('Main page loaded!');  
+    // 动态创建iframe  
+    var iframe = document.createElement('iframe');  
+    iframe.id = 'myIframe';  
+    iframe.width = 500;  
+    iframe.height = 300;  
+    iframe.onload = function() {  
+        console.log('Iframe loaded!');  
+        // iframe加载完成后执行的代码  
+    };  
+    // 将iframe添加到页面中  
+    document.body.appendChild(iframe);  
+    // 设置iframe的src，开始加载内容  
+    iframe.src = 'https://example.com/some-iframe-content.html';  
+};
+```
 
 ### H5新增属性
 1. 语义标签 `<footer><nav>`等
 2. 表单功能增强 `<input type="submit"><input type="email">` oninvalid 当验证不通过时触发此事件等
 3. 新增了音频和视频
-4. 对canvas和svg的支持度
+4. 新增canvas
 5. 地理定位
 6. 拖放API `<div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`
 7. Web Worker
@@ -892,7 +936,7 @@ margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 + flex grid
 + absolute + margin
 + 圣杯布局：center left right在同一层级全部浮动，父级设左右padding，左侧：margin-left:-100% + 定位right对应宽度，右边margin-right对应宽度 
-+ 双飞翼布局：多一个div包裹，中间div用margin不是padding，左侧不需要再借助定位改变位置，右侧不需要通过margin-right直接使用margin-left即可
++ 双飞翼布局：多一个div包裹，中间div用margin不是padding，左侧不需要再借助定位改变位置，右侧不需要通过margin-right直接使用`margin-left`即可
 
 ```html
 <style>
@@ -1011,7 +1055,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 1. 为内容区域添加最小的高度
 	+ min-height
 	+ padding-bottom top元素
-	+ margin-top bottom元素(margin负值的应用)
+	+ `margin-top bottom元素(margin负值的应用)`
 
 ```html
 <!DOCTYPE html>
@@ -1122,6 +1166,7 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 + 百分比
 + vw/vh
 + rem
++ rpx全称“response pixel”，即响应式的px,小程序专用
 
 ### 元素水平垂直居中
 + position 定位四个方向值一致，margin:auto
@@ -1485,7 +1530,7 @@ body {
 + **align-items**:`设置侧轴上的子元素排列方式（单行）`
 + align-self:`允许单个项目有与其他项目不一样的对齐方式`，可覆盖align-items属性。
 + flex-flow:复合属性，相当于同时设置了flex-direction 和 flex-wrap
-+ order：定义项目的排列顺序。数值越小，排列越靠前，默认为0。
++ order：定义项目的排列顺序。**数值越小，排列越靠前**，默认为0。
 
 ```css
 .box {
@@ -1493,7 +1538,7 @@ body {
 }
 ```
 + space-between：两端对齐，项目之间的间隔都相等。
-+ space-around：每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
++ space-around：**每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。**
 
 ![1](book_files/14.jpg)
 
@@ -1526,13 +1571,13 @@ body {
 
 
 ### 元素竖向的百分比设定是相对于容器的高度吗？
-当按百分比设定一个元素的宽度时，它是相对于父容器的宽度计算的，但是，对于一些表示竖向距离的属性，例如 `padding-top , padding-bottom , margin-top , margin-bottom` 等，当按百分比设定它们时，依据的也是父容器的`宽度`，而不是高度。
+当按百分比设定一个元素的宽度时，它是相对于**父容器的宽度**计算的，但是，对于一些表示竖向距离的属性，例如 `padding-top , padding-bottom , margin-top , margin-bottom` 等，当按百分比设定它们时，依据的也是父容器的`宽度`，而不是高度。
 
 ### css选择器
 id选择器 标签选择器 类选择器 后代选择器 子选择器(div>p) 相邻选择器(a+div) 群组选择器(div,p 选择所有div和p) 伪类选择器 伪元素选择器 属性选择器 层级选择器(p~ul 选择前面有p元素的所有ul)
 
 #### css选择器读取顺序
-CSS选择器的解析是从右向左解析的。若从左向右的匹配，发现不符合规则，需要进行回溯，会损失很多性能。
+CSS选择器的解析是从右向左解析的。若从左向右的匹配，发现不符合规则，需要进行`回溯`，会损失很多性能。
 
 若从右向左匹配，先找到所有的最右节点，对于每一个节点，向上寻找其父节点直到找到根元素或满足条件的匹配规则，则结束这个分支的遍历。
 
@@ -1545,11 +1590,11 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 
 ### 伪类和伪元素的区别
 1. 用途：
-	+ 伪类主要用于为某些元素添加一些特殊的效果，这些效果通常是基于元素的某种状态来触发的，例如用户与元素的交互行为（如鼠标悬停、点击等）或元素的特定状态（如链接被访问过、元素获得焦点等）。伪类可以用于改变这些状态下元素的样式。
-	+ 伪元素则用于在某些元素的前面或后面添加一些内容或样式，这些内容或样式是虚拟的，不会出现在DOM结构中，但可以通过CSS进行样式控制。伪元素通常用于向元素添加装饰性的内容或样式，如添加下划线、背景图像等。
+	+ 伪类主要用于为某些元素添加一些**特殊的效果**，这些效果通常是基于元素的某种状态来触发的，例如用户与元素的交互行为（如鼠标悬停、点击等）或元素的**特定状态**（如链接被访问过、元素获得焦点等）。伪类可以用于改变这些状态下元素的样式。
+	+ 伪元素则用于在某些元素的前面或后面添加一些**内容或样式**，这些内容或样式是虚拟的，不会出现在DOM结构中，但可以通过CSS进行样式控制。伪元素通常用于向元素添加装饰性的内容或样式，如添加下划线、背景图像等。
 2. 表示方式：
-	+ 伪类通常用单冒号“:”来表示，例如:hover、:active、:visited等。
-	+ 伪元素则用双冒号“::”来表示，这是为了与伪类进行区分。常见的伪元素有::before、::after、::first-letter、::first-line等。
+	+ 伪类通常用单冒号“:”来表示，例如`:hover、:active、:visited`等。
+	+ 伪元素则用双冒号“::”来表示，这是为了与伪类进行区分。常见的伪元素有`::before、::after、::first-letter、::first-line`等。
 3. 匹配原理：
 	+ 伪类是基于元素的状态来匹配的，当元素处于特定的状态时，伪类选择器就会生效，从而改变元素的样式。
 	+ 伪元素则是基于元素的位置来创建的，它们并不与文档中的任何元素直接对应，而是根据CSS规则在元素的内容之前或之后生成虚拟的内容或样式。
@@ -1571,9 +1616,86 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 	- ::marker：选择列表项的标记，如无序列表中的项目符号点或有序列表中的数字。
 	- ::selection：选择用户选择的文本部分。
 
+### first-child和first-of-type/nth-child和nth-of-type
++ :first-child: 表示在**一组兄弟元素**中的第一个元素，符合要求即匹配对应css样式,不符合就结束
++ :first-of-type:表示一组兄弟元素中**其类型**的第一个元素(存在一个查找的过程)匹配
++ :nth-child(n)和:first-child(n)规则基本一直，只是要找的是第n个元素(按位置判断)
++ :nth-of-type同:first-of-type:规则，第n个该类型的元素(按类型判断)
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<style>
+			*{
+				margin:0;
+				padding:0;
+			}
+			.k1,.k2{
+				border:1px solid ;
+			}
+			.k1 section:first-child{
+				color:red
+			}
+			.k2 section:first-of-type{
+				color:blue
+			}
+		</style>
+	</head>
+	<body>
+		<div class="k1">
+			<section>第一个section</section>
+			<div>
+				<section>div里的一个section</section>
+				<section>
+					<div>xxxxxx</div>
+					<section>999999</section>
+				</section>
+			</div>
+			<div>
+				<div>122222</div>
+				<section>9999</section>
+				<div>
+					<section>2222</section>
+				</div>
+				<section>
+					<section>1</section>
+					<section>2</section>
+					<section>3</section>
+				</section>
+			</div>
+		</div>
+		<div class="k2">
+			<section>第一个section</section>
+			<div>
+				<section>div里的一个section</section>
+				<section>
+					<div>xxxxxx</div>
+					<section>999999</section>
+				</section>
+			</div>
+			<div>
+				<div>122222</div>
+				<section>9999</section>
+				<section>3333</section>
+			</div>
+		</div>
+	</body>
+</html>
+```
+
+![first-child](book_files/265.jpg)
+
+![first-of-type](book_files/266.jpg)
+
+
+
 ### css元素隐藏
 + display:none
-+ visibility:didden
++ visibility:hidden
 + opacity:0
 + 宽高设为0
 + 定位出可视区
@@ -1585,7 +1707,6 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 可以看到,设置不同颜色的各个边框，就会发现边框是梯形，极限情况下，width height为0，其他边框颜色留一个边框就可以得到三角形
 
 ![三角形](book_files/19.jpg)
-
 
 ### css视差滚动实现方案
 + perspective  transform: translateZ() scale();
@@ -1722,7 +1843,7 @@ transform-style 属性指定嵌套元素是怎样在三维空间中呈现。
 
 ### css性能优化
 1. 内联首屏`关键css`，可下载完html立刻渲染，不需要外链下载再渲染，但是不能缓存且代码不能过多(阻塞)
-2. 异步加载css
+2. **异步加载css**
 ```js
 //方案1
 const myCSS = document.createElement( "link" );
@@ -1743,9 +1864,10 @@ ia='all'">
 esheet'">
 ```
 3. 资源压缩 webpack gulp
-4. 选择器(从右往左执行，不要写太多层级div #x 直接写 #x更快)，尽量不用通配符和属性选择器
-5. 减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能
-6. 少使用@import
+4. 避免过度约束，选择器(从右往左执行，不要写太多层级div #x 直接写 #x更快)，尽量不用通配符和属性选择器
+5. 避免！important，可以选择其他选择器
+6. 减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能
+7. 少使用@import
 
 ### 协同开发css类名冲突解决方案
 1. css module
@@ -1773,8 +1895,8 @@ PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。�
 
 ## js
 
-### window.getComputedStyle(element) 获取伪类中的内容
-1. 返回一个对象，可得到元素的所有 CSS 属性的值。私有的 CSS 属性值可以通过对象提供的 API 或通过简单地使用 CSS 属性名称进行索引来访问。
+### 获取伪类中的内容
+1. window.getComputedStyle(element):返回一个对象，可得到元素的所有 CSS 属性的值。私有的 CSS 属性值可以通过对象提供的 API 或通过简单地使用 CSS 属性名称进行索引来访问。
 
 ```js
 let div1 = document.getElementById('div1')
@@ -1916,11 +2038,6 @@ console.log(foo);
 // 1
 ```
 在 foo(10) 执行时，函数体内进行变量提升后，函数体内第一行输出 undefined，函数体内第三行输出 foo。接着运行代码，到了整体第 8 行，console.log(foo) 输出 foo 函数内容（因为 foo 函数内的 foo = num，将 num 赋值给的是函数作用域内的 foo 变量。）
-
-> 结论　作用域在预编译阶段确定，但是作用域链是在执行上下文的创建阶段完全生成的。因为函数在调用时，才会开始创建对应的执行上下文。执行上下文包括了：变量对象、作用域链以及 this 的指向
-
-![执行上下问](book_files/42.jpg)
-
 
 ### 作用域的理解
 作用域（Scope）指的是变量和函数`可访问的区域或范围`。
@@ -2187,7 +2304,7 @@ bar()
 内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
 
 #### 垃圾回收机制GC
-原理：垃圾收集器会定期找出不再继续使用的变量，然后释放其内存
+原理：***垃圾收集器会定期找出不再继续使用的变量，然后释放其内存***
 
 + 标记清除算法：
 
@@ -2447,6 +2564,41 @@ console.warn({} == !{})//false
 // Number('[object Object]') -> NaN
 ```
 
+### 实现a==1&&a==2&&a==3
+```js
+//重写toString
+let a={
+	x:0,
+	toString(){
+		console.log(`执行${this.x}`)
+		return ++this.x
+	}
+}
+
+//数据劫持
+var i=0
+Object.defineProperty(window,"a",{
+	get(){
+		return ++i;
+	}
+})
+
+//数组
+var a=[1,2,3]
+a.toString =a.shift
+
+ 
+if(a==1&&a==2&&a==3){
+	console.log("成功")
+}
+
+// + 先toString方法
+// + null==undefined
+// + NaN!=NaN
+// + 能转变成数字的如果需要可以转成数字
+```
+
+
 ### Object.is() 与比较操作符 “===”、“==” 的区别？
 1. 使用双等号（==）进行相等判断时，如果两边的类型不一致，则会进行强制类型转化后再进行比较。
 2. 使用三等号（===）进行相等判断时，如果两边的类型不一致时，不会做强制类型准换，直接返回 false。
@@ -2501,6 +2653,7 @@ let hexNum1 = 0xA //16进制 10(0x开头)
 + instanceOf可以用来测试构造函数的prototype属性是否出现在对象的`原型链`中的`任何位置`，它可以对引用类型准确判断，但是不能判断基础类型
 + Object.prototype.toString [object xxx]
 + 构造函数:存在风险，可以判断包括简单类型、引用类型的构造函数
++ Array.isArray 判断数组
 
 ```js
 (2).constructor
@@ -2733,6 +2886,63 @@ console.log(str)
 ```
 去重等等……
 
+#### 数组扁平化实现方案
+1. 使用递归
+2. reduce(递归)
+
+
+```js
+function flattenArrayWithReduce(arr) {  
+    return arr.reduce((acc, val) => {  
+        // 如果 val 是一个数组，则递归地调用 flattenArrayWithReduce  
+        // 否则，直接添加到累加器数组中  
+        return acc.concat(Array.isArray(val) ? flattenArrayWithReduce(val) : val);  
+    }, []); // 累加器的初始值是一个空数组  
+}  
+  
+// 示例  
+const nestedArray = [1, [2, [3, 4], 5], 6];  
+const flattenedArray = flattenArrayWithReduce(nestedArray);  
+console.log(flattenedArray); // 输出: [1, 2, 3, 4, 5, 6]
+```
+
+3. 使用扩展运算符
+4. 使用 flat 方法（ES2019）
+
+```js
+const nestedArray = [1, [2, [3, 4], 5], 6];  
+const flattenedArray = nestedArray.flat(Infinity); // Infinity 确保无论嵌套多深，都能扁平化  
+console.log(flattenedArray); // 输出: [1, 2, 3, 4, 5, 6]
+```
+
+5. 堆栈法
+
+```js
+function flattenArrayWithStack(arr) {  
+	    const stack = [...arr]; // 将数组转换为堆栈  
+	    const result = []; // 存放扁平``````													`			化后的结果  
+	    while (stack.length > 0) {  
+	        const current = stack.pop(); // 弹出堆栈顶部的元素  
+	        if (Array.isArray(current)) {  
+	            // 如果当前元素是数组，则将其元素推入堆栈  
+	            for (let i = current.length - 1; i >= 0; i--) {  
+	                stack.push(current[i]);  
+	            }  
+	        } else {  
+	            // 如果当前元素不是数组，则添加到结果数组中  
+	            result.push(current);  
+	        }  
+	    }  
+	    return result;  
+	}  
+	  
+	// 示例  
+	const nestedArray = [1, [2, [3, 4], 5],[8,9,[10,11]], 6];  
+	const flattenedArray = flattenArrayWithStack(nestedArray);  
+	console.log(flattenedArray)//[6, 8, 9, 10, 11, 2, 3, 4, 5, 1]
+```
+
+
 ### 数组中对象的排序
 根据value从小到大排序
 ```js
@@ -2873,7 +3083,7 @@ setTimeout(() => {
 ![图2](book_files/32.jpg)
 ![图3](book_files/34.jpg)
 
-特殊之处：Function的构造函数是自己；Function的prototype和__proto__都指向`Function.prototype`，Function作为对象时，它的`__proto__`指向它构造函数的prototype。Object的构造函数也是Function,同时`一切对象又是Object创建`。
+特殊之处：Function的构造函数是自己；Function的prototype和`__proto__`都指向`Function.prototype`，Function作为对象时，它的`__proto__`指向它构造函数的prototype。Object的构造函数也是Function,同时`一切对象又是Object创建`。
 
 > 一切函数对象（包括Object），都是继承Function对象 
 
@@ -3059,7 +3269,7 @@ console.log( fn1() ) // 相当于 Promise.resolve(100)
     // new_file.html:34 Uncaught (in promise) some err
     console.log(res) // 不会执行
 })()
-使用try…catch捕获异常
+//使用try…catch捕获异常
 (async function () {
     const p4 = Promise.reject('some err')
     try {
@@ -3303,8 +3513,8 @@ console.log(returnedTarget === target);
 ![参考](book_files/54.jpg)
 
 2. Object.entries(obj)，Object.keys(obj)，Object.values(obj)只会给出对应的obj 自身的可遍历属性
-3. Object.getOwnPropertyNames(obj) ：只获取对象自身的属性的key值，包括**可遍历的和不可遍历的属性**
-4. 如果响应的属性key是Symbol设置的，那么是无法通过以上方法遍历的 ,可借助Object.getOwnPropertySymbols获取属性是symbol的
+3. **Object.getOwnPropertyNames(obj)** ：只获取对象自身的属性的key值，包括**可遍历的和不可遍历的属性**
+4. 如果响应的属性key是Symbol设置的，那么是无法通过以上方法遍历的 ,可借助`Object.getOwnPropertySymbols`获取属性是symbol的
 
 ```js
 let obj = {}
@@ -3320,7 +3530,7 @@ Object.getOwnPropertySymbols(obj).forEach(el=>{
 ```
 5. for of也可以遍历有iterator接口的对象
 
-6. Reflect.ownKeys 方法返回一个由目标对象自身的属性键组成的数组。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
+6. **Reflect.ownKeys** 方法返回一个由目标对象自身的属性键组成的数组。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
 
 ![ownKeys](book_files/203.jpg)
 
@@ -10613,6 +10823,80 @@ reader.onload = function(e) {
 reader.readAsDataURL(file); // file是File或Blob对象
 ```
 
+### 如何获取文档中任意一个元素距离文档 document 顶部的距离？
+1. HTMLElement.offsetTop 为只读属性，它返回`当前元素相对于其 offsetParent 元素的顶部`内边距的距离。
+
+通过遍历目标元素、目标元素的父节点、父节点的父节点......依次溯源，并累加这些遍历过的节点相对于其最近祖先节点（且 position 属性非 static）的偏移量，向上直到 document，累加即可得到结果。
+```js
+const offset = ele => {
+    let result = {
+        top: 0,
+        left: 0
+    }
+    // 当前 DOM 节点的 display === 'none' 时, 直接返回 {top: 0, left: 0}
+    if (window.getComputedStyle(ele)['display'] === 'none') {
+        return result
+    }
+    let position
+    const getOffset = (node, init) => {
+        if (node.nodeType !== 1) {
+            return
+        }
+        position = window.getComputedStyle(node)['position']
+        if (typeof(init) === 'undefined' && position === 'static') {
+            getOffset(node.parentNode)
+            return
+        }
+        result.top = node.offsetTop + result.top - node.scrollTop
+        result.left = node.offsetLeft + result.left - node.scrollLeft
+        if (position === 'fixed') {
+            return
+        }
+        getOffset(node.parentNode)
+    }
+    getOffset(ele, true)
+    return result
+}
+```
+
+2. 方案2：getBoundingClientRect，用来描述一个元素的具体位置，这个位置的下面四个属性都是相对于视口左上角的位置而言的。
+
+![如图](book_files/262.jpg)
+
+```js
+const offset = ele => {
+    let result = {
+        top: 0,
+        left: 0
+    }
+    // 当前为 IE11 以下，直接返回 {top: 0, left: 0}
+    if (!ele.getClientRects().length) {
+        return result
+    }
+
+    // 当前 DOM 节点的 display === 'none' 时，直接返回 {top: 0, left: 0}
+    if (window.getComputedStyle(ele)['display'] === 'none') {
+        return result
+    }
+
+    result = ele.getBoundingClientRect()
+    var docElement = ele.ownerDocument.documentElement
+
+    return {
+        top: result.top + window.pageYOffset - docElement.clientTop,
+        left: result.left + window.pageXOffset - docElement.clientLeft
+    }
+}
+```
+
+node.ownerDocument.documentElement 的用法可能大家比较陌生，ownerDocument 是 DOM 节点的一个属性，它返回当前节点的顶层的 document 对象。ownerDocument 是文档，documentElement 是根节点。事实上，ownerDocument 下含 2 个节点：
+
+`<!DocType>`
+
+`documentElement`
+
+docElement.clientTop，clientTop 是一个元素顶部边框的宽度，不包括顶部外边距或内边距。
+
 
 
 
@@ -12211,6 +12495,13 @@ console.log(a)
 
 + 集合：一种无需且唯一的数据结构，Set就是集合。常用于去重/交集/元素是否存在
 + 字典：是一种存储唯一值的数据结构，但是它以`键值对`的形式来存储，ES6中的Map就是字典
++ 图：**网络结构的抽象模型，是一组有 **边** 连接的 **节点**，可用Object和Array来实现
+
+![1](book_files/263.jpg)
+
+![2](book_files/264.jpg)
+
+
 + 树：一种分层的数据抽象模型，如DOM树，级联菜单，树型控件，JS中没有树的结构，不过可以用Object和Array来实现
 
 ### 树的遍历
