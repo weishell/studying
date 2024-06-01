@@ -81,6 +81,8 @@
     - [css性能优化](#css性能优化)
     - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
     - [postcss](#postcss)
+    - [@namespace @document @page @supports在css中的作用](#namespace-document-page-supports在css中的作用)
+    - [CSS函数](#css函数)
   - [js](#js)
     - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -137,11 +139,6 @@
       - [函数的特殊性](#函数的特殊性)
     - [js如何实现继承](#js如何实现继承)
       - [继承的方案](#继承的方案)
-    - [Promise](#promise)
-      - [应用场景](#应用场景)
-    - [async await](#async-await)
-      - [async await异步本质](#async-await异步本质)
-    - [Generator理解和应用](#generator理解和应用)
     - [正则表达式](#正则表达式)
       - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
@@ -176,9 +173,9 @@
     - [跨域](#跨域)
       - [解决方案](#解决方案)
     - [web端常见的攻击方式](#web端常见的攻击方式)
+    - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
     - [如何捕获js异常](#如何捕获js异常)
     - [js计算精度丢失问题](#js计算精度丢失问题)
-    - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
     - [script异步加载顺序](#script异步加载顺序)
     - [ajax fetch axios](#ajax-fetch-axios)
     - [文件上传下载，原生js的实现原理](#文件上传下载原生js的实现原理)
@@ -196,7 +193,13 @@
     - [Decorator应用场景](#decorator应用场景)
     - [Proxy的应用场景](#proxy的应用场景)
     - [ES6中的Module](#es6中的module)
+    - [箭头函数与普通函数](#箭头函数与普通函数)
     - [Map与Object和 Set与Array的区别](#map与object和-set与array的区别)
+    - [Promise](#promise)
+      - [应用场景](#应用场景)
+    - [async await](#async-await)
+      - [async await异步本质](#async-await异步本质)
+    - [Generator理解和应用](#generator理解和应用)
   - [Typescript](#typescript)
     - [never类型的应用场景](#never类型的应用场景)
     - [联合类型的类型收窄操作](#联合类型的类型收窄操作)
@@ -268,6 +271,7 @@
       - [SPA首屏加载优化](#spa首屏加载优化)
       - [hisotory路由404](#hisotory路由404)
     - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
+    - [vue项目性能优化](#vue项目性能优化)
   - [Vue3](#vue3)
     - [与Vue2的不同](#与vue2的不同)
       - [功能改变](#功能改变)
@@ -302,9 +306,11 @@
     - [vue2和vue3的依赖注入区别](#vue2和vue3的依赖注入区别)
   - [React](#react)
     - [说说React特性](#说说react特性)
+    - [React18更新了哪些](#react18更新了哪些)
     - [state 和 props 区别](#state-和-props-区别)
     - [super() 和 super(props) 区别](#super-和-superprops-区别)
     - [类组件和函数组件的区别](#类组件和函数组件的区别)
+      - [react组件创建方式](#react组件创建方式)
       - [类组件的this绑定](#类组件的this绑定)
     - [react受控组件和非受控组件](#react受控组件和非受控组件)
     - [react事件机制](#react事件机制)
@@ -342,6 +348,7 @@
     - [react-router理解](#react-router理解)
       - [useSearchParams的应用](#usesearchparams的应用)
       - [react路由传参的形式](#react路由传参的形式)
+    - [redux工作原理](#redux工作原理)
     - [项目中使用redux，结构划分](#项目中使用redux结构划分)
       - [react-redux redux-thunk](#react-redux-redux-thunk)
   - [Angular](#angular)
@@ -452,11 +459,13 @@
     - [手写router](#手写router)
     - [统一封装axios的思量](#统一封装axios的思量)
   - [webpack](#webpack)
+    - [Webpack的配置](#webpack的配置)
     - [webpack五个核心概念](#webpack五个核心概念)
     - [谈谈webpack升级变化](#谈谈webpack升级变化)
     - [如何区分 Webpack 中的 hash/chunkhash/contenthash](#如何区分-webpack-中的-hashchunkhashcontenthash)
     - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
-      - [loader和plugin](#loader和plugin)
+    - [loader和plugin](#loader和plugin)
+    - [webpack的构建流程](#webpack的构建流程)
     - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
     - [webpack调用和webpack-cli](#webpack调用和webpack-cli)
     - [webpack loader](#webpack-loader)
@@ -478,9 +487,11 @@
     - [wbepack动态加载实现](#wbepack动态加载实现)
     - [split-chunks-plugin的使用](#split-chunks-plugin的使用)
     - [打包的js有个别需要defer延迟加载，有的需要直接加载，怎么设置](#打包的js有个别需要defer延迟加载有的需要直接加载怎么设置)
+    - [webapck tree-shaking](#webapck-tree-shaking)
+    - [vite为什么比webpack快](#vite为什么比webpack快)
   - [Vite](#vite)
     - [构建工具](#构建工具)
-    - [vite为什么比webpack快](#vite为什么比webpack快)
+    - [vite为什么比webpack快](#vite为什么比webpack快-1)
     - [vite预构建](#vite预构建)
     - [vite环境变量设置](#vite环境变量设置)
       - [vite客户端配置环境变量](#vite客户端配置环境变量)
@@ -1868,11 +1879,19 @@ esheet'">
 5. 避免！important，可以选择其他选择器
 6. 减少昂贵属性使用 border-radius filter :nth-child box-shadow,重绘时会降低浏览器性能
 7. 少使用@import
+8. 根据实际需要引入css
+
+```css
+<link href="style.css" rel="stylesheet"> 
+<link href="print.css" rel="stylesheet" media="print"> 
+<link href="other.css" rel="stylesheet" media="(min-width: 40em)">
+```
+上面的第一个样式表声明未提供任何媒体类型或查询，因此它适用于所有情况，也就是说，它始终会阻塞渲染。第二个样式表则不然，它只在打印内容时适用---或许您想重新安排布局、更改字体等等，因此在网页首次加载时，该样式表不需要阻塞渲染。最后，最后一个样式表声明提供由浏览器执行的“媒体查询”：符合条件时，浏览器将阻塞渲染，直至样式表下载并处理完毕。
 
 ### 协同开发css类名冲突解决方案
 1. css module
 2. scoped
-3. css in js 库
+3. css in js 库，如styled-components 
 
 scoped 的实现原理是，Vue 会为每个组件生成一个唯一的 data-v-hash 属性（其中 hash 是基于组件选项计算得出的一个唯一值），并在编译时将组件的 CSS 选择器添加这个属性，以确保这些选择器只选中当前组件的元素。这样，即使两个组件使用了相同的类名，也不会发生样式冲突，因为它们的 CSS 选择器实际上并不相同。
 
@@ -1885,9 +1904,61 @@ css-module流程
 ### postcss
 PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。它允许你使用未来的 CSS 语法，并为你提供许多有用的功能，如变量、嵌套规则、混合（mixins）、函数等，这些功能在原生 CSS 中是不可用的，并且可以添加前缀和低浏览器适配。
 
+PostCSS 的主要功能只有两个：第一个就是前面提到的把 `CSS 解析成 JavaScript 可以操作的 AST`，第二个就是`调用插件来处理 AST 并得到结果`。因此，不能简单的把 PostCSS 归类成 CSS 预处理或后处理工具。PostCSS 所能执行的任务非常多，同时涵盖了传统意义上的预处理和后处理。
+
 它支持的功能可以通过添加各类插件得到实现。
 
 ![图](book_files/137.jpg)
+
+### @namespace @document @page @supports在css中的作用
+在 CSS 中，@namespace、@document、@page 和 @supports 都是特殊的“at-rules”，它们各自有不同的用途和上下文。然而，需要注意的是，并非所有的这些 at-rules 都在所有 CSS 版本或所有浏览器中得到广泛支持。
+
+在 HTML 文档中，通常不需要使用 @namespace，因为 HTML5 默认使用 HTML 命名空间。
+```css
+@namespace url(http://www.w3.org/1999/xhtml);  
+/* 现在可以针对 XHTML 命名空间中的元素应用样式 */  
+xhtml|p {  
+  color: blue;  
+}
+```
+@document 规则（也称为“文档查询”）允许你为特定的文档（或一组文档）定义样式。然而，这个规则并未在 CSS 标准中得到最终确定，因此在大多数浏览器中都不受支持。
+
+@page 规则用于修改**打印文档**的页面布局。可以使用它来设置边距、孤行控制、页眉和页脚等。
+```css
+@page {  
+  size: A4;  
+  margin: 1cm;  
+  
+  /* 设置页眉和页脚 */  
+  @top-center {  
+    content: "My Document";  
+    font-size: 10pt;  
+  }  
+  @bottom-right {  
+    content: counter(page) " / " counter(pages);  
+    font-size: 10pt;  
+  }  
+}
+```
+@supports 规则允许你基于浏览器是否支持某个 CSS 特性来应用样式。这有助于创建兼容多个浏览器的样式表。
+```css
+/* 如果浏览器支持 grid 布局，则应用以下样式 */  
+@supports (display: grid) {  
+  .container {  
+    display: grid;  
+    grid-template-columns: 1fr 1fr 1fr;  
+  }  
+}  
+  
+/* 如果不支持 grid 布局，则应用以下回退样式 */  
+.container {  
+  display: flex;  
+  flex-wrap: wrap;  
+}
+```
+
+### CSS函数
+![图](book_files/267.jpg)
 
 
 
@@ -3176,202 +3247,6 @@ console.log(person6);
 
 ![整体思路](book_files/35.jpg)
 
-
-### Promise
-+ 三种状态 pending resolved rejected
-+ then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
-+ catch函数正常返回resolved，里面有报错返回rejected[同上]
-
-```js
-Promise.resolve().then(() => {
-    console.log(1) //1
-    }).catch(() => {
-        console.log(2)
-    }).catch(() => {
-        console.log(2)
-}).catch(() => {
-        console.log(2)
-    }).then((val) => {
-    console.warn(val)//undefined
-        console.log(3)//3
-})
-```
-
-```js
-Promise.resolve().then(() => { // 返回 rejected 状态的 promise
-    console.log(1)
-    throw new Error('erro1')
-}).catch((e) => { // 返回 resolved 状态的 promise
-  console.log(e)  //Error: erro1
-    console.log(2) // 2
-}).catch(() => { 
-    console.log(2)
-}).catch(() => { 
-    console.log(2)
-}).then(() => {
-    console.log(3)//3
-})
-```
-
-#### 应用场景
-+ 图片加载
-
-```js
-const preloadImage = function (path) {
- return new Promise(function (resolve, reject) {
- const image = new Image();
- image.onload = resolve;
- image.onerror = reject;
- image.src = path;
- });
-};
-```
-
-### async await
-async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
-```js
-async function fn2() {
-    return new Promise(() => {})
-}
-console.log( fn2() ) //Promise {<pending>}
-
-async function fn1() {
-    return 100
-}
-console.log( fn1() ) // 相当于 Promise.resolve(100)
-```
-**await相当于Promise的then.**
-
-+ await 后面跟 Promise 对象：会阻断后续代码，`等待状态变为 resolved` ，才获取结果并继续执行
-+ await 后续跟非 Promise 对象：会直接返回该值，不过也是要等其他同步代码执行完后。如const f = await 400 ，内部相当于做了转换const f= await Promise.resolve(400)
-
-```js
-!(async function () {
-    const p1 = new Promise(() => {})
-    await p1
-    console.log('p1') // 不会执行
-})()
-
-!(async function () {
-    const p2 = Promise.resolve(100)
-    const res = await p2
-    console.log(res) // 100
-})()
-
-!(async function () {
-    const res = await 100
-    console.log(res) // 100
-})()
-
-!(async function () {
-    const p3 = Promise.reject('some err')
-    const res = await p3 
-    // new_file.html:34 Uncaught (in promise) some err
-    console.log(res) // 不会执行
-})()
-//使用try…catch捕获异常
-(async function () {
-    const p4 = Promise.reject('some err')
-    try {
-        const res = await p4
-        console.log(res)
-    } catch (ex) {
-        console.error(ex)
-    }
-})()
-```
-
-#### async await异步本质
-await是同步写法，但本质还是异步调用。即只要遇到了await ，**后面的代码都相当于放在callback里。**
-
-await虽然会异步调用，但是它后面的函数是立刻执行的。
-```js
-async function async1 () {
-  console.log('async1 start')
-  await async2()
-  console.log('async1 end') // 关键在这一步，它相当于放在 callback 中，最后执行
-}
-
-async function async2 () {
-  console.log('async2')
-}
-
-console.log('script start')
-async1()
-console.log('script end')
-```
-
-### Generator理解和应用
-Generator通过yield标识位和next()方法调用，实现函数的分段执行。
-
-function与函数名之间有一个星号 * ；函数体内部使用 yield 表达式，定义不同的内部状态。箭头函数不能用来定义生成器函数。
-
-```js
-//它内部有两个 yield表达式（hello和world），即该函数有三个状态：hello，world 和 return 语句（结束执行）。
-function* helloWorldGenerator() {
-  yield 'hello';
-  yield 'world';
-  return 'ending';
-}
-var hw = helloWorldGenerator();
-```
-```js
-hw.next()
-// { value: 'hello', done: false } 
-hw.next()
-// { value: 'world', done: false }
-hw.next()
-// { value: 'ending', done: true }
-hw.next()
-// { value: undefined, done: true }
-```
-生成器对象实现了Iterator接口，它默认的迭代器是自引用的。
-
-```js
-function *fun(){}
-const test =fun()
-console.log(test === test[Symbol.iterator]())//true
-```
-
-```js
-function* helloWorldGenerator(x,y) {
-  const f1 = yield(x+'hello');
-  const f2 = 3 * (yield (y+'world'+f1));
-  console.log(f1,f2)// 1 6
-  return 'ending';
-}
-var hw = helloWorldGenerator(20,50);
-const v1= hw.next() 
-const v2 = hw.next(1)
-const v3 = hw.next(2)
-console.warn(v1,v2,v3)
-// {value: "20hello", done: false} {value: "50world1", done: false} {value: "ending", done: true}
-```
-1. 初始化生成器:
-	+ 调用 helloWorldGenerator(20,50) 来初始化生成器，并传入参数 20,50。
-	+ 生成器函数内部的 x 被赋值为 20,y为50。
-2. 第一次调用 hw.next():
-	+ 生成器函数开始执行，直到遇到第一个 yield 表达式 yield(x+'hello')。
-	+ x 的值是 20，所以 yield 的值是 '20hello'。
-	+ 生成器暂停执行，返回 { value: '20hello', done: false }。
-	+ v1 接收这个对象，所以 v1.value 是 '20hello'，v1.done 是 false。
-	+ `此时 f1 还没有被赋值`。
-3. 第二次调用 hw.next(1):
-	+ 生成器恢复执行，并将 1 赋值给yield的右边(或者yield整体) const f1 = yield(x+'hello') 中的 `f1`。
-	+ 接着，执行到 const f2 = 3 * (yield (y+'world'+f1))，生成器再次暂停执行。
-	+ yield 3 * (yield (y+'world'+f1)) 的值是 `50world1`。(y的50，f1的1)
-	+ 生成器返回 { value: "50world1", done: false }。
-	+ v2 接收这个对象。
-	+ **此时 f2 还没有被计算，因为它依赖于下一次 next() 方法的参数。**
-4. 第三次调用 hw.next(2):
-	+ 生成器恢复执行，并将 2 用于计算 const f2 =  3 * (yield (y+'world'+f1)) 中的 f2，即 f2 被赋值为 3 * 2 = 6。
-	+ 然后执行 console.log(f1, f2)，输出 1 6。
-	+ 生成器函数返回 'ending'，并结束执行。
-	+ 生成器返回 { value: 'ending', done: true }。
-	+ v3 接收这个对象，所以 v3.value 是 'ending'，v3.done 是 true。
-
-> for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
-
 ### 正则表达式
 正则表达式使用一种特殊的语法来定义模式，这些模式可以被用来搜索、匹配或替换文本。
 
@@ -3681,9 +3556,8 @@ var baz = new bar(3)
 console.log(baz.a) // 3
 
 console.log(obj1)//{a: 2}
-
 ```
-bar 函数本身是通过 bind 方法构造的函数，其内部已经对将 this 绑定为 obj1，它再作为构造函数，通过 new 调用时，返回的实例已经与 obj1 解绑。
+bar 函数本身是通过 bind 方法构造的函数，其内部已经对将 this 绑定为 obj1，它再作为构造函数，通过 new 调用时，**返回的实例已经与 obj1 解绑**。
 
 #### this隐式绑定丢失
 隐式丢失最常见的就是作为`参数传递以及变量赋值` ,一个最常见的 this 绑定问题就是被隐式绑定的函数会丢失绑定对象，也就是说它会应用默认绑定，从而把 this 绑定到全局对象或者 undefined或者是新创建的隐式绑定的对象上，取决于是否是严格模式
@@ -3805,7 +3679,7 @@ const bar = foo.call(obj1); // bar现在是一个箭头函数，它捕获了obj1
 bar.call(obj2); // 打印2，因为this.a引用的是obj1.a，忽略obj2  
 ```
 
-在您调用 foo.call(obj1) 时，foo 函数内部的 this 被绑定到了 obj1。然后，foo 函数返回了一个箭头函数，这个箭头函数捕获了 foo 函数执行时的 this 值，即 obj1。
+在调用 foo.call(obj1) 时，foo 函数内部的 this 被绑定到了 obj1。然后，foo 函数返回了一个箭头函数，这个箭头函数捕获了 foo 函数执行时的 this 值，即 obj1。
 
 因此，当您调用 bar.call(obj2) 时，您试图改变 bar 函数内部的 this 值，但这是不可能的，因为 bar 是一个箭头函数。箭头函数忽略 call、apply 或 bind 方法传入的 this 值。
 
@@ -3824,7 +3698,7 @@ const obj2 = { a: 3 }
 const bar = foo.call(obj1)
 bar.call(obj2)//123
 ```
-在返回的箭头函数中，您试图访问 this.a。但是，由于这是一个箭头函数，它不会绑定自己的 this 值，而是捕获其定义时所在上下文的 this 值。在这种情况下，this 指向全局对象（在浏览器中是 window），而全局对象上有一个 a 属性，其值为 123。
+在返回的箭头函数中，当试图访问 this.a。但是，`由于这是一个箭头函数，它不会绑定自己的 this 值，而是捕获其定义时所在上下文的 this 值`。在这种情况下，this 指向全局对象（在浏览器中是 window），而全局对象上有一个 a 属性，其值为 123。
 
 ```js
 let a = 123
@@ -4210,8 +4084,6 @@ GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线
 + **异步 http 请求线程**:在 XMLHttpRequest 在连接后是通过浏览器新开一个线程请求
 将检测到状态变更时，如果设置有回调函数，异步线程就产生状态变更事件，将这个回调再放入事件队列中。再由 JavaScript 引擎执行。
 
-
-
 ### 本地存储和场景
 + Cookies：它是由服务器发送到浏览器，并保存在浏览器上的一小段数据。Cookies主要用于跟踪会话信息，但由于其大小限制（通常不超过`4KB`）和每次`请求`都会发送到服务器的特性，不适合`大量数据`的存储。【标记用户和跟踪用户行为】
 + Web Storage API：包括localStorage和sessionStorage。提供了更大的存储空间，并且数据只保存在客户端，不会发送到服务器。
@@ -4512,6 +4384,7 @@ otherWindow.postMessage(message, targetOrigin, [transfer]);
 	- DOM型：由浏览器端完成
 + 跨站请求伪造（CSRF攻击），`攻击者诱导受害者进入第三方网站，该网站向被攻击网站发送跨站请求。`由于请求携带了受害者的合法cookie，因此验证通过，攻击得以完成。
 + SQL注入攻击
++ 点击劫持：目标网站客户以通过iframe嵌套【禁止内嵌top.location === window.locaation】；后台设置：X-FRAME-OPTIONS 禁止内嵌
 
 ```
 XSRF流程
@@ -4522,43 +4395,15 @@ XSRF流程
 网站A接收到请求后，由于Cookie是有效的，因此会误以为是用户自己发送的请求，并执行相应的操作。
 ```
 
+![图](book_files/268.jpg)
+
 为了防范CSRF攻击，可以采取以下措施：
 
-+ 验证请求的来源：服务器在接收到请求时，可以检查请求的来源是否合法，即是否来自受信任的域名。
++ **验证请求的来源**：服务器在接收到请求时，可以检查请求的来源是否合法，即是否来自受信任的域名。
 + 使用验证码：对于关键操作，可以要求用户输入验证码，以确保操作是由用户本人执行的。
 + 设置Token：服务器在用户登录后生成一个随机的Token，并将其保存在用户的Session中。在后续请求中，要求客户端携带这个Token。由于Token是随机的，攻击者很难伪造。
 + 避免在URL中传递敏感信息：敏感信息应该通过POST请求传递，而不是通过URL的查询参数。
-+ 实施安全的Cookie策略：设置HttpOnly属性，防止JavaScript访问Cookie；设置Secure属性，确保Cookie只能通过HTTPS传输。
-
-### 如何捕获js异常
-重点代码try…catch…
-
-全局还可以使用window.onerror进行检测，压缩后的代码需要配合sourceMap找出对应的行列（对第三方库的定位不会太准确）
-
-### js计算精度丢失问题
-```js
-0.1+0.2=== 0.3 false 
-```
-```js
-1/3=0.3333...
-```
-可以有无限个3，但是计算机要存储，所以最后只能取`近似值`，当计算机存储后再取出就存在错误的可能。
-
-对于整数，很容易转换成十进制或者二进制，而浮点数则不知道小数位数多少位，采取的是科学计数法。因为存储时有位数限制，某些十进制转二进制存在无限循环，二进制会采取舍入操作。
-
-解决思路：转成整数
-```js
-function add(num1, num2) {
- const num1Digits = (num1.toString().split('.')[1] || '').length;
- const num2Digits = (num2.toString().split('.')[1] || '').length;
- const baseNum = Math.pow(10, Math.max(num1Digits, num2Digits));
- return (num1 * baseNum + num2 * baseNum) / baseNum;
-}
-
-console.log(add(0.1,0.2))
-```
-
-> Math.js BigDecimal.js
++ 实施安全的Cookie策略：`设置HttpOnly属性`，防止JavaScript访问Cookie；设置Secure属性，确保Cookie只能通过HTTPS传输。
 
 ### 前端防护xss和xsrf攻击
 【Cross Site Script】跨站脚本攻击 恶意攻击者往Web页面里插入恶意Script代码，当用户浏览该页之时，嵌入其中Web里面的Script代码会被执行，从而达到恶意攻击用户的目的。可以直接安装xss对应插件。
@@ -4645,6 +4490,36 @@ XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
 4.	Get 请求不对数据进行修改
 5.	不让第三方网站访问到用户 Cookie =>后台cookie配置设置 same-site 属性进行控制
 6.	CORS是否必要[JSONP]，是否兼容老浏览器
+
+### 如何捕获js异常
+重点代码try…catch…
+
+全局还可以使用window.onerror进行检测，压缩后的代码需要配合sourceMap找出对应的行列（对第三方库的定位不会太准确）
+
+### js计算精度丢失问题
+```js
+0.1+0.2=== 0.3 false 
+```
+```js
+1/3=0.3333...
+```
+可以有无限个3，但是计算机要存储，所以最后只能取`近似值`，当计算机存储后再取出就存在错误的可能。
+
+对于整数，很容易转换成十进制或者二进制，而浮点数则不知道小数位数多少位，采取的是科学计数法。因为存储时有位数限制，某些十进制转二进制存在无限循环，二进制会采取舍入操作。
+
+解决思路：转成整数
+```js
+function add(num1, num2) {
+ const num1Digits = (num1.toString().split('.')[1] || '').length;
+ const num2Digits = (num2.toString().split('.')[1] || '').length;
+ const baseNum = Math.pow(10, Math.max(num1Digits, num2Digits));
+ return (num1 * baseNum + num2 * baseNum) / baseNum;
+}
+
+console.log(add(0.1,0.2))
+```
+
+> Math.js BigDecimal.js
 
 ### script异步加载顺序
 + 如果脚本是模块化的并且不依赖任何脚本，则使用async.
@@ -4774,6 +4649,8 @@ document.getElementById("k").src=window.URL.createObjectURL(file)
 5. 前端配置hash，后台对比后，避免不同名字的同一张图片上传，也避免同名的图片不同的内容的被阻止上传
 	- fileReader.readAsArrayBuffer(file);获取buffer
 	- SparkMD5.ArrayBuffer读取，生动对应hash
+	- fileReader.readAsDataURL:获取base64
+	
 ```js
 /* 文件缩略图 & 自动生成名字 */
 (function () {
@@ -5220,7 +5097,7 @@ console.log(arr) //[empty*10]
 
 ### Set和Map的应用
 Set是一种叫做集合的数据结构，而Map是一种叫做字典的数据结构。
-+ 集合：一堆无需相关联，且不重复的内存结构组成的组合
++ 集合：一堆**无序**相关联，且**不重复**的内存结构组成的组合
 + 字典：一些元素的集合，每个元素有一个称做key的域，不同元素的key各不相同
 
 + Set的方法
@@ -5453,6 +5330,15 @@ let exists = _fs.exists;
 let readfile = _fs.readfile;
 ```
 
+### 箭头函数与普通函数
+1. 箭头函数比普通函数更加简洁
+2. 箭头函数没有自己的this它只会在自己作用域的上一层继承this。所以箭头函数中this的指向在它在定义时已经确定了，之后不会改变。
+3. call()、apply()、bind()等方法不能改变箭头函数中this的指向
+4. 箭头函数**不能**作为**构造函数**使用
+5. 箭头函数没有自己的arguments
+6. 箭头函数没有**prototype**
+7. 箭头函数不能用作**Generator函数**，不能使用yeild关键字
+
 ### Map与Object和 Set与Array的区别
 相对于对象，Map的key不仅是字符串，也可以使其他的，Map数据结构是有序的且Map的查询速度也是非常快的。
 
@@ -5490,7 +5376,200 @@ console.timeEnd('set find')
 
 ![arr](book_files/71.jpg)
 
+### Promise
++ 三种状态 pending resolved rejected
++ then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
++ catch函数正常返回resolved，里面有报错返回rejected[同上]
 
+```js
+Promise.resolve().then(() => {
+    console.log(1) //1
+    }).catch(() => {
+        console.log(2)
+    }).catch(() => {
+        console.log(2)
+}).catch(() => {
+        console.log(2)
+    }).then((val) => {
+    console.warn(val)//undefined
+        console.log(3)//3
+})
+```
+
+```js
+Promise.resolve().then(() => { // 返回 rejected 状态的 promise
+    console.log(1)
+    throw new Error('erro1')
+}).catch((e) => { // 返回 resolved 状态的 promise
+  console.log(e)  //Error: erro1
+    console.log(2) // 2
+}).catch(() => { 
+    console.log(2)
+}).catch(() => { 
+    console.log(2)
+}).then(() => {
+    console.log(3)//3
+})
+```
+
+#### 应用场景
++ 图片加载
+
+```js
+const preloadImage = function (path) {
+ return new Promise(function (resolve, reject) {
+ const image = new Image();
+ image.onload = resolve;
+ image.onerror = reject;
+ image.src = path;
+ });
+};
+```
+
+### async await
+async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
+```js
+async function fn2() {
+    return new Promise(() => {})
+}
+console.log( fn2() ) //Promise {<pending>}
+
+async function fn1() {
+    return 100
+}
+console.log( fn1() ) // 相当于 Promise.resolve(100)
+```
+**await相当于Promise的then.**
+
++ await 后面跟 Promise 对象：会阻断后续代码，`等待状态变为 resolved` ，才获取结果并继续执行
++ await 后续跟非 Promise 对象：会直接返回该值，不过也是要等其他同步代码执行完后。如const f = await 400 ，内部相当于做了转换const f= await Promise.resolve(400)
+
+```js
+!(async function () {
+    const p1 = new Promise(() => {})
+    await p1
+    console.log('p1') // 不会执行
+})()
+
+!(async function () {
+    const p2 = Promise.resolve(100)
+    const res = await p2
+    console.log(res) // 100
+})()
+
+!(async function () {
+    const res = await 100
+    console.log(res) // 100
+})()
+
+!(async function () {
+    const p3 = Promise.reject('some err')
+    const res = await p3 
+    // new_file.html:34 Uncaught (in promise) some err
+    console.log(res) // 不会执行
+})()
+//使用try…catch捕获异常
+(async function () {
+    const p4 = Promise.reject('some err')
+    try {
+        const res = await p4
+        console.log(res)
+    } catch (ex) {
+        console.error(ex)
+    }
+})()
+```
+
+#### async await异步本质
+await是同步写法，但本质还是异步调用。即只要遇到了await ，**后面的代码都相当于放在callback里。**
+
+await虽然会异步调用，但是它后面的函数是立刻执行的。
+```js
+async function async1 () {
+  console.log('async1 start')
+  await async2()
+  console.log('async1 end') // 关键在这一步，它相当于放在 callback 中，最后执行
+}
+
+async function async2 () {
+  console.log('async2')
+}
+
+console.log('script start')
+async1()
+console.log('script end')
+```
+
+### Generator理解和应用
+Generator通过yield标识位和next()方法调用，实现函数的分段执行。
+
+function与函数名之间有一个星号 * ；函数体内部使用 yield 表达式，定义不同的内部状态。箭头函数不能用来定义生成器函数。
+
+```js
+//它内部有两个 yield表达式（hello和world），即该函数有三个状态：hello，world 和 return 语句（结束执行）。
+function* helloWorldGenerator() {
+  yield 'hello';
+  yield 'world';
+  return 'ending';
+}
+var hw = helloWorldGenerator();
+```
+```js
+hw.next()
+// { value: 'hello', done: false } 
+hw.next()
+// { value: 'world', done: false }
+hw.next()
+// { value: 'ending', done: true }
+hw.next()
+// { value: undefined, done: true }
+```
+生成器对象实现了Iterator接口，它默认的迭代器是自引用的。
+
+```js
+function *fun(){}
+const test =fun()
+console.log(test === test[Symbol.iterator]())//true
+```
+
+```js
+function* helloWorldGenerator(x,y) {
+  const f1 = yield(x+'hello');
+  const f2 = 3 * (yield (y+'world'+f1));
+  console.log(f1,f2)// 1 6
+  return 'ending';
+}
+var hw = helloWorldGenerator(20,50);
+const v1= hw.next() 
+const v2 = hw.next(1)
+const v3 = hw.next(2)
+console.warn(v1,v2,v3)
+// {value: "20hello", done: false} {value: "50world1", done: false} {value: "ending", done: true}
+```
+1. 初始化生成器:
+	+ 调用 helloWorldGenerator(20,50) 来初始化生成器，并传入参数 20,50。
+	+ 生成器函数内部的 x 被赋值为 20,y为50。
+2. 第一次调用 hw.next():
+	+ 生成器函数开始执行，直到遇到第一个 yield 表达式 yield(x+'hello')。
+	+ x 的值是 20，所以 yield 的值是 '20hello'。
+	+ 生成器暂停执行，返回 { value: '20hello', done: false }。
+	+ v1 接收这个对象，所以 v1.value 是 '20hello'，v1.done 是 false。
+	+ `此时 f1 还没有被赋值`。
+3. 第二次调用 hw.next(1):
+	+ 生成器恢复执行，并将 1 赋值给yield的右边(或者yield整体) const f1 = yield(x+'hello') 中的 `f1`。
+	+ 接着，执行到 const f2 = 3 * (yield (y+'world'+f1))，生成器再次暂停执行。
+	+ yield 3 * (yield (y+'world'+f1)) 的值是 `50world1`。(y的50，f1的1)
+	+ 生成器返回 { value: "50world1", done: false }。
+	+ v2 接收这个对象。
+	+ **此时 f2 还没有被计算，因为它依赖于下一次 next() 方法的参数。**
+4. 第三次调用 hw.next(2):
+	+ 生成器恢复执行，并将 2 用于计算 const f2 =  3 * (yield (y+'world'+f1)) 中的 f2，即 f2 被赋值为 3 * 2 = 6。
+	+ 然后执行 console.log(f1, f2)，输出 1 6。
+	+ 生成器函数返回 'ending'，并结束执行。
+	+ 生成器返回 { value: 'ending', done: true }。
+	+ v3 接收这个对象，所以 v3.value 是 'ending'，v3.done 是 true。
+
+> for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
 
 
 
@@ -5712,7 +5791,7 @@ jim.log()//log
 ```
 
 ### interface 和 type的各自应用场景
-+ 接口可以实现 extends 和 implements,类型别名可以借助&进行继承,实现类应用type也可以借助implements
++ 接口可以实现 `extends 和 implements`,类型别名可以借助`&`进行继承,实现类应用type也可以借助implements
 + 类型别名并不会创建新类型，是对原有类型的引用，而接口会定义一个新类型。
 + 接口只能用于定义对象类型，而类型别名的声明方式除了对象之外还可以定义`交叉、联合、原始类型`等。
 + TS推荐尽可能的使用接口来规范代码。
@@ -5766,6 +5845,9 @@ function loggingIdentity<T extends LengthDefine>(arg: T): T {
     console.log(arg.length);
     return arg;
 }
+
+// loggingIdentity(1) //error 类型“number”的参数不能赋给类型“ILength”的参数。
+loggingIdentity([1,2,3])// 正确
 ```
 
 ### keyof
@@ -7295,6 +7377,9 @@ performance.getEntriesByName("first-contentful-paint")[0].startTime
 	+ 组件重复打包:假设A.js文件是一个常用的库，现在有多个路由使用了A.js文件，这就造成了重复下载,需要构建工具提取，如在webpack的config文件中，修改CommonsChunkPlugin的配置，minChunks为3表示会把使用3次及以上的包抽离出来，放进公共依赖文件，避免了重复加载组件(在 Webpack 4 及以上版本中,CommonsChunkPlugin 已经被废弃，取而代之的是 optimization.splitChunks 配置。splitChunks 配置允许你更加灵活和细致地控制代码拆分和公共依赖的提取。)[CommonsChunkPlugin 的主要作用就是将公共的代码模块提取出来，生成一个新的 chunk 文件，这样浏览器在加载页面时就可以缓存这个公共的 chunk 文件，后续加载其他页面时就可以复用已经缓存的公共代码，避免重复下载。]
 	+ 开启GZip压缩
 	+ 使用SSR
+	+ http2
+	+ CDN
+	+ 提高代码使用率：利用代码分割，将脚本中无需立即调用的代码在代码构建时转变为异步加载的过程
 
 #### hisotory路由404
 nginx需要额外配置：只需要配置将任意页面都重定向到 index.html，把路由交由前端处理
@@ -7361,6 +7446,22 @@ module.exports = {
 ```
 
 ![解决思路](book_files/167.jpg)
+
+### vue项目性能优化
+1. 尽量减少 data 中的数据，data 中的数据都会增加 getter 和 setter，会收集对应的 watcher
+2. v-if 和 v-for 不能连用
+3. 如果需要使用 v-for 给每项元素绑定事件时使用事件代理
+4. SPA 页面采用 keep-alive 缓存组件
+5. key 保证唯一
+6. 使用路由懒加载、异步组件
+7. 防抖、节流
+8. 第三方模块按需导入
+9. 长列表滚动到可视区域动态加载
+10. 图片懒加载
+11. 压缩代码
+12. Tree Shaking/Scope Hoisting
+13. 使用 cdn 加载第三方模块
+14. splitChunks 抽离公共文件
 
 
 
@@ -8345,6 +8446,17 @@ React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、
 + 声明式编程:声明式编程是一种编程范式，它关注的是你要做什么，而不是如何做
 + Component：可组合可复用可重用
 
+### React18更新了哪些
++ 并发模式
++ 更新 render API
++ 自动批处理
++ Suspense 支持 SSR
++ startTransition
++ useTransition
++ useDeferredValue
++ useId
++ 提供给第三方库的 Hook
+
 ### state 和 props 区别
 1. state
 
@@ -8461,6 +8573,54 @@ useEffect(() => {
 	 }, 1000);
 	 return () => clearInterval(timer);//组件卸载的时候执行，这个return函数相当于 componentWillUnmount
 	 }, []);// 第二个参数是依赖更新项，相当于 componentDidUpdate
+```
+
+#### react组件创建方式
++ React.createClass
++ ES6 class
++ 函数式组件
+
+```js
+var MyComponent = React.createClass({  
+  propTypes: {  
+    // 定义props的类型和是否必需  
+    name: React.PropTypes.string.isRequired,  
+  },  
+  
+  getDefaultProps: function() {  
+    // 定义默认的props  
+    return {  
+      name: 'John Doe',  
+    };  
+  },  
+  
+  getInitialState: function() {  
+    // 定义初始的state  
+    return {  
+      count: 0,  
+    };  
+  },  
+  
+  handleClick: function() {  
+    // 处理点击事件  
+    this.setState({  
+      count: this.state.count + 1,  
+    });  
+  },  
+  
+  render: function() {  
+    // 渲染组件  
+    return (  
+      <div>  
+        <p>Hello, {this.props.name}!</p>  
+        <p>You clicked {this.state.count} times.</p>  
+        <button onClick={this.handleClick}>Click Me</button>  
+      </div>  
+    );  
+  },  
+});  
+  
+ReactDOM.render(<MyComponent />, document.getElementById('root'));
 ```
 
 #### 类组件的this绑定
@@ -9156,7 +9316,7 @@ class ErrorBoundary extends React.Component {
 可以利用trycatch或者window.addEventListener('error', function(event) { ... })去处理
 
 ### 对React refs 的理解，应用场景
-React 中的 Refs提供了一种方式，允许我们访问 DOM节点或在 render方法中创建的 React元素
+React 中的 Refs提供了一种方式，`允许访问 DOM节点或在 render方法中创建的 React元素`
 
 本质为`ReactDOM.render()返回的组件实例`，如果是渲染组件则返回的是组件实例，如果渲染dom则返回的是具体的dom节点
 
@@ -9707,6 +9867,10 @@ JavaScript引擎和页面渲染引擎两个线程是互斥的，当其中一个�
 这就会导致一些用户交互、动画等任务无法立即得到处理，导致卡顿的情况
 	
 #### React Fiber
+React16 实现了新的基于 requestIdleCallback 的调度器（因为 requestIdleCallback 兼容性和稳定性问题，自己实现了 polyfill），通过任务优先级的思想，在高优先级任务进入的时候，中断 reconciler。
+
+为了适配这种新的调度器，推出了 FiberReconciler，将原来的树形结构（vdom）转换成 Fiber 链表的形式（child/sibling/return），整个 Fiber 的遍历是基于循环而非递归，可以随时中断。
+
 + 为每个增加了优先级，优先级高的任务可以中断低优先级的任务。然后再重新，注意是重新执行优先级低的任务
 + 增加了异步任务，调用requestIdleCallback api，浏览器空闲的时候执行
 + dom diff树变成了链表，一个dom对应两个fiber（一个链表），对应两个队列，这都是为找到被中断的任务，重新执行
@@ -10357,6 +10521,14 @@ to传入对象或字符串
 </NavLink>
 <Route path="/detail2" component={Detail2}/>
 ```
+
+### redux工作原理
+它基于一个称为存储的状态容器的概念，组件可以从该容器中作为 props 接收数据。
+
+更新存储区的唯一方法是向存储区发送一个操作，该操作被传递到一个reducer中。reducer接收操作和当前状态，并返回一个新状态，触发订阅的组件重新渲染。
+
+![redux](book_files/269.jpg)
+
 
 ### 项目中使用redux，结构划分
 Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redux遵循三大基本原则：
@@ -13951,7 +14123,23 @@ module.exports = {
   // ... 其他配置  
 };
 ```
+### Webpack的配置
+Webpack的配置主要包括以下几个部分：
 
+1. entry指定Webpack打包的入口文件，可以是单个或多个JavaScript文件。这个配置决定了Webpack从哪个模块开始生成依赖关系图。1234
+2. output设置Webpack打包后输出的目录和文件名称，包括path、filename和publicPath等。235
+3. module配置了不同的loaders来处理不同的模块，例如，对于CSS文件，可以使用css-loader和style-loader。2345
+4. resolve设置Webpack如何解析模块依赖，包括别名、扩展名等。
+5. plugins使用不同的插件可以增强Webpack的功能，例如，使用html-webpack-plugin可以将打包后的js文件自动引用到HTML文件中。
+6. devServer提供了一个简单的web服务器和实时重载功能，可以通过devServer.contentBase、devServer.port、devServer.proxy等进行配置。
+7. optimization可以使用optimization.splitChunks和optimization.runtimeChunk配置代码拆分和运行时代码提取等优化策略。
+8. externals用于配置排除打包的模块，例如，可以将jQuery作为外置扩展，避免将其打包到应用程序中
+9. devtool配置source-map类型。
+10. contextwebpack使用的根目录，string类型必须是绝对路径。
+11. target指定Webpack编译的目标环境。
+12. performance输出文件的性能检查配置。
+13. noParse不用解析和处理的模块。
+14. stats控制台输出日志控制。
 
 ### webpack五个核心概念
 1. Entry
@@ -14030,11 +14218,31 @@ require('./index.css')
 	+ webpack.HotModuleReplacementPlugin (webpack内置热更新组件，新版webpack-dev-server根据devserver中hot值为true会自动调用)
 	+ terser-webpack-plugin： w5内置，w4需要安装，处理多进程打包，可以配置在plugins中，也可以在optimization中配置(如果配置了css压缩，这个就算不需要配置多进程打包也最好要配置)
 
-#### loader和plugin
+### loader和plugin
 + loader：模块转换器，用于特定的模块类型进行转换，原内容按照需要转成想要的内容
 + plugin：可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等，在webpack构建流程中的特定时机注入扩展逻辑，来改变构建结果，是用来自定义webpack打包过程的方式，一个插件是含有apply方法的一个对象，通过这个方法可以参与到整个webpack打包的各个流程(生命周期)。
 
 ![图解](book_files/95.jpg)
+
+1. 功能不同：
+	+ Loader本质是一个函数，它是一个转换器。webpack只能解析原生js文件，对于其他类型文件就需要loade进行转换。
+	+ Plugin它是一个插件，用于增强webpack功能。webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 webpack 提供的 API 改变输出结果 。
+2. 用法不同：
+	+ Loader的配置是在module.rules下进行。类型为数组，每项都是个 Object ，描述了对于什么类型的文件（ test ），使用什么加载( loader )和使用的参数（ options ） 。
+	+ Plugin的配置在plugins下。类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
+
+### webpack的构建流程
+Webpack的构建流程主要包括以下几个步骤：
+
++ 初始化参数。解析Webpack配置参数，合并Shell传入和webpack.config.js文件配置的参数，形成最终的配 置结果。
++ 开始编译。使用上一次得到的参数初始化compiler对象，注册所有配置的插件，插件监听Webpack构建生命周期的事件节点，做出相应的反应，执行对象的run方法开始执行编译。
++ 确定入口。从配置的entry入口，开始解析文件构建AST语法树，找出依赖，递归下去。
++ 编译模块。递归中根据文件类型和loader配置，调用所有配置的loader对文件进行转换，再找出该模块依赖的模块，再递归本步骤直到所有入口依赖的文件都经过了本步骤的处理。
++ 完成模块编译。在经过第四步使用Loader翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系。
++ 输出资源。根据入口和模块之间的依赖关系，组装成一个个包含多个模块的Chunk，再把每个Chunk转换成单独的文件加入到输出列表，这步是可以修改输出内容的最后机会。
++ 输出完成。在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。
+
+这个流程是一个串行的过程，Webpack的运行流程是一个串行的过程，它的工作流程就是将各个插件串联起来。在运行过程中会广播事件，插件只需要监听它所关心的事件，就能加入到这条Webpack机制中，去改变Webpack的运作，使得整个系统扩展性良好。
 
 ### bundle，chunk，module是什么
 + bundle：是由webpack打包出来的文件。
@@ -14802,9 +15010,43 @@ new HtmlWebpackPlugin({
 })
 ```
 
+### webapck tree-shaking
+Webpack的Tree Shaking是一个利用ES6模块静态结构特性来去除生产环境下不必要代码的优化过程。其工作原理在于：
 
+1. 当Webpack分析代码时，它会标记出所有的import语句和export语句。
+2. 然后，当Webpack确定某个模块没有被导入时，它会在生成的bundle中排除这个模块的代码。
+3. 同时，Webpack还会进行递归的标记清理，以确保所有未使用的依赖项都不会出现在最终的bundle中。
 
+### vite为什么比webpack快
+(一）、开发模式的差异
 
+在开发环境中，Webpack 是先打包再启动开发服务器，而 Vite 则是直接启动，然后再按需编译依赖文件。（大家可以启动项目后检查源码 Sources 那里看到）
+
+这意味着，当使用 Webpack 时，**所有的模块都需要在开发前进行打包，这会增加启动时间和构建时间。**
+
+而 Vite 则采用了不同的策略，**它会在请求模块时再进行实时编译**，这种按需动态编译的模式极大地缩短了编译时间，特别是在大型项目中，文件数量众多，Vite 的优势更为明显。
+
+Webpack启动
+
+![webpack](book_files/270.jpg)
+
+Vite启动
+
+![vite](book_files/271.jpg)
+
+（二）、对ES Modules的支持
+
+现代浏览器本身就支持 ES Modules，会主动发起请求去获取所需文件。Vite充分利用了这一点，将开发环境下的模块文件直接作为浏览器要执行的文件，而不是像 Webpack 那样先打包，再交给浏览器执行。这种方式减少了中间环节，提高了效率。
+
+(三)、底层语言的差异
+
+Webpack 是基于 Node.js 构建的，而 Vite 则是基于 esbuild 进行预构建依赖。
+
+(四)、热更新的处理
+
+在 Webpack 中，当一个模块或其依赖的模块内容改变时，`需要重新编译这些模块`。
+
+而在 Vite 中，当某个模块内容改变时，`只需要让浏览器重新请求该模块即可`，这大大减少了热更新的时间。
 
 ## Vite
 它主要由两部分组成：
