@@ -7,8 +7,12 @@
 	}
 	code{
 		color:#9400D3;
-		font-family:"楷体" !important;
+		font-family:"宋体" !important;
 		font-size:16px !important;
+		font-weight:600
+	}
+	code[class*="language-"], pre[class*="language-"]{
+		font-weight:normal
 	}
 	em{
 		font-style:normal;
@@ -52,6 +56,7 @@
       - [SGML](#sgml)
     - [iframe有哪些优点和缺点](#iframe有哪些优点和缺点)
     - [H5新增属性](#h5新增属性)
+    - [常见的浏览器内核有哪些](#常见的浏览器内核有哪些)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
     - [margin负值](#margin负值)
@@ -83,6 +88,7 @@
     - [postcss](#postcss)
     - [@namespace @document @page @supports在css中的作用](#namespace-document-page-supports在css中的作用)
     - [CSS函数](#css函数)
+    - [rgba和opacity的透明效果有什么不同？](#rgba和opacity的透明效果有什么不同)
   - [js](#js)
     - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -184,6 +190,11 @@
     - [文件传输前后端](#文件传输前后端)
     - [token无感刷新](#token无感刷新)
     - [js for 循环中break和return区别](#js-for-循环中break和return区别)
+    - [前端控制并发请求](#前端控制并发请求)
+    - [登录密码安全](#登录密码安全)
+      - [CryptoJS](#cryptojs)
+    - [对象保护不被修改](#对象保护不被修改)
+    - [onload 和 DOMContentLoaded](#onload-和-domcontentloaded)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -200,6 +211,7 @@
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
     - [Generator理解和应用](#generator理解和应用)
+    - [实现解构let \[a,b\] = {a:1,b:2}](#实现解构let-ab--a1b2)
   - [Typescript](#typescript)
     - [never类型的应用场景](#never类型的应用场景)
     - [联合类型的类型收窄操作](#联合类型的类型收窄操作)
@@ -211,6 +223,7 @@
       - [泛型定义实际应用](#泛型定义实际应用)
     - [约束泛型](#约束泛型)
     - [keyof](#keyof)
+    - [keyof any](#keyof-any)
     - [映射类型](#映射类型)
     - [部分高级特性的实现](#部分高级特性的实现)
     - [Ts中的Pick，Omit，Extract和Exclude区别](#ts中的pickomitextract和exclude区别)
@@ -230,6 +243,7 @@
       - [mounted created 请求数据](#mounted-created-请求数据)
     - [数据双向绑定](#数据双向绑定)
     - [Vue双向绑定的原理](#vue双向绑定的原理)
+    - [vue页面初始化闪烁](#vue页面初始化闪烁)
     - [Vue组件通信方式](#vue组件通信方式)
     - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
     - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
@@ -275,6 +289,7 @@
   - [Vue3](#vue3)
     - [与Vue2的不同](#与vue2的不同)
       - [功能改变](#功能改变)
+    - [v-on.native修饰符移除，怎么去操作组件的事件](#v-onnative修饰符移除怎么去操作组件的事件)
     - [vue3的Composition Api的好处](#vue3的composition-api的好处)
       - [Composition API 和 React hooks 对比](#composition-api-和-react-hooks-对比)
     - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
@@ -361,6 +376,7 @@
     - [服务端返回xml](#服务端返回xml)
     - [前端图片转base64](#前端图片转base64)
     - [如何获取文档中任意一个元素距离文档 document 顶部的距离？](#如何获取文档中任意一个元素距离文档-document-顶部的距离)
+    - [document.write 和 innerHTML 的区别](#documentwrite-和-innerhtml-的区别)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -393,6 +409,7 @@
     - [路由跳转传参的获取](#路由跳转传参的获取)
     - [vue和nvue区别](#vue和nvue区别)
     - [uniapp兼容各端编译](#uniapp兼容各端编译)
+    - [uniapp 应用的生命周期、页面的生命周期、组件的生命周期](#uniapp-应用的生命周期页面的生命周期组件的生命周期)
   - [node](#node)
     - [为什么拼接目录不用相对目录要用path处理](#为什么拼接目录不用相对目录要用path处理)
     - [koa洋葱模型](#koa洋葱模型)
@@ -666,6 +683,23 @@ window.onload = function() {
 7. Web Worker
 8. Web Storage
 9. WebSocket
+
+### 常见的浏览器内核有哪些
+
+主要分成两部分：渲染引擎(layout engineer或Rendering Engine)和JS引擎。
+
+渲染引擎：负责取得网页的内容（HTML、XML、图像等等）、整理讯息（例如加入CSS等），以及计算网页的显示方式，然后会输出至显示器或打印机。浏览器的内核的不同对于网页的语法解释会有不同，所以渲染的效果也不相同。所有网页浏览器、电子邮件客户端以及其它需要编辑、显示网络内容的应用程序都需要内核。
+
+JS引擎则：解析和执行javascript来实现网页的动态效果。
+
+最开始渲染引擎和JS引擎并没有区分的很明确，后来JS引擎越来越独立，内核就倾向于只指渲染引擎。
+
+常见内核
+
++ Trident 内核：IE, MaxThon, TT, The World, 360, 搜狗浏览器等。[又称 MSHTML]
++ Gecko 内核：Netscape6 及以上版本，FF, MozillaSuite / SeaMonkey 等
++ Presto 内核：Opera7 及以上。 [Opera内核原为：Presto，现为：Blink;]
++ Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支）]
 
 
 
@@ -1959,6 +1993,12 @@ xhtml|p {
 
 ### CSS函数
 ![图](book_files/267.jpg)
+
+### rgba和opacity的透明效果有什么不同？
+
+opacity是一个属性。opacity属性的值，可以被其子元素继承，给父级div设置opacity属性，那么所有子元素都会继承这个属性，并且，该元素及其继承该属性的所有子元素的所有内容透明度都会改变。
+
+rgba是一个属性值。rgba设置的元素，只对该元素的背景色有改变，并且，该元素的后代不会继承该属性。
 
 
 
@@ -3318,6 +3358,8 @@ console.warn(Object.fromEntries([
 
 //{foo: 'bar', baz: 42}
 ```
+
++ Object.freeze 对象冻结
 
 ### new Object()和Object.cretate()以及Object.assign()区别
 {}就是new Object的简单写法
@@ -5045,6 +5087,231 @@ function findFirstFive() {
 console.log(findFirstFive()); // 输出 5  
 ```
 
+### 前端控制并发请求
+前端高并发的场景，需要发送大量的http请求，如果直接将所有的请求都放入浏览器queue中排队的话，势必会造成浏览器卡顿或者崩溃，这时候就需要一种机制来做控制。
+
+1. 通过async await串行处理
+
+```js
+async getProSendList(){
+	let listDB = [];
+	for(let i in this.pageIds){
+		await getProSendOutSheets(this.pageIds[i]).then(res=>{
+			if(res.success){
+				let db = res.data;
+				list.push(db);
+			}
+		})
+	}
+	//此处的listDB就是最后整合的数据
+}
+```
+
+> 请求是一条发送完成才会接着下一条发送，上面的时间看板显示请求是在一条线上的，因为用了keep-alive，复用同一条TCP链接，超长的 stalled 已经不存在了，但是这么请求的效率显然太慢了。浏览器默认支持6-8个请求，所以用这种方案也需要调整策略
+
+2. 并发控制——使用**p-limit**插件
+
+```js
+import PLimit from 'p-limit'
+
+// 限制五条并发
+const pLimit = PLimit(5)
+async getProSendList(){
+	let listDB = [];
+	for(let i in this.pageIds){
+		listDB.push(pLimit(getProSendOutSheets(this.pageIds[i]).then(res=>{
+			if(res.success){
+				let db = res.data;
+				return db;
+			}
+		})))
+	}
+	await Promise.all(listDB);
+	//此处的listDB就是最后整合的数据
+}
+```
+
+### 登录密码安全
+前端存储秘钥不安全，有条件的可以使用https，通过后台动态接受秘钥，前端可以存储在单独的配置文件中。
+
+
+```js
+// 例如，使用 CryptoJS 进行密码加密（这里以SHA-256为例）
+const password = '用户密码'; // 从用户输入获取密码
+
+const encryptedPassword = CryptoJS.SHA256(password).toString();
+// 将加密后的密码传输给后端
+// 通常可以通过axios发送HTTP请求
+axios.post('/login', { password: encryptedPassword })
+  .then(response =&gt; {
+    // 处理后端返回的响应
+  })
+  .catch(error =&gt; {
+    // 处理错误
+  });
+```
+```js
+
+// 假设接收前端传来的加密密码，这里以SHA-256为例
+@PostMapping("/login")
+public ResponseEntity<String> login(@RequestBody Map<String, String>; request) {
+    String receivedEncryptedPassword = request.get("password");
+    // 对接收到的密码再进行加密（使用相同的算法和密钥）
+    String serverSalt = "服务器存储的盐"; // 这是加密过程中的盐值
+    String encryptedPassword = encryptPassword(receivedEncryptedPassword, serverSalt);
+    // 与数据库中存储的加密密码比对
+    String storedEncryptedPassword = "数据库中存储的加密密码"; // 从数据库中获取
+    if (encryptedPassword.equals(storedEncryptedPassword)) {
+        // 密码匹配，登录成功
+        return ResponseEntity.ok("登录成功");
+    } else {
+        // 密码不匹配，登录失败
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("登录失败");
+    }
+}
+// 这个方法用于对密码进行加密（这里仅是示例，请根据实际使用的算法进行适当的调整）
+private String encryptPassword(String password, String salt) {
+    // 这里可使用你选择的加密算法和盐值进行密码加密
+    // 例如，SHA-256 + 盐值
+    String encrypted = hashFunction(password + salt); // hashFunction代表哈希函数，需要根据实际使用的算法进行替换
+    return encrypted;
+}
+```
+
+#### CryptoJS
+  CryptoJS 是一个 JavaScript 库，提供了一系列密码学函数和工具，用于加密、解密、生成摘要等任务。它支持多种加密算法，包括常见的对称加密算法（如 AES、DES）和非对称加密算法（如 RSA）。
+
+```js
+import CryptoJS from 'crypto-js';
+Vue.prototype.cryptoJS = CryptoJS;
+```
+1. SHA256算法加密(碰撞测试远低于MD5)
+
+```js
+const password = 'hello world';
+const res = this.cryptoJS.SHA256(password);
+const plainRes = res.toString(); // 加密的结果
+console.log('password 加密的结果是:', plainRes); // 
+```
+
+前后端判断逻辑
+
+1. 用户输入账号密码
+2. 前端对密码进行 SHA256 算法加密密码
+3. 后端将前端传入的已加密的密码存入数据库
+4. 用户再次登录时根据前端传入的已加密的密码与数据库中存入的密码进行比较，一致说明密码正确；否则错误
+
+2. AES加密(相对安全)
+
+```js
+// AES 加密
+decrypt(word, key, iv) {
+  let srcs = this.cryptoJS.enc.Utf8.parse(word);
+  const AES_JM_RES = this.cryptoJS.AES.encrypt(srcs, key, {
+    // 对称加密算法主要有AES、DES、3DES / 非对称加密算法主要有RSA、DSA、RCC
+    // iv(初始变量)
+    // key(加密密钥)
+    // mode(加密模式 主要有CBC(默认)、CFB、CTR、OFB、ECB)
+    // padding(填充方式 主要有Pkcs7(默认)、Iso97971、AnsiX923、Iso10126、ZeroPadding)
+    iv: iv,
+    mode: this.cryptoJS.mode.CBC, // 选择模式为CBC
+    padding: this.cryptoJS.pad.Pkcs7 // 选择填充方式为PKCS7
+  });
+  let encryptedBase64Data = this.cryptoJS.enc.Base64.stringify(AES_JM_RES.ciphertext);
+  return encodeURIComponent(encryptedBase64Data);
+}
+// AES 解密
+encrypt(word, key, iv) {
+  word = decodeURIComponent(word);
+  let encryptedHexStr = this.cryptoJS.enc.Base64.parse(word);
+  let srcs = this.cryptoJS.enc.Base64.stringify(encryptedHexStr);
+  let decrypt = this.cryptoJS.AES.decrypt(srcs, key,
+    {
+      iv: iv,
+      mode: this.cryptoJS.mode.CBC,
+      padding: this.cryptoJS.pad.Pkcs7,
+    }
+  );
+  let decryptedStr = decrypt.toString(this.cryptoJS.enc.Utf8);
+  return decryptedStr.toString();
+}
+
+// 样例
+const password = 'hello world';
+// 定义加密所需的参数
+const key = this.cryptoJS.enc.Utf8.parse('1234567890abcdef'); // 设置密钥为16字节长度的十六进制字符串
+const iv = this.cryptoJS.enc.Utf8.parse('abcdefghijklmnop'); // 初始化向量也必须是16字节长度的十六进制字符串
+const str = this.decrypt(password, key, iv);
+console.log('加密结果', str);
+const str1 = this.encrypt(str, key, iv);
+console.log('解密结果', str1);
+```
+
+3. DES加密(秘钥短，不再安全)
+4. MD5加密(无法防止碰撞测试)
+5. HMAC-SHA256
+
+```js
+// 示例中采用HMAC-SHA256算法对数据进行加密
+// HMAC并不是一个加密算法，它是一种用于消息认证的技术，因此并不能进行解密操作
+const password = 'hello world';
+// 密钥 key 必须是安全存储和传输的。它不应该在客户端的代码中硬编码，也不应该在不安全的网络通道中传输。
+const key = this.cryptoJS.enc.Utf8.parse('123456789');
+// 计算 HMAC 
+const hmac = this.cryptoJS.HmacSHA256(password, key);
+console.log('HMAC加密结果:', hmac.toString()); 
+// 9da40d794b56b945a8e382216b9778216326dd187f6b37e921ec28b63a09bdb0
+```
+
+### 对象保护不被修改
++ 闭包实现
++ Object.defineProperty
+
+```js
+var myObj={
+    PI:3.1415926
+}
+
+Object.defineProperty(myObj,'PI',{
+    value:3.1415926,
+    writable:false,
+    configurable:true,
+})
+myObj.PI = 2
+console.log(myObj.PI);
+```
+
+3. Object.freeze():冻结一个对象，使其所有属性都变为不可修改，包括其内部的属性。
+
+```js
+const obj1 = {
+    prop: 42,
+};
+  
+Object.freeze(obj1);
+
+obj1.prop=33
+console.log(obj1);
+//42
+```
+
+### onload 和 DOMContentLoaded
+onload 和 DOMContentLoaded 都是用于确定何时执行JavaScript代码的事件，但它们的触发时机不同。
+
+onload 事件在页面所有资源都加载完成后触发,相较于 onload，DOMContentLoaded 事件会更快地触发，因为它不等待所有资源的加载。
+
+适用于需要在DOM加载完成后立即执行的代码，而无需等待其他资源的加载，如操作DOM元素、绑定事件等。
+
+```js
+window.onload = function() { ... } 
+imgElement.onload = function() { ... }。
+```
+```js
+document.addEventListener('DOMContentLoaded', function() { 
+	... 
+})
+```
+
 
 
 
@@ -5571,6 +5838,21 @@ console.warn(v1,v2,v3)
 
 > for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
 
+### 实现解构let [a,b] = {a:1,b:2}
+
+```js
+// Object.prototype[Symbol.iterator] = function (){
+// 	return Object.values(this)[Symbol.iterator]()
+// }
+Object.prototype[Symbol.iterator] = function* () {  
+  yield* Object.values(this);  
+};
+let [a,b] = {a:1,b:3}
+console.log(a,b)
+```
+
+
+
 
 
 ## Typescript
@@ -5854,6 +6136,7 @@ loggingIdentity([1,2,3])// 正确
 keyof 可以获取对象/接口的**可访问索引字符串**字面量类型
 
 在 TypeScript 中，keyof 是一个操作符，它返回一个对象类型的所有公开属性的联合类型。这与 JavaScript 中的 Object.keys 函数有些相似，但 Object.keys 返回的是一个包含所有属性名称的数组，而 keyof 返回的是一个类型。
+
 ```js
 interface User {
   id: number,
@@ -5882,7 +6165,8 @@ type token = keyof Token // type token = "accessExp" | "refreshExp"
 ```js
 // T是Person类型。
 // K可以是'name'、'position'或'age'中的一个或多个。
-// 因此，T[K]可以是string（如果K是'name'或'position'）或number（如果K是'age'）。所以T[K]的完整类型是string | number。
+// T[K]可以是string（如果K是'name'或'position'）或number（如果K是'age'）。
+//所以T[K]的完整类型是string | number。
 // T[K][]则是一个数组，其中的元素可以是string或number。
 function pluck<T, K extends keyof T>(o: T, names: K[]): T[K][] {
   return names.map(n => o[n])
@@ -5902,6 +6186,17 @@ let person: Person = {
 let values: unknown[] = pluck(person, ['name', 'age'])
 console.log(values)//[ 'Evan', 27 ]
 ```
+
+### keyof any
+```js
+keyof any //string | number | symbol
+```
+
+![keyof any](book_files/272.jpg)
+
+虽然我们可以将布尔值作为属性访问器的参数，但它们实际上被当作字符串 'true' 和 'false' 来处理。
+
+因此，keyof 操作符返回的对象键类型不包括 boolean
 
 ### 映射类型
 映射类型可以将已知类型的每个属性都变为可选的或者只读的。**使用 Readonly 与 Partial 关键字**
@@ -5944,12 +6239,31 @@ ts内置的一些常用工具类型，简化ts的操作。它们都是基于泛�
 + Exclude<T, U> – 从 T 中剔除可以赋值给 U 的类型。
 + Extract<T, U> – 提取 T 中可以赋值给 U 的类型。
 + NonNullable<T> – 从 T 中剔除 null 和 undefined。
+
+```js
+type MyType = string | number | null | undefined;  
+  
+// 使用 NonNullable<T> 排除 null 和 undefined  
+type NonNullableMyType = NonNullable<MyType>;
+//type NonNullableMyType = string | number  
+```
+
 + ReturnType<T> – 获取函数返回值类型。
+
+```js
+// 定义一个函数类型  
+type MyFunctionType = () => string;  
+  
+// 使用 ReturnType<T> 获取 MyFunctionType 的返回类型  
+type MyFunctionReturnType = ReturnType<MyFunctionType>;  //string
+```
+
 + InstanceType<T> – 获取构造函数类型的实例类型。
 
 ```js
 // 原理
-type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
+type InstanceType<T extends abstract new (...args: any) => any>
+ = T extends abstract new (...args: any) => infer R ? R : any;
 ```
 ```js
 class C {
@@ -5964,14 +6278,18 @@ type T0 = InstanceType<typeof C>;
 let f:T0 ={
   x:0,
   y:0
-}
+}//正确
 
+let f1:C ={
+  x:0,
+  y:0
+}//正确
 ```
 
 + Partial<T> - 设置可选部分类等
 + Required<T> - 将可选全部转为必选
 + Readonly<T> - 只读
-+ Record:将 K 中的所有属性值都转换为 T 类型，并返回新的对象类型
++ **Record:将 K 中的所有属性值都转换为 T 类型，并返回新的对象类型**
 
 ```js
 type Record<K extends keyof any, T> = {
@@ -6069,12 +6387,9 @@ type B = "like" | "eat" | "name";
 type C = Extract<A, B>; //'name'
 ```
 
-
-
 ### infer 推断使用
 infer会根据当前场景推断出具体类型
 ```js
-
 type ElementOf<T> = T extends Array<infer E> ? E : boolean;
 
 type Tuple = string[];
@@ -6087,7 +6402,6 @@ console.log(k20t1)//“30”
 
 // number extends Array<?> =>不成立，走boolean
 let k20t2:ElementOf<number> = true
-cons
 ```
 
 ```js
@@ -6203,10 +6517,11 @@ type SomeConstructor = {
 }
 //3.使用函数 参数为Ctor:类型为type定义好的类型名:SomeConstructor
 function Fn(Ctor: SomeConstructor) {
-  ////Ctor: SomeConstructor可以理解为一个构造函数，那么这里就可以调用这个函数了,Ctor('字符串')，
+  //Ctor: SomeConstructor可以理解为一个构造函数，那么这里就可以调用这个函数了,Ctor('字符串')，
   //但是这里只实现了调用签名，并没有实现构造签名，在ts里要实现构造签名，
   //需要在type SomeConstructor={}对象里的方法添加一个new,这样它就是一个构造函数类型了,
-  //那么在这里的Ctor('字符串')前面也要加一个new才能够被实例化。如果要返回这个实例，前面再加一个return，那么这里就返回了一个构造函数的实例了
+  //那么在这里的Ctor('字符串')前面也要加一个new才能够被实例化。
+  //如果要返回这个实例，前面再加一个return，那么这里就返回了一个构造函数的实例了
  return new Ctor('字符串');
 }
 
@@ -6357,20 +6672,49 @@ Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 ![vue基本实现方式](book_files/62.jpg)
 ![对应关系](book_files/63.jpg)
 
+### vue页面初始化闪烁
+因为在 Vue 代码尚未解析之前，尚无法控制页面中 DOM 的显示，所以看见模板字符串等代码。
+```css
+[v-cloak] {
+display: none;
+}
+<div v-cloak>{{ message }}</div>
+```
+
 ### Vue组件通信方式
 1. props 和 $emit
-2. ref
+2. ref:父组件通过获取子节点的引用`this.refs.xx.childmethods`，子组件可以`this.$parent.fathermethods`,注意时间，父组件如果调用子组件的方法，不要不要选择在created的时候，而是应该放在**mouted**时候，而子组件调用父组件的方法可以写在created时候，类似koa的洋葱模型。
+
+```html
+ <ChildData v-model="myapp" ref="zz"/>
+ <script>
+ import ChildData from './ChildData.vue'
+ export default {
+     mounted(){
+		 // 调用子组件的add方法
+         this.$refs.zz.add()
+         console.log(this.$refs.zz)
+     }
+ }
+ </script>
+```
+
 3. EventBus
 4. parent root children
-5. attrs 和listeners
+5. **attrs 和listeners和inheritAttrs**
+
+inheritAttrs：默认为true, 会自动在挂载组件元素上属性值,如props声明了属性，则挂载未被声明的属性；false时会关闭自动挂载到组件根元素上属性。`注意：这个选项不影响 class 和 style 绑定。`
+
+![图](book_files/277.jpg)
+
 6. Provide 和 Inject
 7. Vuex
 
-$root
+$root[不要随意使用，耦合性太高]
 ```js
 // 根组件
-// this等于this$root 
-
+// this.$root 引用的是 Vue 实例的根实例，无论你在哪个子组件中调用它，它都会指向同一个根实例 
+// this.$root.$emit('myname') 可以在任何组件内部被调用，不仅仅是根组件
 new Vue({
   render: h => h(App),
   methods: {  
@@ -6418,12 +6762,17 @@ provide 和inject
   },
   methods:{
     changeF(){
-      this.k =1000 //简单类型后代组件不会随之改变
+      this.k++ //简单类型后代组件不会随之改变
       this.arr=[2] // 直接重新给值不会
       this.test.f=30 //只修改对应属性后代组件可以改变
     }
   }
 ```
+![对比](book_files/273.jpg)
+
+当通过 provide 提供了一个简单类型（如数字、字符串、布尔值等）的变量（如 for1: this.k），后代组件注入的是这个变量的值的拷贝，而不是变量本身的引用。
+
+如果修改的是数组或对象的属性（如 this.test.f = 30），并且这个数组或对象是通过 provide 提供的，那么后代组件注入的是这个数组或对象的引用的拷贝。由于你并没有改变这个引用的值（你只是修改了它所引用的对象的一个属性），后代组件看到的仍然是同一个对象的引用，所以当对象的属性改变时，后代组件也会看到这个改变。
 
 
 ```js
@@ -6457,7 +6806,7 @@ Vue.prototype.$bus = new Vue() //方案2 Vue2自身支持
 <HelloWorld foo="foo"/>
 ```
 
- 组件通过 Child2 间接地与 Grandson 组件通信，传递属性和监听事件，而 Child2 组件仅作为属性和事件的“中继站”。这种模式在构建大型 Vue.js 应用程序时非常有用，因为它允许你构建可重用的组件，同时保持组件之间的解耦。
+ 组件通过 Child2 间接地与 Grandson 组件通信，传递属性和监听事件，而 Child2 组件仅作为属性和事件的**“中继站”**。这种模式在构建大型 Vue.js 应用程序时非常有用，因为它允许你构建可重用的组件，同时保持组件之间的解耦。
 ```html
 // Grandson communication/index.vue 祖辈
 <Child2 msg="lalala" @some-event="onSomeEvent"></Child2>
@@ -6465,10 +6814,11 @@ Vue.prototype.$bus = new Vue() //方案2 Vue2自身支持
 // Child2 父辈
 <Grandson v-bind="$attrs" v-on="$listeners"></Grandson>
 
-v-bind="$attrs"：这个指令将父组件传递给 Child2 的所有`未被 Child2 组件显式声明的属性`（props）`向下传递`给 Grandson 组件。在这个例子中，msg 属性就是这样被传递的。
+// v-bind="$attrs"：这个指令将父组件传递给 Child2 的所有`未被 Child2 组件显式声明的属性`
+//（props）`向下传递`给 Grandson 组件。在这个例子中，msg 属性就是这样被传递的。
 
-v-on="$listeners"：这个指令将父组件（即 Grandson communication/index.vue）监听的所有事件监听器传递给 `Grandson 组件`。这意味着 some-event 事件监听器也会被传递给 Grandson 组件。
-
+// v-on="$listeners"：这个指令将父组件（即 Grandson communication/index.vue）
+// 监听的所有事件监听器传递给 `Grandson 组件`。这意味着 some-event 事件监听器也会被传递给 Grandson 组件。
 
 // Grandson
 <div @click="$emit('some-event', 'msg from grandson')">
@@ -6488,7 +6838,7 @@ this.$parent.emit('add')
 + 如果是组件实例对象，则必须是函数，目的是为了防止公用data会造成数据污染，使用函数返回一个全新的data对象
 
 ### vue直接给对象添加属性的问题
-vue2的响应式依赖Object.defineProperty去添加依赖收集触发，但是这个操作是在编译模板时已经触发了，现在手动添加，无法感知到，所以vue2提供了Vue.set()方法，去再次触发收集依赖。
+vue2的响应式依赖Object.defineProperty去添加`依赖收集触发`，但是这个操作是在编译模板时已经触发了，现在手动添加，无法感知到，所以vue2提供了Vue.set()方法，去再次触发`收集依赖`。
 
 ### v-if和v-for的优先级
 vue2中通过编译后发现，v-for的优先级高于v-if，vue3中v-if高于v-for，但是不建议v-if和v-for放在一个层级.
@@ -6527,7 +6877,7 @@ key是每一个vnode的唯一id，是diff的一种优化侧率，根据key，可
 ### Vue.extend 和 Vue.component
 Vue.extend() 是 Vue.js 中的一个全局 API，它用于创建一个“子类”或“扩展”的 Vue 构造器。这个扩展的构造器可以用来创建可复用的组件构造器，这些构造器可以用来创建新的 Vue 组件实例。
 
-在某些情况下，可能需要动态地创建组件实例，或者需要一种更底层的、编程式的方式来创建组件，这时 Vue.extend() 就非常有用。
+在某些情况下，可能需要`动态地创建组件实例`，或者需要一种更底层的、编程式的方式来创建组件，这时 Vue.extend() 就非常有用。
 
 ```js
 // 创建一个扩展的 Vue 构造器  
@@ -6548,7 +6898,7 @@ const instance = new MyComponent().$mount();
 Vue.component：在内部，它实际上也调用了 Vue.extend 来创建一个构造器，但随后它还进行了组件的注册和命名等额外操作。因此，你可以将 Vue.component 看作是 Vue.extend 和组件注册的结合体。
 
 ### vue中mixin的理解和应用场景
-Mixin是面向对象程序设计语言中的类，提供了方法实现。其他类可以访问mixin类的方法而不必成为其子类。
+Mixin是面向对象程序设计语言中的类，提供了方法实现。`其他类可以访问mixin类的方法而不必成为其子类。`
 
 Mixin类通常作为功能模块使用，在需要该功能时“混入”，有利于代码复用有避免多继承的复杂。
 
@@ -6589,8 +6939,8 @@ Vue.mixin({
 })
 ```
 #### mixin注意事项
-+ 组件 data, methods，computed等 优先级高于 mixin data, methods,computed... 优先级(存在相同的组件覆盖混入)
-+ 生命周期函数，先执行 mixin 里面的，再执行组件里面的(数组形式，都会执行)
++ 组件 data, methods，computed等 `优先级`高于 mixin data, methods,computed... 优先级(存在相同的组件覆盖混入)
++ 生命周期函数，先执行 mixin 里面的，再执行组件里面的(`数组形式`，都会执行)
 
 ```js
 const toggle = {
@@ -6666,31 +7016,30 @@ Mixins 在 Vue.js 中的实现原理主要基于 `JavaScript 的对象合并和�
 + @click.self.prevent(阻止当前元素的点击)
 
 ### v-bind:value.sync
-简易写法，这样子组件需要通知父组件改变值时，只需简单触发事件即可，不过vue3由于加强了v-model，不需要.sync这种用法。
+简易写法，这样子组件需要通知父组件改变值时，`只需简单触发事件`即可，不过vue3由于加强了v-model，不需要.sync这种用法。
 ```html
-//
+// 父组件操作
 <comp :myMessage.sync="bar"></comp>
-//
+// 子组件操作
 this.$emit('update:myMessage',params);
 ```
 相当于下面的简写
 ```html
-//
+// 父组件操作
 <comp :myMessage="bar" @update:myMessage="func"></comp>
 func(e){
 	this.bar = e;
 }
-// js
+// 子组件操作
 func2(){
  this.$emit('update:myMessage',params);
 }
 ```
 
-
 ### vue中的$nextTick
 在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM。
 
-nextTick的核心是利用了如 Promise、MutationObserver、setImmediate、setTimeout 的原生 JavaScript 方法来模拟对应的微/宏任务的实现，本质是为了利用JavaScript的这些异步回调任务队列来实现 Vue 框架中自己的异步回调队列。
+nextTick的核心是利用了如 `Promise、MutationObserver、setImmediate、setTimeout` 的原生 JavaScript 方法来模拟对应的微/宏任务的实现，本质是为了利用JavaScript的这些异步回调任务队列来实现 Vue 框架中自己的异步回调队列。
 
 #### 为什么要有$nextTick
 
@@ -6700,7 +7049,7 @@ for(let i=0; i<100000; i++){
  num = i
 }
 ```
-如果没有nextTick，那么每次num变动，都会更新视图。有了nextTick，只需要更新一次，本质是一种性能优化策略。
+如果没有nextTick，那么每次num变动，都会更新视图。有了nextTick，只需要更新一次，`本质是一种性能优化策略。`
 
 > 实现回调的机制分别可能是Promise.then>MutationObserver>setImmediate>setTimeout(降级操作)
 
@@ -6770,7 +7119,7 @@ console.log(this.$el.textContent) // => '最新值'
 4. (如果不是用model，那么参数仍然是value，触发条件仍然是input事件)
 5. 注意checkbox修改的值是e.target.checked,不是e.target.value
 
-使用 v-model好处是无需记特定的 prop 字段名，即可绑定到组件中的值，降低组件的使用成本。其次，应该尽量将「重复的逻辑处理」放在子组件中，这样子才会让组件的封装更有意义。
+使用 v-model好处是`无需记特定的 prop 字段名`，即可绑定到组件中的值，降低组件的使用成本。其次，应该尽量将「重复的逻辑处理」放在子组件中，这样子才会让组件的封装更有意义。
 
 应用场景：**子组件想要使用父组件的值,又想去改父组件的值**
 
@@ -6794,6 +7143,50 @@ vue3已废弃，vue3可以同时给一个组件加多个v-model，不需要再�
   @input="value = $event.target.value"
 >
 ```
+
+父组件
+```html
+<template>
+  <div id="app">
+    <ParentData/>
+  </div>
+</template>
+<script>
+import ParentData from '../src/02vmodel/ParentData.vue'
+export default {
+  name: 'App',
+  components: {
+    ParentData
+  },
+ 
+}
+</script>
+```
+
+子组件
+```html
+<template>
+    <div>
+        child - {{ value }}
+        <button @click="add">child add</button>
+    </div>
+</template>
+<script>
+export default {
+    props:['value'],
+    methods: {
+      add(){
+        this.$emit("input",this.value+1)
+      }
+    }
+}
+</script>
+```
+
+父子组件都可以使用到value，且子组件触发emit，父组件会自动更新value
+
+![触发](book_files/274.jpg)
+
 #### Vue3中的v-model不同之处
 ![v-model](book_files/83.jpg)
 
@@ -6875,7 +7268,40 @@ Vue.use(插件名字,{ /* ... */} )
 
 ### 自定义指令的应用场景
 1. 按钮权限控制：通过后台返回的权限控制表，对需要控制的按钮进行匹配，v-xxx控制显示或者隐藏
+
+```html
+<el-button
+	type="primary"
+	v-hasPermi="['cms:communityAnnouncement:add']"
+	@click="handlerExport"
+>导出</el-button> 
+```
+```js
+import store from '@/store'
+
+export default {
+  inserted(el, binding, vnode) {
+    const { value } = binding
+    const all_permission = '*:*:*'
+    const permissions = store.getters && store.getters.permissions
+
+    if (value && value instanceof Array && value.length > 0) {
+      const permissionFlag = value
+      const hasPermissions = permissions.some(permission => {
+        return all_permission === permission || permissionFlag.includes(permission)
+      })
+      if (!hasPermissions) {
+        el.parentNode && el.parentNode.removeChild(el)
+      }
+    } else {
+      throw new Error(`请设置操作权限标签值`)
+    }
+  }
+}
+```
+
 2. v-throttle： 防止重复表单提交
+
 ```js
 // 1.设置v-throttle自定义指令
 Vue.directive('throttle', {
@@ -6899,6 +7325,40 @@ Vue.directive('throttle', {
 // 2.为button标签设置v-throttle自定义指令
 <button @click="sayHello" v-throttle>提交</button>
 ```
+
+3. 一键复制
+4. 活动埋点
+
+```js
+Vue.directive('track', {  
+  // 当被绑定的元素挂载到 DOM 中时……  
+  bind(el, binding, vnode) {  
+    // 确保element有一个唯一的事件处理器  
+    if (!el.hasAttribute('data-track-bound')) {  
+      el.setAttribute('data-track-bound', 'true');  
+      el.addEventListener('click', (event) => {  
+        // 这里你可以自定义你的埋点数据  
+        // binding.value 可能是一个函数，返回埋点数据，或者是一个直接的对象  
+        let trackData = typeof binding.value === 'function' ? binding.value(event, el) : binding.value;  
+  
+        // 发送埋点数据到你的服务器或第三方服务  
+        // 这里只是简单地将数据打印到控制台  
+        console.log('Track event:', trackData);  
+  
+        // 如果你使用的是第三方埋点库，你可以调用它的API来发送数据  
+        // analytics.trackEvent(trackData);  
+      });  
+    }  
+  },  
+  // 指令与元素解绑的时候调用  
+  unbind(el) {  
+    // 移除之前添加的事件监听器  
+    el.removeEventListener('click', el._trackClickHandler);  
+    el.removeAttribute('data-track-bound');  
+  }  
+});
+```
+
 
 ### vue过滤器
 vue3已废弃
@@ -7238,6 +7698,7 @@ function pruneCacheEntry (
   remove(keys, key)
 }
 ```
+
 #### 缓存后如何获取数据
 1. 每次组件渲染的时候，都会执行beforeRouteEnter
 ```js
@@ -7271,7 +7732,6 @@ activated(){
 ```
 注意点：正常理解v-if会删除dom重新创建，但是组件外套keep-alive之后，虽然确实会移除dom（可以打开控制台发现dom确实被移除了），但是dom结构会保存在缓存中，当被v-if为true时候直接搬回来，并不会再重新绘制dom，就**不会激发mounted生命周期**。
 
-
 ### Vue动态组件和异步组件
 ```html
 <!-- 使用场景：tab切换，常配合keep-alive使用
@@ -7303,7 +7763,7 @@ Actions：可以处理多个Mutations和异步操作
 ![vuex](book_files/91.jpg)
 
 ### 介绍Vue的模板编译
-模版指的就是template属性。vue内部会将template字符串转化成render函数进行渲染。render函数返回虚拟节点，再将虚拟节点转化成真实DOM。（模版=>方法=>节点）
+`模版指的就是template属性。vue内部会将template字符串转化成render函数进行渲染。render函数返回虚拟节点，再将虚拟节点转化成真实DOM。`（模版=>方法=>节点）
 而编译过程就是template转换render函数的过程。
 
 如何将template转换成render函数？
@@ -7450,7 +7910,7 @@ module.exports = {
 ### vue项目性能优化
 1. 尽量减少 data 中的数据，data 中的数据都会增加 getter 和 setter，会收集对应的 watcher
 2. v-if 和 v-for 不能连用
-3. 如果需要使用 v-for 给每项元素绑定事件时使用事件代理
+3. `如果需要使用 v-for 给每项元素绑定事件时使用事件代理`
 4. SPA 页面采用 keep-alive 缓存组件
 5. key 保证唯一
 6. 使用路由懒加载、异步组件
@@ -7459,13 +7919,15 @@ module.exports = {
 9. 长列表滚动到可视区域动态加载
 10. 图片懒加载
 11. 压缩代码
-12. Tree Shaking/Scope Hoisting
+12. Tree Shaking/Scope Hoisting(对作用域进行提升，并且让webpack打包后的代码更小、运行更快，开发环境需自己配置，生成环境默认开启)
 13. 使用 cdn 加载第三方模块
 14. splitChunks 抽离公共文件
 
+Scope Hoisting：
 
+![1](book_files/275.jpg)
 
-
+![2](book_files/276.jpg)
 
 ## Vue3
 vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
@@ -7492,6 +7954,7 @@ Monorepo 的主要优势包括：
 	+ 缓存事件，空间换时间
 2. 体积更小
 	+ 通过tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的
+	+ 移除过滤器+内联模板+.sync+on.native等其他功能可替代的语法
 3. 更易维护：compositon Api + options Api
 4. 更好的Typescript支持
 5. 编译器重写
@@ -7552,6 +8015,63 @@ Monorepo 的主要优势包括：
 ![teleport](book_files/118.jpg)
 
 ![suspense](book_files/119.jpg)
+
+### v-on.native修饰符移除，怎么去操作组件的事件
+
+在 Vue 3 中，直接在父组件模板中监听子组件的原生事件（如 <Child @click="add"/>）通常不会工作，除非子组件的**根元素**实际上是一个**原生元素**
+```html
+<template>
+  <h1>{{ count }}</h1>
+  <Child @click="add"/>
+</template>
+```
+![可以触发](book_files/278.jpg)
+
+![不会触发](book_files/279.jpg)
+
+其他解决方案
+```html
+<!-- Child.vue -->  
+<template>  
+  <button @click="handleClick">Click me</button>  
+</template>  
+  
+<script>  
+export default {  
+  methods: {  
+    handleClick() {  
+      // 触发一个名为 'custom-click' 的自定义事件  
+      this.$emit('custom-click');  
+    }  
+  }  
+}  
+</script>  
+  
+<!-- Parent.vue -->  
+<template>  
+  <h1>{{ count }}</h1>  
+  <Child @custom-click="add"/>  
+</template>  
+<script>  
+import Child from './Child.vue';  
+export default {  
+  components: {  
+    Child  
+  },  
+  data() {  
+    return {  
+      count: 0  
+    };  
+  },  
+  methods: {  
+    add() {  
+      this.count++;  
+    }  
+  }  
+}  
+</script>
+```
+
 
 ### vue3的Composition Api的好处
 1. 不需要像options API一个功能代码跳转很多地方
@@ -11069,8 +11589,10 @@ node.ownerDocument.documentElement 的用法可能大家比较陌生，ownerDocu
 
 docElement.clientTop，clientTop 是一个元素顶部边框的宽度，不包括顶部外边距或内边距。
 
+### document.write 和 innerHTML 的区别
+document.write 只能重绘整个页面
 
-
+innerHTML 可以重绘页面的一部分
 
 
 ## BOM
@@ -12064,6 +12586,39 @@ export default {
 </script>
 ```
 
+### uniapp 应用的生命周期、页面的生命周期、组件的生命周期
+```
+应用的生命周期
+
+onLaunch——当uni-app 初始化完成时触发（全局只触发一次）
+onShow——当 uni-app 启动，或从后台进入前台显示
+onHide——当 uni-app 从前台进入后台
+onError——当 uni-app 报错时触发
+onUniNViewMessage——对 nvue 页面发送的数据进行监听，可参考 nvue 向 vue 通讯
+onUnhandledRejection——对未处理的 Promise 拒绝事件监听函数（2.8.1+）
+onPageNotFound——页面不存在监听函数
+onThemeChange——监听系统主题变化 
+页面的生命周期
+
+onInit——监听页面初始化，其参数同 onLoad 参数，为上个页面传递的数据，参数类型为 Object（用于页面传参），触发时机早于 onLoad
+onLoad——监听页面加载，其参数为上个页面传递的数据，参数类型为 Object（用于页面传参），参考示例
+onShow——监听页面显示。页面每次出现在屏幕上都触发，包括从下级页面点返回露出当前页面
+onReady——监听页面初次渲染完成。注意如果渲染速度快，会在页面进入动画完成前触发
+onHide——监听页面隐藏
+onUnload——监听页面卸载
+onResize——监听窗口尺寸变化
+组件的生命周期
+uni-app 组件支持的生命周期，与vue标准组件的生命周期相同
+
+beforeCreate——在实例初始化之后被调用。
+created——在实例创建完成后被立即调用。
+beforeMount——在挂载开始之前被调用。
+mounted——挂载到实例上去之后调用。详见 注意：此处并不能确定子组件被全部挂载，如果需要子组件完全挂载之后在执行操作可以使用$nextTickVue官方文档
+beforeUpdate——数据更新时调用，发生在虚拟 DOM 打补丁之前。
+updated——由于数据更改导致的虚拟 DOM 重新渲染和打补丁，在这之后会调用该钩子。
+beforeDestroy——实例销毁之前调用。在这一步，实例仍然完全可用。
+destroyed——Vue 实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。
+```
 
 
 
