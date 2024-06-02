@@ -290,10 +290,12 @@
     - [与Vue2的不同](#与vue2的不同)
       - [功能改变](#功能改变)
     - [v-on.native修饰符移除，怎么去操作组件的事件](#v-onnative修饰符移除怎么去操作组件的事件)
+    - [vue2和vue3异步组件用法](#vue2和vue3异步组件用法)
     - [vue3的Composition Api的好处](#vue3的composition-api的好处)
       - [Composition API 和 React hooks 对比](#composition-api-和-react-hooks-对比)
     - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
     - [vue3proxy取代defineProperty API原因](#vue3proxy取代defineproperty-api原因)
+    - [defineComponent](#definecomponent)
     - [如何理解ref reactive toRef toRefs](#如何理解ref-reactive-toref-torefs)
       - [ref](#ref)
       - [reactive](#reactive)
@@ -8072,6 +8074,95 @@ export default {
 </script>
 ```
 
+### vue2和vue3异步组件用法
+在Vue 2中，你可以通过动态import()语法或工厂函数的方式来实现异步组件的加载。
+```js
+export default {  
+  components: {  
+    AsyncComponent: () => import('./AsyncComponent.vue')  
+  },  
+}
+```
+工厂函数允许你更细粒度地控制异步组件的加载，包括指定加载状态、错误状态等。(V2.3.0+ 新增)
+```js
+const AsyncComponent = () => ({  
+  component: import('./AsyncComponent.vue'),  
+  loading: LoadingComponent, // 加载时显示的组件  
+  error: ErrorComponent, // 加载失败时显示的组件  
+  delay: 200, // 显示加载组件之前的延迟时间，单位ms  
+  timeout: 3000 // 加载组件的超时时间，单位ms  
+});  
+
+export default {  
+  components: {  
+    AsyncComponent  
+  },  
+  // ...  
+}
+```
+错误处理:当异步组件加载失败时，如果你指定了error组件，Vue会自动渲染这个组件。但是，如果你想要更细粒度的错误处理，你可以在全局配置或组件级别的配置中设置错误处理器。
+```js
+Vue.config.errorHandler = function (err, vm, info) {  
+  // 处理错误  
+  console.error('Caught an error:', err);  
+  // 你可以在这里记录错误，发送报告等  
+};
+```
+组件级别的处理
+```js
+const AsyncComponent = () => {  
+  return new Promise((resolve, reject) => {  
+    import('./AsyncComponent.vue')  
+      .then(component => {  
+        resolve({  
+          component  
+          // 其他选项...  
+        });  
+      })  
+      .catch(err => {  
+        // 处理错误  
+        console.error('Failed to load AsyncComponent:', err);  
+        reject(err);  
+      });  
+  });  
+};
+```
+在Vue 3中，引入了`defineAsyncComponent`函数来更简洁、更明确地定义异步组件。
+
+这个函数接受一个返回Promise的加载函数作为参数，该Promise在解析时应该返回组件定义。Vue 3还提供了更丰富的选项，如loadingComponent、errorComponent、delay和timeout，用于定制加载状态、错误处理和超时行为。
+```js
+import { defineAsyncComponent } from 'vue'
+
+const AsyncComp = defineAsyncComponent(() => {
+  return new Promise((resolve, reject) => {
+    // ...从服务器获取组件
+    resolve(/* 获取到的组件 */)
+  })
+})
+// ... 像使用其他一般组件一样使用 `AsyncComp`
+```
+```js
+import { defineAsyncComponent } from 'vue'
+
+const AsyncComp = defineAsyncComponent(() =>
+  import('./components/MyComponent.vue')
+)
+```
+```js
+const AsyncComp = defineAsyncComponent({
+  // 加载函数
+  loader: () => import('./Foo.vue'),
+  // 加载异步组件时使用的组件
+  loadingComponent: LoadingComponent,
+  // 展示加载组件前的延迟时间，默认为 200ms
+  delay: 200,
+  // 加载失败后展示的组件
+  errorComponent: ErrorComponent,
+  // 如果提供了一个 timeout 时间限制，并超时了
+  // 也会显示这里配置的报错组件，默认值是：Infinity
+  timeout: 3000
+})
+```
 
 ### vue3的Composition Api的好处
 1. 不需要像options API一个功能代码跳转很多地方
@@ -8231,7 +8322,7 @@ export function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 + SSR优化:当静态内容大到一定量级时候，会用createStaticVNode方法在客户端去生成一个static node，这些静态node，会被直接innerHtml，就不需要创建对象，然后根据对象渲染
 
-+ 源码体积：相比Vue2，Vue3整体体积变小了，除了移出一些不常用的API，再重要的是Tree shanking。任何一个函数，如ref、reavtived、computed等，仅仅在用到的时候才打包，没用到的模块都被摇掉，打包的整体体积变小
++ 源码体积：相比Vue2，Vue3整体体积变小了，除了移出一些不常用的API，最重要的是Tree shanking。任何一个函数，如ref、reavtived、computed等，仅仅在用到的时候才打包，没用到的模块都被摇掉，打包的整体体积变小
 
 + 响应式系统：vue3采用proxy重写了响应式系统，因为proxy可以对整个对象进行监听，所以不需要深度遍历。
 
@@ -8245,6 +8336,24 @@ export function render(_ctx, _cache, $props, $setup, $data, $options) {
 + Proxy可以直接监听数组的变化（push、shift、splice）
 + Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等，这是Object.defineProperty不具备的
 + **Proxy 不兼容IE，也没有 polyfill**
+
+### defineComponent
+是一个函数，用于显式地定义一个 Vue 组件。虽然 Vue 3 在很多情况下可以自动推断组件的定义（即，即使你不使用 defineComponent，它也能正常工作），但 defineComponent 提供了一些额外的功能，比如更好的类型推断和更明确的代码结构。
+```js
+import { defineComponent } from 'vue';  
+export default defineComponent({  
+  name: 'MyComponent',  
+  props: {  
+    // 定义 props  
+  },  
+  setup() {  
+    // 组件逻辑  
+    return {  
+      // 暴露给模板的响应式数据  
+    };  
+  },  
+});
+```
 
 ### 如何理解ref reactive toRef toRefs
 
