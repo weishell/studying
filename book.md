@@ -279,6 +279,7 @@
     - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
     - [Vue动态组件和异步组件](#vue动态组件和异步组件)
     - [Vuex的使用](#vuex的使用)
+    - [vuex辅助函数](#vuex辅助函数)
     - [介绍Vue的模板编译](#介绍vue的模板编译)
     - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
@@ -315,12 +316,26 @@
     - [ref作为作为 reactive 对象的属性注意](#ref作为作为-reactive-对象的属性注意)
       - [数组和集合的注意事项](#数组和集合的注意事项)
     - [ref在模板中解包的注意事项](#ref在模板中解包的注意事项)
+    - [shallowRef()](#shallowref)
+    - [ref、isRef、customRef、triggerRef、shallowRef](#refisrefcustomreftriggerrefshallowref)
     - [script setup](#script-setup)
     - [Vue3中 script setup props emit 向父组件暴露数据用法](#vue3中-script-setup-props-emit-向父组件暴露数据用法)
     - [事件参数](#事件参数)
     - [vue3生命周期](#vue3生命周期)
     - [defineModel() V3.4](#definemodel-v34)
     - [vue2和vue3的依赖注入区别](#vue2和vue3的依赖注入区别)
+    - [动态组件](#动态组件)
+    - [全局注册和局部注册组件优缺点](#全局注册和局部注册组件优缺点)
+    - [插槽的理解](#插槽的理解)
+      - [条件插槽](#条件插槽)
+      - [动态插槽](#动态插槽)
+      - [作用域插槽](#作用域插槽)
+    - [pinia对比vuex](#pinia对比vuex)
+    - [vue插件的场景](#vue插件的场景)
+      - [插件中的 Provide / Inject](#插件中的-provide--inject)
+    - [v-memo(v3.2)](#v-memov32)
+    - [vue高阶组件](#vue高阶组件)
+    - [vue渲染机制](#vue渲染机制)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [React18更新了哪些](#react18更新了哪些)
@@ -369,6 +384,11 @@
     - [项目中使用redux，结构划分](#项目中使用redux结构划分)
       - [react-redux redux-thunk](#react-redux-redux-thunk)
   - [Angular](#angular)
+    - [angular生命周期](#angular生命周期)
+    - [angular组件通信](#angular组件通信)
+      - [父组件传值(也可以是函数)给子组件](#父组件传值也可以是函数给子组件)
+      - [子组件传值(函数)给父组件](#子组件传值函数给父组件)
+      - [跨层级通信](#跨层级通信)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -438,6 +458,7 @@
     - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
     - [浅谈前端性能优化](#浅谈前端性能优化)
     - [长列表虚拟列表](#长列表虚拟列表)
+    - [重排重绘](#重排重绘)
   - [数据结构](#数据结构-1)
     - [树的遍历](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
@@ -552,6 +573,7 @@
   - [koa express](#koa-express)
   - [css预编译语言](#css预编译语言)
   - [微前端](#微前端)
+  - [单元测试](#单元测试)
 
 
 ## html
@@ -7329,7 +7351,8 @@ Vue.directive('throttle', {
 ```
 
 3. 一键复制
-4. 活动埋点
+4. 自动聚焦
+5. 活动埋点
 
 ```js
 Vue.directive('track', {  
@@ -7763,6 +7786,150 @@ Actions：可以处理多个Mutations和异步操作
 + modules => 模块化 Vuex
 
 ![vuex](book_files/91.jpg)
+
+### vuex辅助函数
+可以使用map辅助函数使代码更精简
+```html
+<template>
+  <div>
+    <h2>这是计数器页面</h2>
+    <div>
+      <div>计数：{{count}}  -  {{countAlias}}</div>
+      <div>双倍计数：{{doubleCount}}  -  {{doubleCountAlias}}</div>
+      <br/>
+      <button @click="increment">+1</button>
+      <div>
+        增加值 <input type="text" v-model="num" />
+        <button @click="incrementBy(num)">=</button>
+      </div>
+      <div>
+        <button @click="asyncAdd">异步加10</button>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+export default {
+  name: 'index',
+  data () {
+    return {
+      num: 0,
+      localCount: 10
+    }
+  },
+  // computed:mapState(['a','b']),
+  //如果computed只获取store中的数据且不需要转换，那么可以直接使用mapState，不需要解构
+  //mapState本身返回的就是个对象
+  computed: {
+    /*
+    * ------------------------------------------------------------
+    * mapState
+    */
+    // 【传统形式】
+    // count () {
+    //   return this.store.state.count
+    // },
+    // 【对象形式】
+    ...mapState({
+      // 箭头函数可使代码更简练
+      count: state => state.count,
+      // 传字符串参数 'count' 等同于 `state => state.count`
+      // 使用这种方式可以更简洁地为state生成的计算属性定义一个别名
+      countAlias: 'count',
+
+      // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+      countPlusLocalState (state) {
+        return state.count + this.localCount
+      }
+    }),
+    // 【数组形式】
+    // 当映射的计算属性的名称与 state 的子节点名称相同时，我们也可以给 mapState 传一个字符串数组。
+    ...mapState([
+      // 映射 this.count 为 store.state.count
+      'count'
+    ]),
+    /*
+    * ------------------------------------------------------------
+    * mapGetters
+    */
+
+    // 【传统形式】
+    // doubleCount () {
+    //   return this.store.getters.doubleCount
+    // }
+
+    // 【对象形式】
+    // 如果你想将一个 getter 属性另取一个名字，使用对象形式
+    ...mapGetters({
+      // 把 `this.doubleCountAlias` 映射为 `this.store.getters.doubleCount`
+      doubleCountAlias: 'doubleCount'
+    }),
+
+    // 【数组形式】
+    ...mapGetters(['doubleCount'])
+  },
+  methods: {
+    /*
+    * ------------------------------------------------------------
+    * mapMutations
+    */
+    // 【传统形式】
+    // 自增1
+    // increment () {
+    //   this.store.commit('increment')
+    // },
+    // // 加指定的值
+    // incrementBy (amount) {
+    //   this.store.commit('incrementBy', amount)
+    // },
+    // 【数组形式】
+    ...mapMutations([
+      'increment', // 将 `this.increment()` 映射为 `this.store.commit('increment')`
+
+      // `mapMutations` 也支持载荷：
+      'incrementBy' // 将 `this.incrementBy(amount)` 映射为 `this.store.commit('incrementBy', amount)`
+    ]),
+    // 【对象形式】
+    ...mapMutations({
+      add: 'increment' // 将 `this.add()` 映射为 `this.store.commit('increment')`
+    }),
+
+    // // 异步加1
+    // asyncAdd () {
+    //   this.store.dispatch('asyncAddAction')
+    // }
+
+    /*
+    * ------------------------------------------------------------
+    * mapActions
+    */
+   // 【数组形式】
+    ...mapActions([
+      'asyncAddAction', // 将 `this.asyncAddAction()` 映射为 `this.store.dispatch('asyncAddAction')`
+    ]),
+    // 【对象形式】
+    ...mapActions({
+      asyncAdd: 'asyncAddAction' // 将 `this.asyncAdd()` 映射为 `this.$store.dispatch('asyncAddAction')`
+    })
+  }
+}
+</script>
+```
+
+当 Vuex store 被命名空间（namespaced）时，也可以使用这个函数创建具有命名空间的辅助函数。
+```js
+import { createNamespacedHelpers } from 'vuex'  
+const { mapState, mapActions } = createNamespacedHelpers('moduleName')  
+export default {  
+  computed: {  
+    ...mapState(['localCount'])  
+  },  
+  methods: {  
+    ...mapActions(['localIncrement'])  
+  }  
+}
+```
 
 ### 介绍Vue的模板编译
 `模版指的就是template属性。vue内部会将template字符串转化成render函数进行渲染。render函数返回虚拟节点，再将虚拟节点转化成真实DOM。`（模版=>方法=>节点）
@@ -8833,7 +9000,7 @@ console.log(map.get('count').value)
 
 
 ### ref在模板中解包的注意事项
-在模板渲染上下文中，只有顶级的 ref 属性才会被解包。
+**在模板渲染上下文中，只有顶级的 ref 属性才会被解包。**
 
 在下面的例子中，count 和 object 是顶级属性，但 object.id 不是：
 ```js
@@ -8862,6 +9029,108 @@ const { id } = object
 ```
 该特性仅仅是文本插值的一个便利特性，等价于 {{ object.id.value }}。
 
+### shallowRef()
+和 ref() 不同，浅层 ref 的内部值将会原样存储和暴露，并且不会被深层递归地转为响应式。只有对 .value 的访问是响应式的。
+
+shallowRef() 常常用于对大型数据结构的性能优化或是与外部的状态管理系统集成。
+```js
+<template>
+   <div>--{{ state?.count ? state.count : 'xxx'}}--hhh</div>
+   <button @click="change">+++</button>
+</template>
+
+<script lang="ts" setup>
+import { shallowRef, triggerRef} from 'vue';
+
+const state = shallowRef({ count: 1 })
+
+// 不会触发更改
+state.value.count = 2
+state.value = { count: 12 }
+setTimeout(() => {
+    // state.value = { count: 16 } //① 会更改
+    state.value.count = 20 //有①会更改成20，没有不会变动
+}, 1000);
+function change (){
+    state.value.count = 2000 // 不会触发
+    // triggerRef(state)  //增加这行会更新成2000
+    // state.value = { count: 1600 }// 会触发
+}
+
+state.value.count = 25 //初始化
+</script>
+```
+>注意25变成20的前提：第一是在settimeout中，第二state.value = { count: 16 }这行代码触发了
+
+![变化](book_files/282.jpg)
+
+> shallowRef就不要state.value.count写这种，真的写这种也需要用triggerRef(state)保证触发
+
+### ref、isRef、customRef、triggerRef、shallowRef
+ref绑定基本数据类型为proxy响应对象、isRef判断是否为ref对象
+```js
+<script setup lang="ts">
+import { ref, isRef } from 'vue';
+// ref 将msg变量变成一个’双向绑定‘变量
+const msg: {} = ref({ name: 'name' });
+const cahngeMsg = () => {
+  // isRef判断变量 是不是’双向绑定‘变量
+  console.log(isRef(msg, 'msg')); //true
+};
+</script>
+```
+customRef:工厂函数实现get和set适合去做防抖之类的
+```js
+<template>
+   <div>{{ myRef }}</div>
+    <button @click="add">+++</button>
+</template>
+
+<script lang="ts" setup>
+import { isRef } from 'vue';
+import { useCustomRef } from './useDemo';
+
+const myRef = useCustomRef('Hello')  
+
+console.log(isRef(myRef),myRef)
+
+function add(){
+    myRef.value=50
+    console.log(isRef(myRef),myRef)
+
+}
+</script>
+```
+```js
+import { customRef, ref } from 'vue'  
+export function useCustomRef(initialValue:any) {  
+    const state = ref(initialValue)  
+    const customRef1 = customRef((track, trigger) => {  
+      // 当第一次访问get方法时，运行这个副作用  
+      let firstTime = true  
+      return {  
+        get() {  
+          track() // 告诉Vue这个依赖项依赖于这个Ref  
+          if (firstTime) {  
+            console.log('This is the first time accessing the value!')  
+            firstTime = false  
+            return 'something'
+          }  
+          return state.value  
+        },  
+        set(newValue) {  
+          state.value = newValue  
+          trigger() // 告诉Vue这个Ref的值已经改变，需要更新所有依赖项  
+        }  
+      }  
+    })  
+    return customRef1
+  }  
+```
+triggerRef：强制更新页面DOM,强制触发依赖于一个浅层 ref 的副作用，这通常在对浅引用的内部值进行深度变更后使用。
+```js
+triggerRef(message)
+```
 
 ### script setup
 可以使用 `<script setup>` 来大幅度地简化代码
@@ -8883,7 +9152,6 @@ function increment() {
   </button>
 </template>
 ```
-
 
 ### Vue3中 script setup props emit 向父组件暴露数据用法
 + 定义属性 defineProps
@@ -8914,6 +9182,7 @@ function deleteHandler() {
     <button @click="deleteHandler">delete</button>
 </template>
 ```
+使用了 `<script setup>` 的组件是默认私有的：一个父组件无法访问到一个使用了 `<script setup>` 的子组件中的任何东西，除非子组件在其中通过 defineExpose 宏显式暴露
 ```js
 //child3Ref
 <script setup>
@@ -8970,6 +9239,9 @@ function warn(message, event) {
 ![生命周期](book_files/204.jpg)
 
 ### defineModel() V3.4
+
+![defineModel](book_files/283.jpg)
+
 ```html
 <script setup>
 import Child from './Child.vue'
@@ -9057,6 +9329,287 @@ export default {
 ***在Vue 3中，provide 和 inject 的行为并没有改变，它们本身仍然不是可响应的*** 。但是，由于Vue 3采用了基于Proxy的响应式系统，这个系统可以检测到对象属性的添加、删除和修改。因此，如果你提供了一个可响应的对象（**例如使用 ref 或 reactive 创建的对象** ）作为 provide 的值，那么该对象的属性变化将会自动传递给通过 inject 接收该对象的子组件。
 
 注意的是，不能直接修改通过 inject 接收到的对象。因为 provide 的值在组件树中是共享的.为了避免这种情况，你可以使用 readonly 函数来创建一个只读版本的对象，并将其作为 provide 的值。这样，你就可以确保组件不会意外地修改到 provide 的值。
+
+### 动态组件
+```html
+<!-- currentTab 改变时组件也改变 -->
+<component :is="tabs[currentTab]"></component>
+```
+
+当使用 `<component :is="..."> `来在多个组件间作切换时，被切换掉的组件会被卸载。我们可以通过 <KeepAlive> 组件强制被切换掉的组件仍然保持“存活”的状态。
+
+### 全局注册和局部注册组件优缺点
+全局注册虽然很方便，注册完后可以在任何地方使用，但是并未使用的组件无法在生产打包时被自动移除；全局注册在大型项目中使项目的依赖关系变得不那么明确。
+
+在父组件中使用子组件时，不太容易定位子组件的实现。和使用过多的全局变量一样，这可能会影响应用长期的可维护性。
+
+局部注册的组件需要在使用它的父组件中显式导入，并且只能在该父组件中使用。它的优点是使组件之间的依赖关系更加明确，并且对 tree-shaking 更加友好。
+
+不过在使用 `<script setup>` 的单文件组件中，导入的组件可以直接在模板中使用
+
+### 插槽的理解
+插槽内容可以访问到父组件的数据作用域，因为插槽内容本身是在父组件模板中定义的。
+```html
+<!-- 子组件 -->
+<div class="container">
+  <header>
+    <slot name="header"></slot>
+  </header>
+  <main>
+    <slot></slot>
+  </main>
+  <footer>
+    <slot name="footer"></slot>
+  </footer>
+</div>
+```
+```html
+<!-- 父组件 -->
+<BaseLayout>
+  <template v-slot:header>
+    <!-- header 插槽的内容放这里 -->
+  </template>
+</BaseLayout>
+```
+#### 条件插槽
+需要根据插槽是否存在来渲染某些内容，可以结合使用 $slots 属性与 v-if 来实现
+```html
+<template>
+  <div class="card">
+    <div v-if="$slots.header" class="card-header">
+      <slot name="header" />
+    </div>
+    <div v-if="$slots.default" class="card-content">
+      <slot />
+    </div>
+    <div v-if="$slots.footer" class="card-footer">
+      <slot name="footer" />
+    </div>
+  </div>
+</template>
+```
+#### 动态插槽
+```html
+<base-layout>
+  <template v-slot:[dynamicSlotName]>
+    ...
+  </template>
+
+  <!-- 缩写为 -->
+  <template #[dynamicSlotName]>
+    ...
+  </template>
+</base-layout>
+```
+#### 作用域插槽
+在某些场景下插槽的内容可能想要同时使用父组件域内和子组件域内的数据。要做到这一点，我们需要一种方法来让子组件在渲染时将一部分数据提供给插槽。
+
+可以像对组件传递 props 那样，向一个插槽的出口上传递 attributes：
+
+![图](book_files/284.jpg)
+
+### pinia对比vuex
+
+Vuex和Pinia都是Vue.js的状态管理库，但它们在设计、使用、体积和社区支持等方面存在一些区别。以下是关于Vuex和Pinia的主要区别：
+
+1. 设计和使用：
+	+ Vuex：采用**全局单例模式**，通过一个store对象来管理所有的状态。组件通过store对象来获取和修改状态。Vuex提供了强大的生态系统，适用于复杂的项目和对状态管理有更高要求的开发者。
+	+ Pinia：采用了**中心化架构**，将状态分布在多个模块里，每个模块都有自己独特的状态。Pinia允许使用多个store实例，每个组件都拥有自己的store实例，通过在组件中创建store实例来管理状态。Pinia提供了简单的API来管理应用程序的状态，更适用于初学者和快速开发项目。
+2. 数据修改：
+	+ Vuex：通过mutations和actions来修改状态，提供了State、Getters、Mutations和Modules等模块化的管理方式。
+	+ Pinia：**没有mutations**，只有state、getters和actions。Pinia没有modules配置，每一个独立的仓库都是通过defineStore生成出来的，提供了扁平结构来更好地进行代码分割且没有命名空间。
+3. 体积和复杂程度：
+	+ Vuex：作为Vue.js的官方状态管理库，在Vue.js中广泛使用，拥有强大的生态系统。Vuex的体积相对较大，但功能丰富，适用于复杂的项目。
+	+ Pinia：是一个很小且较新的库，操作简单。Pinia的体积约1KB，相对较小，提供了简单直观且可扩展的方式来组织和访问应用程序的状态。
+4. TypeScript支持：
+	+ Vuex：从Vue 2.x版本开始引入对TypeScript支持，但需要使用额外的插件来实现类型检查。
+	+ Pinia：在设计之初就对TypeScript提供了原生的支持，提供了更好的类型推导和类型检查。
+5. 语法和使用：
+	+ Vuex：使用了传统的mutations和actions方法来修改state里边的状态，语法较为固定。
+	+ Pinia：语法上比Vuex更容易理解和使用灵活，提供了更好的TypeScript支持，且支持Vue 2和Vue 3。
+6. 适用场景：
+	+ Vuex：更适合复杂的项目和对状态管理有更高要求的开发者。
+	+ Pinia：更适合初学者和快速开发项目，特别是当项目对TypeScript要求很高时。
+
+```js
+// stores/counter.js
+import { defineStore } from 'pinia'
+export const useCounterStore = defineStore('counter', {
+  state: () => {
+    return { count: 0 }
+  },
+  // 也可以这样定义
+  // state: () => ({ count: 0 })
+  actions: {
+    increment() {
+      this.count++
+    },
+  },
+})
+```
+组件中使用
+```html
+<script setup>
+import { useCounterStore } from '@/stores/counter'
+const counter = useCounterStore()
+counter.count++
+// 自动补全！ ✨
+counter.$patch({ count: counter.count + 1 })
+// 或使用 action 代替
+counter.increment()
+</script>
+<template>
+  <!-- 直接从 store 中访问 state -->
+  <div>Current Count: {{ counter.count }}</div>
+</template>
+```
+
+### vue插件的场景
+1. 通过 app.component() 和 app.directive() 注册一到多个全局组件或自定义指令。
+2. 通过 app.provide() 使一个资源可被注入进整个应用。
+3. 向 app.config.globalProperties 中添加一些全局实例属性或方法
+4. 一个可能上述三种都包含了的功能库 (例如 vue-router)。
+
+```js
+// plugins/i18n.js
+export default {
+  install: (app, options) => {
+    // 注入一个全局可用的 $translate() 方法
+    app.config.globalProperties.$translate = (key) => {
+      // 获取 `options` 对象的深层属性
+      // 使用 `key` 作为索引
+	  console.log(key)
+      return key.split('.').reduce((o, i) => {
+        if (o) return o[i]
+      }, options)
+    }
+  }
+}
+```
+```js
+import i18nPlugin from './plugins/i18n'
+app.use(i18nPlugin, {
+  greetings: {
+    hello: 'Bonjour!'
+  }
+})
+```
+表达式 $translate('greetings.hello') 就会在运行时被替换为 Bonjour! 了。
+
+#### 插件中的 Provide / Inject
+在插件中，我们可以通过 provide 来为插件用户供给一些内容。举例来说，我们可以将插件接收到的 options 参数提供给整个应用，让任何组件都能使用这个翻译字典对象。
+```js
+// plugins/i18n.js
+export default {
+  install: (app, options) => {
+    app.provide('i18n', options)
+  }
+}
+```
+```js
+<script setup>
+import { inject } from 'vue'
+const i18n = inject('i18n')
+console.log(i18n.greetings.hello)
+</script>
+```
+
+### v-memo(v3.2)
+用于提高渲染能力。它接收一个数组作为参数，当数组中的值与上次渲染时的值相同时，Vue会跳过该元素及其子元素的更新渲染，直接复用缓存中的内容进行渲染。这样可以有效减少前端渲染耗时，特别是在处理大数据时。
+```html
+<template>  
+  <div>  
+    <input type="text" v-model="searchText" />  
+    <div v-for="item in filteredList" :key="item.id" v-memo="[item.id, searchText]">  
+      <!-- 列表项内容 -->  
+    </div>  
+  </div>  
+</template>  
+  
+<script>  
+export default {  
+  data() {  
+    return {  
+      searchText: '',  
+      list: [...], // 假设这是你的1000+条数据列表  
+    };  
+  },  
+  computed: {  
+    filteredList() {  
+      return this.list.filter(item => item.name.includes(this.searchText));  
+    },  
+  },  
+};  
+</script>
+```
+
+### vue高阶组件
+高阶组件（Higher-Order Components, HOCs）是一个函数，该函数接收一个组件并返回一个新的组件。高阶组件在Vue中并不像在React中那样常见，因为Vue的组件系统已经提供了很多功能，如`mixins、slots、scoped slots和provide/inject`等。然而，高阶组件在某些场景下仍然是一个有用的模式。
+
+下面是一个简单的Vue 3高阶组件的例子，它用于给任何传入的组件添加一个新的props和一个新的事件监听器
+```js
+// 高阶组件  
+function withLogging(WrappedComponent) {  
+  return {  
+    name: `WithLogging(${WrappedComponent.name})`,  
+    props: WrappedComponent.props,  
+    emits: WrappedComponent.emits ? [...WrappedComponent.emits, 'log'] : ['log'],  
+    setup(props, { emit }) {  
+      // 这里可以添加一些通用的逻辑，比如日志记录  
+      const logMessage = () => {  
+        console.log(`Component ${WrappedComponent.name} was rendered with props:`, props);  
+        emit('log', `Component ${WrappedComponent.name} logged a message`);  
+      };  
+      // 返回WrappedComponent的setup函数的结果，并添加我们自己的逻辑  
+      const wrappedComponentInstance = WrappedComponent.setup(props, {  
+        ...context,  
+        emit: (...args) => {  
+          logMessage(); // 在每次emit之前都进行日志记录  
+          emit(...args);  
+        },  
+      });  
+      // 如果有render函数，则返回一个包装过的render函数  
+      if (WrappedComponent.render) {  
+        return () => h(WrappedComponent, {  
+          ...wrappedComponentInstance,  
+          // 可以添加额外的props或slots  
+        });  
+      }  
+      // 如果没有render函数，则直接返回wrappedComponentInstance  
+      return wrappedComponentInstance;  
+    },  
+  };  
+}  
+// 示例组件  
+const MyComponent = {  
+  name: 'MyComponent',  
+  props: {  
+    msg: String,  
+  },  
+  setup(props) {  
+    // 组件逻辑...  
+    return {  
+      // ...返回的数据和方法  
+    };  
+  },  
+  render() {  
+    // 渲染逻辑...  
+  },  
+};  
+// 使用高阶组件  
+const LoggedMyComponent = withLogging(MyComponent);  
+// 在父组件中使用LoggedMyComponent  
+// ...
+```
+
+### vue渲染机制
+从高层面的视角看，Vue 组件挂载时会发生如下几件事：
+
+1. 编译：Vue 模板被编译为渲染函数：即用来返回虚拟 DOM 树的函数。这一步骤可以通过构建步骤提前完成，也可以通过使用运行时编译器即时完成。
+2. 挂载：运行时渲染器调用渲染函数，遍历返回的虚拟 DOM 树，并基于它创建实际的 DOM 节点。这一步会作为响应式副作用执行，因此它会追踪其中所用到的所有响应式依赖。
+3. 更新：当一个依赖发生变化后，副作用会重新运行，这时候会创建一个更新后的虚拟 DOM 树。运行时渲染器遍历这棵新树，将它与旧树进行比较，然后将必要的更新应用到真实 DOM 上去。
+
+![vue](book_files/285.jpg)
 
 
 
@@ -11225,6 +11778,277 @@ Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redu
 
 
 ## Angular
+Angular 是一个应用设计框架与开发平台，旨在创建高效而精致的单页面应用。
+
+### angular生命周期
+
+![1](book_files/280.jpg)
+
+> ngOnChanges注意：这发生得比较频繁，所以在这里执行的任何操作都会显著影响性能。如果你的组件没有输入属性，或者你使用它时没有提供任何输入属性，那么框架就不会调用 ngOnChanges()。
+
+![2](book_files/281.jpg)
+
+### angular组件通信
+
+#### 父组件传值(也可以是函数)给子组件
+父组件js
+```js
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  templateUrl: './parent.component.html',
+  styleUrls: ['./parent.component.less']
+})
+export class ParentComponent implements OnInit {
+  //声明一个需要传递给子组件的变量
+  public msg: string = "我是parent组件传递过来的msg"
+  constructor() { }
+  ngOnInit(): void {
+  }
+  //声明一个需要传递给子组件的函数
+  parentRun(){
+    console.log("this is function of parent")
+  }
+
+}
+```
+父组件页面
+```html
+<p>我是父组件</p>
+<!-- 引入子组件 -->
+<!-- 这里的写法是 [msg] 是我们需要发送的变量，这里的名字可以自己定义，后面"msg"是我们ts文件中定义的变量 -->
+<!-- 这里需要注意的是，我们传递给子组件函数的时候不可以加()，因为加上以后代表函数的执行 -->
+<app-children [msg]="msg" [parentRun]="parentRun"></app-children>
+```
+子组件
+```js
+//这里我们需要引入angular核心模块中的Input模块进行接收父组件的变量值
+import { Component, OnInit,Input } from '@angular/core';
+
+@Component({
+  selector: 'app-children',
+  templateUrl: './children.component.html',
+  styleUrls: ['./children.component.less']
+})
+export class ChildrenComponent implements OnInit {
+  //使用@Input装饰器进行接收父组件的变量值
+  @Input() msg:any
+  //使用@Input装饰器接收父组件的函数
+  @Input() parentRun:any
+  constructor() { }
+  ngOnInit(): void {
+  }
+  /**
+   * @function run 子组件本地函数
+   */
+  run(){
+    //通过this进行执行父组件的函数
+    this.parentRun()
+  }
+}
+```
+子组件页面
+```html
+<!-- 直接使用{{}}进行变量值的获取，这里的写法和vue的基本是一致的 -->
+<p>{{msg}}</p>
+<!-- 这里和vue的区别在于，vue调用函数是需要@click，angular需要的是(click) 只是语法上的区别，执行过程是一致的 -->
+<button (click)="run()">
+    执行parentRun
+</button>
+```
+
+> 子组件调用父组件的方法，注意里的this指向，parentFun里的操作的this仍然是指向子组件的。
+
+#### 子组件传值(函数)给父组件
+方案1：ViewChild
+```js
+//这里我们需要引入angular核心模块中的Input模块进行接收父组件的变量值
+import { Component, OnInit,Input } from '@angular/core';
+......
+export class ChildrenComponent implements OnInit {
+  public childmsg:any = "我是子组件中即将被父组件进行获取的变量"
+  childfunc(){
+    console.log("我是子组件的函数")
+  }
+  /**
+   * @function run 子组件本地函数
+   */
+  run(){
+    console.log("this is run")
+  }
+}
+```
+父组件
+```html
+<!-- 这里给子组件起一个节点名字，为后续父组件获取该节点的值提供名字 -->
+<app-children #childrenNode></app-children>
+<button (click)="passfun()"> 执行子组件的childfunc方法</button>
+```
+```js
+// 引入angular核心模块的viewchild模块
+import { Component, OnInit,ViewChild } from '@angular/core';
+......
+export class ParentComponent implements OnInit {
+//使用viewchild装饰器进行节点值的获取
+  @ViewChild('childrenNode') children:any
+  parentRun(){
+  //通过viewchild进行子组件数据的获取
+    console.log(this.children)
+    console.log(this.children.childmsg)
+  }
+  //父组件执行子组件的函数
+  passfun(){
+    this.children.childfunc()
+  }
+}
+```
+
+方案2：通过@Output触发父组件的方法
+```js
+//这里需要引入angular核心模块中的Input模块进行接收父组件的变量值
+import { Component, OnInit,Input,Output,EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-children',
+  templateUrl: './children.component.html',
+  styleUrls: ['./children.component.less']
+})
+export class ChildrenComponent implements OnInit {
+  constructor() { }
+  //通过Output进行子组件给父组件传递数据 childOut 是自己随意起的名字
+  @Output() public childOut = new EventEmitter()
+  ngOnInit(): void {
+  }
+  //声明一个使用output方式传递数据的函数
+  passOutput(){
+    this.childOut.emit("我是子组件的output方法")
+  }
+}
+```
+父组件
+```html
+<!-- 父组件引用子组件 -->
+<!-- (childOut) 就是子组件中自己起的名字,不可更改，$event非必写，这里就是子组件传递的数据，但是写的话只能写$event-->
+<app-children (childOut)="parentInput($event)"></app-children>
+```
+```js
+// 父组件
+export class ParentComponent implements OnInit {
+  //通过output进行子组件数据的获取
+  parentInput(e:any){
+    console.log("执行了....")
+    console.log(e)
+  }
+}
+```
+
+#### 跨层级通信
+1. rxjs
+```js
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+
+export enum EmitType{
+    // 无
+    None,
+    // 左侧目录更新
+    LeftMenu
+}
+
+export interface IEmitMessageParams{
+    type:EmitType, // 类型
+    from:string, // 来自哪个文件，主要定位异常的触发
+    message?:any, //发送信息
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmitMessage {
+  private subject = new Subject<any>();
+
+  sendMessage(message: IEmitMessageParams) {
+    this.subject.next(message);
+  }
+
+  clearMessage() {
+    this.subject.next();
+  }
+
+  getMessage(): Observable<any> {
+    return this.subject.asObservable();
+  }
+}
+```
+
+```js
+import { Component } from '@angular/core';
+import { MessageService } from '../message.service';
+
+@Component({
+  selector: 'app-home',
+  template: `
+    <div>
+      <h1>Home</h1>
+      <button (click)="sendMessage()">Send Message</button>
+      <button (click)="clearMessage()">Clear Message</button>
+    </div>
+  
+  `
+})
+
+export class HomeComponent {
+  constructor(private messageService: MessageService) { }
+  sendMessage(): void { // 发送消息
+	this.emitMessage.sendMessage({
+	  type: EmitType.LeftMenu,
+	  from: 'data-set'
+	})
+  }
+
+  clearMessage(): void { // 清除消息
+    this.messageService.clearMessage();
+  }
+}
+```
+```js
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { MessageService } from './message.service';
+@Component({
+  selector: 'my-app',
+  template: `
+      <div *ngIf="message">{{message.text}}</div>
+      <app-home></app-home>
+    `
+})
+export class AppComponent implements OnDestroy {
+  message: any;
+  subscription: Subscription;
+  constructor(private messageService: MessageService) {
+     // 监听是否需要更新
+     this.subscription = this.emitMessage.getMessage().subscribe((message:IEmitMessageParams) => {
+       if(message?.type === EmitType.LeftMenu){
+         this.menuData = []
+         this.getMenuData(false)
+       }
+     });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+}
+
+```
+
+2. NgRx
+	+ Store：类似于Redux中的Store，它是Angular应用中全局状态的单一来源。Store是一个可观察对象，当状态发生变化时，它会发出新的状态值。
+	+ Actions：描述应用中发生的事件或操作的对象。它们被发送到Reducer以触发状态更新。
+	+ Reducers：纯函数，它们根据Actions改变应用的状态。它们接收当前的状态和一个Action作为参数，并返回一个新的状态。
+	+ Effects：用于处理异步操作（如API调用）的副作用。它们监听特定的Actions，执行异步操作，并在操作完成后发出新的Actions。
+	+ Selectors：用于从Store中选择特定部分的状态。它们允许组件以声明式方式从Store中获取所需的数据。
 
 
 
@@ -13287,6 +14111,19 @@ li {
 ```
 
 2.  IntersectionObserver API 交叉视口器
+
+### 重排重绘
+**重排一定重绘，重绘不一定重排**
+
+使用transform: translate来移动一个元素时，这个移动是在渲染的后期阶段进行的，具体是在`CSS复合层`（也称为图形层或合成层）上。在这个层上，元素的位置被修改，但这个过程并不会触发文档流的重新计算，也就是不会触发重排（reflow）。
+
+以下是为什么transform: translate不会影响重排的一些关键点：
+
+文档流保持不变：transform: translate只是改变了元素在屏幕上的`最终绘制位置`，而没有改变元素在`文档流中的位置`。文档流是由HTML元素的结构和CSS盒模型属性（如position, display, float, margin, border, padding等）决定的。由于transform属性不改变这些属性，因此文档流保持不变。
+
+使用GPU加速：当元素被赋予transform或某些其他属性（如opacity低于1、filter、will-change等）时，浏览器可能会将其提升到一个独立的复合层上。这个层独立于常规的文档流渲染过程，并由GPU进行加速。由于GPU加速的存在，transform: translate的移动操作可以非常快速且高效地完成，而不需要重新计算整个文档流。
+
+性能优化：通过将需要动画或频繁更新的元素提升到`复合层上`，浏览器可以避免对这些元素进行昂贵的重排和重绘操作。这可以`显著提高页面的滚动、动画和交互性能`。
 
 
 
@@ -17051,3 +17888,5 @@ option = {
 ## css预编译语言
 
 ## 微前端
+
+## 单元测试
