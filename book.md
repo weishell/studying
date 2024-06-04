@@ -238,6 +238,7 @@
     - [TS类的关键字](#ts类的关键字)
     - [抽象类的作用](#抽象类的作用)
     - [TS类的重写](#ts类的重写)
+    - [类和接口](#类和接口)
   - [Vue2](#vue2)
     - [Vue 生命周期](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
@@ -391,6 +392,7 @@
       - [跨层级通信](#跨层级通信)
     - [angular-cli 命令行命令](#angular-cli-命令行命令)
     - [属性定义](#属性定义)
+    - [angular事件以及事件优化](#angular事件以及事件优化)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -6665,6 +6667,14 @@ class JsShuai extends Jspang{
   }
 }
 ```
+
+### 类和接口
+类和接口都可以定义对象，但是类适合复杂情况，接口只是在编译阶段使用，最后打包回移除
+
+类则一直存在在代码中
+
+![接口](book_files/288.jpg)
+
 
 
 
