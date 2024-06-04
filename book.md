@@ -389,6 +389,8 @@
       - [父组件传值(也可以是函数)给子组件](#父组件传值也可以是函数给子组件)
       - [子组件传值(函数)给父组件](#子组件传值函数给父组件)
       - [跨层级通信](#跨层级通信)
+    - [angular-cli 命令行命令](#angular-cli-命令行命令)
+    - [属性定义](#属性定义)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -399,6 +401,7 @@
     - [前端图片转base64](#前端图片转base64)
     - [如何获取文档中任意一个元素距离文档 document 顶部的距离？](#如何获取文档中任意一个元素距离文档-document-顶部的距离)
     - [document.write 和 innerHTML 的区别](#documentwrite-和-innerhtml-的区别)
+    - [property 和attribute](#property-和attribute)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
@@ -11945,6 +11948,7 @@ export class ParentComponent implements OnInit {
 
 #### 跨层级通信
 1. rxjs
+
 ```js
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
@@ -12049,6 +12053,32 @@ export class AppComponent implements OnDestroy {
 	+ Reducers：纯函数，它们根据Actions改变应用的状态。它们接收当前的状态和一个Action作为参数，并返回一个新的状态。
 	+ Effects：用于处理异步操作（如API调用）的副作用。它们监听特定的Actions，执行异步操作，并在操作完成后发出新的Actions。
 	+ Selectors：用于从Store中选择特定部分的状态。它们允许组件以声明式方式从Store中获取所需的数据。
+
+### angular-cli 命令行命令
+1. ng new `<project-name> 或 ng n <project-name>`：创建一个新的Angular项目。
+2. ng generate `<entity> 或 ng g <entity>`：根据模板生成文件。`<entity>` 可以是组件（component）、服务（service）、管道（pipe）、指令（directive）、枚举（enum）、类（class）、接口（interface）等。
+
+```
+例如：
+ng g component my-component：生成名为my-component的组件。
+ng g service my-service：生成名为my-service的服务。
+```
+
+3. ng build：将Angular应用程序编译到输出目录中（默认为dist/）。
+4. ng serve：启动一个本地开发服务器，并实时重新编译项目文件。
+
+### 属性定义
+
+```html 
+ <!-- 可自定义属性需加前缀attr -->
+ <div [attr.abc]="f1" [id]="f2">2221</div>
+```
+
+### angular事件以及事件优化
+
+![图](book_files/286.jpg)
+
+![优化](book_files/287.jpg)
 
 
 
@@ -12526,6 +12556,18 @@ docElement.clientTop，clientTop 是一个元素顶部边框的宽度，不包�
 document.write 只能重绘整个页面
 
 innerHTML 可以重绘页面的一部分
+
+### property 和attribute
+Attribute：HTML属性，书写在标签内的属性，使用setAttribute()和getAttribute()进行设置和获取。
+
+Property：DOM属性，html标签对应的DOM节点属性，使用 .属性名 或者 ['属性名']进行设置和获取。
+
+简单理解，Attribute就是dom节点自带的属性，例如html中常用的id、class、title、align等;而Property是这个DOM元素作为对象，其附加的内容，例如childNodes、firstChild等。
+
+另外，常用的Attribute，例如id、class等，已经被作为Property附加到DOM对象上，可以和Property一样取值和赋值。但是自定义的Attribute，就不会有这样的优待。
+
+
+
 
 
 ## BOM
