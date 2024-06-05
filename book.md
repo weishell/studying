@@ -39,6 +39,19 @@
 		border-top:2px solid #20B2AA !important;
 		padding-top:10px !important
 	}
+	.markdown-body p, .markdown-body blockquote, .markdown-body ul, .markdown-body ol, .markdown-body dl, .markdown-body table, .markdown-body pre{
+		margin-bottom:10px !important
+	}
+	h3 code,h4 code{
+		color:red !important
+	}
+	li a code{
+		color:red !important;
+		background:none !important
+	}
+	li a code:after{
+		content:"☆"
+	}
 </style>
 
 
@@ -62,7 +75,7 @@
     - [margin负值](#margin负值)
     - [BFC](#bfc)
       - [margin重叠](#margin重叠)
-    - [三栏布局](#三栏布局)
+    - [两三栏布局](#两三栏布局)
     - [粘连布局](#粘连布局)
     - [清除浮动](#清除浮动)
     - [盒模型](#盒模型)
@@ -80,6 +93,11 @@
     - [first-child和first-of-type/nth-child和nth-of-type](#first-child和first-of-typenth-child和nth-of-type)
     - [css元素隐藏](#css元素隐藏)
     - [css画三角形](#css画三角形)
+    - [CSS动画是什么](#css动画是什么)
+    - [css动画实现方式](#css动画实现方式)
+      - [transition 实现渐变动画](#transition-实现渐变动画)
+      - [transform 转变动画](#transform-转变动画)
+      - [animation 实现自定义动画](#animation-实现自定义动画)
     - [css视差滚动实现方案](#css视差滚动实现方案)
     - [3D立体感绕x轴旋转](#3d立体感绕x轴旋转)
       - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
@@ -393,6 +411,7 @@
     - [angular-cli 命令行命令](#angular-cli-命令行命令)
     - [属性定义](#属性定义)
     - [angular事件以及事件优化](#angular事件以及事件优化)
+    - [Angular独立组件模式与传统基于模块](#angular独立组件模式与传统基于模块)
   - [DOM](#dom)
     - [DOM操作节点的基本API](#dom操作节点的基本api)
       - [innerHTML outerHTML createTextNode innerText textContent异同](#innerhtml-outerhtml-createtextnode-innertext-textcontent异同)
@@ -412,7 +431,7 @@
     - [获取当前页面URL参数](#获取当前页面url参数)
   - [移动端](#移动端)
     - [上拉加载下拉刷新实现](#上拉加载下拉刷新实现)
-    - [rem em vw vh dpr](#rem-em-vw-vh-dpr)
+    - [`rem em vw vh dpr`](#rem-em-vw-vh-dpr)
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
   - [小程序](#小程序)
@@ -478,6 +497,7 @@
     - [复杂度](#复杂度)
     - [递归](#递归)
       - [递归和尾递归](#递归和尾递归)
+    - [二分查找](#二分查找)
     - [将一个数组旋转k步](#将一个数组旋转k步)
     - [判断字符串括号匹配](#判断字符串括号匹配)
     - [最近的请求次数](#最近的请求次数)
@@ -888,11 +908,11 @@ k1和k2是两个div
 	+ margin不会传递给父级（父级触发了BFC）
 	+ 两个相邻元素上下margin会重叠（给其中一个元素增加一个父级，然后让他的父级触发）【margin重叠三个条件:同属于一个BFC;相邻;块级元素】
 3. 产生方式
-	+ float 不为none
-	+ overflow不为visible
-	+ position不为relative和static
-	+ display为table-cell table-caption `inline-block`之一
-	+ 根元素HTML
+	+ 根元素，即HTML元素
+	+ 浮动元素：float值为left、right
+	+ overflow值不为 visible，为 auto、scroll、hidden
+	+ display的值为inline-block、inltable-cell、table-caption、table、inline-table、flex、inline-flex、grid、inline-grid
+	+ position的值为absolute或fixed
 4. BFC作用 :多栏布局,清除浮动,上下margin重叠
 
 > 多栏布局指的是左侧float，然后给整体父级加上BFC模式，这样就可以避免右侧的内容占据左侧
@@ -1006,8 +1026,33 @@ margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 ![图例](book_files/3.jpg)
 
 
-### 三栏布局
+### 两三栏布局
 + flex grid
+
+```html
+<style>
+    .box{
+        display: flex;
+    }
+    .left {
+        width: 100px;
+    }
+    .right {
+        flex: 1;
+    }
+</style>
+<div class="box">
+    <div class="left">左边</div>
+    <div class="right">右边</div>
+</div>
+```
+flex可以说是最好的方案了，代码少，使用简单
+
+> 注意的是，flex容器的一个默认属性值:align-items: stretch;
+
+> 这个属性导致了列等高的效果。 为了让两个盒子高度自动，需要设置: align-items: flex-start
+
++ 两边使用 float，中间使用 margin
 + absolute + margin
 + 圣杯布局：center left right在同一层级全部浮动，父级设左右padding，左侧：margin-left:-100% + 定位right对应宽度，右边margin-right对应宽度 
 + 双飞翼布局：多一个div包裹，中间div用margin不是padding，左侧不需要再借助定位改变位置，右侧不需要通过margin-right直接使用`margin-left`即可
@@ -1122,7 +1167,6 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
     </div>
 </body>
 </html>
-
 ```
 
 ### 粘连布局
@@ -1782,6 +1826,143 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 
 ![三角形](book_files/19.jpg)
 
+
+### CSS动画是什么
+
+CSS动画（CSS Animations）是为层叠样式表建议的允许可扩展标记语言（XML）元素使用CSS的动画的模块
+
+`即指元素从一种样式逐渐过渡为另一种样式的过程`
+
+常见的动画效果有很多，如`平移、旋转、缩放`等等，复杂动画则是多个简单动画的组合
+
+`css`实现动画的方式，有如下几种：
+- transition 实现渐变动画
+- transform 转变动画
+- animation 实现自定义动画
+
+
+### css动画实现方式
+
+#### transition 实现渐变动画
+`transition`的属性如下：
+
+- property:填写需要变化的css属性
+- duration:完成过渡效果需要的时间单位(s或者ms)
+- timing-function:完成效果的速度曲线
+- delay: 动画效果的延迟触发时间
+
+其中`timing-function`的值有如下：
+
+| 值                            | 描述                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| linear                        | 匀速（等于 cubic-bezier(0,0,1,1)）                           |
+| ease                          | 从慢到快再到慢（cubic-bezier(0.25,0.1,0.25,1)）              |
+| ease-in                       | 慢慢变快（等于 cubic-bezier(0.42,0,1,1)）                    |
+| ease-out                      | 慢慢变慢（等于 cubic-bezier(0,0,0.58,1)）                    |
+| ease-in-out                   | 先变快再到慢（等于 cubic-bezier(0.42,0,0.58,1)），渐显渐隐效果 |
+| cubic-bezier(*n*,*n*,*n*,*n*) | 在 cubic-bezier 函数中定义自己的值。可能的值是 0 至 1 之间的数值 |
+
+注意：并不是所有的属性都能使用过渡的，如`display:none<->display:block`
+
+举个例子，实现鼠标移动上去发生变化动画效果
+
+```html
+<style>
+       .base {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            background-color: #0EA9FF;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #5daf34;
+            transition-property: width, height, background-color, border-width;
+            transition-duration: 2s;
+            transition-timing-function: ease-in;
+            transition-delay: 500ms;
+        }
+
+        /*简写*/
+        /*transition: all 2s ease-in 500ms;*/
+        .base:hover {
+            width: 200px;
+            height: 200px;
+            background-color: #5daf34;
+            border-width: 10px;
+            border-color: #3a8ee6;
+        }
+</style>
+<div class="base"></div>
+```
+
+#### transform 转变动画
+包含四个常用的功能：
+- translate：位移
+- scale：缩放
+- rotate：旋转
+- skew：倾斜
+
+一般配合`transition`过度使用
+
+注意的是，`transform`不支持`inline`元素，使用前把它变成`block`
+
+#### animation 实现自定义动画
+
+`animation`是由 8 个属性的简写，分别如下：
+
+| 属性                                   | 描述                                                         | 属性值                                        |
+| -------------------------------------- | ------------------------------------------------------------ | --------------------------------------------- |
+| animation-duration                     | 指定动画完成一个周期所需要时间，单位秒（s）或毫秒（ms），默认是 0 |                                               |
+| animation-timing-function              | 指定动画计时函数，即动画的速度曲线，默认是 "ease"            | linear、ease、ease-in、ease-out、ease-in-out  |
+| animation-delay                        | 指定动画延迟时间，即动画何时开始，默认是 0                   |                                               |
+| animation-iteration-count              | 指定动画播放的次数，默认是 1                                 |                                               |
+| animation-direction 指定动画播放的方向 | 默认是 normal                                                | normal、reverse、alternate、alternate-reverse |
+| animation-fill-mode                    | 指定动画填充模式。默认是 none                                | forwards、backwards、both                     |
+| animation-play-state                   | 指定动画播放状态，正在运行或暂停。默认是 running             | running、pauser                               |
+| animation-name                         | 指定 @keyframes 动画的名称                                   |                                               |
+
+`CSS` 动画只需要定义一些关键的帧，而其余的帧，浏览器会根据计时函数插值计算出来，
+
+通过 `@keyframes` 来定义关键帧
+
+因此，如果我们想要让元素旋转一圈，只需要定义开始和结束两帧即可：
+
+```css
+@keyframes rotate{
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+}
+```
+
+`from` 表示最开始的那一帧，`to` 表示结束时的那一帧
+
+也可以使用百分比刻画生命周期
+
+```css
+@keyframes rotate{
+    0%{
+        transform: rotate(0deg);
+    }
+    50%{
+        transform: rotate(180deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+```
+
+定义好了关键帧后，下来就可以直接用它了：
+
+```css
+animation: rotate 2s;
+```
+
+
 ### css视差滚动实现方案
 + perspective  transform: translateZ() scale();
 + background-attachment
@@ -1950,6 +2131,15 @@ esheet'">
 <link href="other.css" rel="stylesheet" media="(min-width: 40em)">
 ```
 上面的第一个样式表声明未提供任何媒体类型或查询，因此它适用于所有情况，也就是说，它始终会阻塞渲染。第二个样式表则不然，它只在打印内容时适用---或许您想重新安排布局、更改字体等等，因此在网页首次加载时，该样式表不需要阻塞渲染。最后，最后一个样式表声明提供由浏览器执行的“媒体查询”：符合条件时，浏览器将阻塞渲染，直至样式表下载并处理完毕。
+
+其他
++ 减少重排操作，以及减少不必要的重绘
++ 了解哪些属性可以继承而来，避免对这些属性重复编写
++ cssSprite，合成所有icon图片，用宽高加上backgroud-position的背景图方式显现出我们要的icon图，减少了http请求
++ 把小的icon图片转成base64编码
++ CSS3动画或者过渡尽量使用transform和opacity来实现动画，不要使用left和top属性
+
+> css实现性能的方式可以从选择器嵌套、属性特性、减少http这三面考虑，同时还要注意css代码的加载顺序
 
 ### 协同开发css类名冲突解决方案
 1. css module
@@ -12090,8 +12280,39 @@ ng g service my-service：生成名为my-service的服务。
 
 ![优化](book_files/287.jpg)
 
+### Angular独立组件模式与传统基于模块
+如果没有特别指定，默认情况下项目可能不会自动生成app.module.ts文件。这一变化反映了Angular框架逐渐倾向于使用更简洁的独立组件（Standalone Components）模式，`这是一种与传统基于模块（NgModule）体系并行的组件定义方式。`
 
+在Angular中，组件、指令、管道等以前都需要在@NgModule中声明和导出，以便它们能在应用的其他部分被使用。而独立组件则不需要挂在任何模块下，可以直接在其它组件中通过其选择器使用，简化了配置和依赖管理。
 
+如果仍然希望使用传统的 NgModule 结构，并生成 app.module.ts 文件，您可以在创建项目时使用 `--no-standalone `选项。例如：
+```
+ng new my-app --no-standalone
+```
+这将确保新项目中包含传统的 app.module.ts 文件，按照经典的方式组织和管理应用程序模块。
+
+独立组件（Standalone Components）模式是Angular 14引入的新特性，它提供了一种更轻量级的方式来定义和使用组件，与传统的基于 NgModule 的组件模式相比，有以下几个主要区别：
+
+1. 模块依赖：
+	+ 传统模式：组件必须在一个 NgModule 中声明，才能在应用中使用。组件的依赖（如指令、服务等）通过 NgModule 的 imports 和 exports 进行管理。
+	+ 独立模式：组件可以直接在没有 NgModule 的情况下声明和使用。这意味着你可以创建一个组件而不必将其放入 NgModule，减少了模块间的耦合。
+2. 导入和导出：
+	+ 传统模式：组件、指令、管道等需要在 NgModule 的 declarations 中声明，并可能通过 exports 导出来供其他模块使用。
+	+ 独立模式：组件可以单独导出和导入，无需通过 NgModule。这简化了组件之间的引用，但可能会导致更多单独的导入语句。
+3. 服务提供：
+	+ 传统模式：服务通常在 NgModule 的 providers 数组中注册，这样它们在整个模块范围内可用。
+	+ 独立模式：组件可以有自己的局部服务提供商，但这需要使用 providers 属性直接在组件级别声明，限制了服务的可见范围。
+4. 懒加载：
+	+ 传统模式：模块可以被配置为懒加载，以优化应用的初始加载性能。
+	+ 独立模式：独立组件不适用于懒加载，因为它们不与 NgModule 相关联。不过，仍然可以通过其他方式实现类似的功能，比如路由级别的懒加载。
+5. 模块化：
+	+ 传统模式： NgModule 通常用于组织功能相关的组件和共享资源，提供了一种强模块化的结构。
+	+ 独立模式：组件可以独立存在，使得模块化更加灵活，但也可能导致整体结构变得松散。
+6. 代码组织：
+	+ 传统模式：通常有一个统一的 app.module.ts 文件来管理核心应用组件和全局资源。
+	+ 独立模式：代码组织可能更分散，每个组件都有自己的独立性，这可能导致需要更多的文件管理和组织策略。
+	
+独立组件模式旨在提高开发效率，减少不必要的模块化开销，同时允许更细粒度的代码复用。然而，对于大型复杂应用，传统的 NgModule 模式可能更适合保持代码的组织和可维护性。开发者可以根据项目的规模和需求选择适合的模式。
 
 
 ## DOM
@@ -12608,6 +12829,7 @@ window.moveBy(50, 100); // 将窗口向右移动50像素，向下移动100像素
 ### location
 
 它提供了关于当前窗口或标签页中显示的URL的信息，并允许你解析URL的各个部分，以及重定向浏览器到新的URL
+![href](book_files/289.jpg)
 
 ![location](book_files/49.jpg)
 
@@ -12691,7 +12913,7 @@ if ((scrollTop + clientHeight) >= (scrollHeight - distance)) {
 下拉刷新则是监听touch事件
 
 
-### rem em vw vh dpr
+### `rem em vw vh dpr`
 1.	rem: 相对大小，但相对的只是HTML根元素
 2.	em:  继承父级元素的字体大小
 3.	vw:window.innerWidth = 100vw
@@ -12701,6 +12923,18 @@ if ((scrollTop + clientHeight) >= (scrollHeight - distance)) {
 7.	dpr（设备像素比）：是指`设备物理像素的个数`除以`设备独立像素`的大小。物理像素是手机屏幕上一个一个的发光的点，大小是固定的；独立像素也叫做逻辑像素，css设置的像素大小就是逻辑像素。
 
 `window.devicePixelRatio`可获取，无缩放的情况下，1个css像素 === 一个设备独立像素
+
+设备像素：设备像素（device pixels），又称为物理像素，从屏幕在工厂生产出的那天起，它上面设备像素点就固定不变了，单位为pt
+
+设备独立像素（Device Independent Pixel）：与设备无关的逻辑像素，代表可以通过程序控制使用的虚拟像素，是一个总体概念
+
+iPhone 3GS 和 iPhone 4/4s 的尺寸都是 3.5 寸，但 iPhone 3GS 的分辨率是 320x480，iPhone 4/4s 的分辨率是 640x960
+
+这意味着，iPhone 3GS 有 320 个物理像素，iPhone 4/4s 有 640 个物理像素
+
+> 我们统一 iPhone 3GS 和 iPhone 4/4s 都是 320 个虚拟像素，只是在 iPhone 3GS 上，最终 1 个虚拟像素换算成 1 个物理像素，在 iphone 4s 中，1 个虚拟像素最终换算成 2 个物理像素
+
+![对比](book_files/291.jpg)
 
 ![dpr](book_files/20.jpg)
 
@@ -14602,6 +14836,7 @@ var minWindow = function (s, t) {
 
 
 ## 算法
+算法（Algorithm）是指解题方案的准确而完整的描述，是一系列解决问题的清晰指令，算法代表着用系统的方法描述解决问题的策略机制
 
 ### 复杂度
 程序执行时需要的计算量和内存空间（和代码是否简洁无关），复杂度是个数量级，不是具体的数字
@@ -14641,6 +14876,48 @@ function factorial(n, total) {
 }
 factorial(5, 1) // 120
 ```
+
+### 二分查找
+二分查找算法，也称折半搜索算法，是一种在有序数组中查找某一特定元素的搜索算法
+
+![二分查找](book_files/290.jpg)
+
+![二分查找](book_files/1.gif)
+
+```js
+function BinarySearch(arr, target) {
+    if (arr.length <= 1) return -1
+    // 低位下标
+    let lowIndex = 0
+    // 高位下标
+    let highIndex = arr.length - 1
+
+    while (lowIndex <= highIndex) {
+        // 中间下标
+        const midIndex = Math.floor((lowIndex + highIndex) / 2)
+        if (target < arr[midIndex]) {
+            highIndex = midIndex - 1
+        } else if (target > arr[midIndex]) {
+            lowIndex = midIndex + 1
+        } else {
+            // target === arr[midIndex]
+            return midIndex
+        }
+    }
+    return -1
+}
+```
+
+二分查找法的O(logn)让它成为十分高效的算法。不过它的缺陷却也是比较明显，就在它的限定之上：
+
++ 有序：我们很难保证我们的数组都是有序的
++ 数组：数组读取效率是O(1)，可是它的插入和删除某个元素的效率却是O(n)，并且数组的存储是需要连续的内存空间，不适合大数据的情况
+
+关于二分查找的应用场景，主要如下：
++ 不适合数据量太小的数列；数列太小，直接顺序遍历说不定更快，也更简单
++ 每次元素与元素的比较是比较耗时的，这个比较操作耗时占整个遍历算法时间的大部分，那么使用二分查找就能有效减少元素比较的次数
++ 不适合数据量太大的数列，二分查找作用的数据结构是顺序表，也就是数组，数组是需要连续的内存空间的，系统并不一定有这么大的连续内存空间可以使用
+
 
 ### 将一个数组旋转k步
 输入一个数组[1,2,3,4,5,6,7] k=3,即旋转3步 输出[5,6,7,1,2,3,4]
