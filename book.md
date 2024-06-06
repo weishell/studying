@@ -49,7 +49,7 @@
 		color:red !important;
 		background:none !important
 	}
-	li a code:after{
+	li a code:after,h3 code:after,h4 code:after{
 		content:"☆"
 	}
 </style>
@@ -58,20 +58,23 @@
 # 前端整理合集
 - [前端整理合集](#前端整理合集)
   - [html](#html)
-    - [如何理解html语义化](#如何理解html语义化)
+    - [`如何理解html语义化`](#如何理解html语义化)
     - [p标签里面不能嵌套ul、div等块级元素原因](#p标签里面不能嵌套uldiv等块级元素原因)
     - [src 和 href 的区别](#src-和-href-的区别)
     - [说说常用的 meta 标签](#说说常用的-meta-标签)
     - [meta作用](#meta作用)
-      - [HTML meta viewport属性](#html-meta-viewport属性)
+      - [`HTML meta viewport属性`](#html-meta-viewport属性)
     - [DOCTYPE的作用？严格模式和混杂模式的区别？](#doctype的作用严格模式和混杂模式的区别)
     - [HTML5 为什么只需要写 !DOCTYPE HTML](#html5-为什么只需要写-doctype-html)
       - [SGML](#sgml)
     - [iframe有哪些优点和缺点](#iframe有哪些优点和缺点)
-    - [H5新增属性](#h5新增属性)
-    - [常见的浏览器内核有哪些](#常见的浏览器内核有哪些)
+    - [`H5新增属性`](#h5新增属性)
+    - [`常见的浏览器内核有哪些`](#常见的浏览器内核有哪些)
+    - [h5新特性SharedWorker](#h5新特性sharedworker)
+    - [webWorker](#webworker)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
+    - [a标签伪类顺序](#a标签伪类顺序)
     - [margin负值](#margin负值)
     - [BFC](#bfc)
       - [margin重叠](#margin重叠)
@@ -80,7 +83,8 @@
     - [清除浮动](#清除浮动)
     - [盒模型](#盒模型)
     - [响应式设计](#响应式设计)
-    - [元素水平垂直居中](#元素水平垂直居中)
+    - [`元素水平垂直居中`](#元素水平垂直居中)
+      - [伪类实现水平垂直居中](#伪类实现水平垂直居中)
     - [line-height继承](#line-height继承)
     - [css预处理语言](#css预处理语言)
     - [flex布局](#flex布局)
@@ -107,6 +111,7 @@
     - [@namespace @document @page @supports在css中的作用](#namespace-document-page-supports在css中的作用)
     - [CSS函数](#css函数)
     - [rgba和opacity的透明效果有什么不同？](#rgba和opacity的透明效果有什么不同)
+    - [node-sass 和 dart-sass](#node-sass-和-dart-sass)
   - [js](#js)
     - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -193,6 +198,8 @@
       - [使用js-cooke插件](#使用js-cooke插件)
       - [cookie查看范围和跨域携带](#cookie查看范围和跨域携带)
       - [localstorange本地过期时间](#localstorange本地过期时间)
+      - [localstorage监听](#localstorage监听)
+      - [需要在本页监听localstorage数据变化方案](#需要在本页监听localstorage数据变化方案)
     - [单点登录](#单点登录)
     - [跨域](#跨域)
       - [解决方案](#解决方案)
@@ -466,6 +473,7 @@
     - [npm link的应用场景](#npm-link的应用场景)
     - [yarn安装和依赖模块扁平化优势](#yarn安装和依赖模块扁平化优势)
       - [解除项目和模块之间的链接](#解除项目和模块之间的链接)
+    - [修改源码方案](#修改源码方案)
   - [http](#http)
     - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
     - [http状态码](#http状态码)
@@ -530,6 +538,7 @@
     - [如何区分 Webpack 中的 hash/chunkhash/contenthash](#如何区分-webpack-中的-hashchunkhashcontenthash)
     - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
     - [loader和plugin](#loader和plugin)
+    - [postcss-loader cssloader sass-loader style-loader执行顺序](#postcss-loader-cssloader-sass-loader-style-loader执行顺序)
     - [webpack的构建流程](#webpack的构建流程)
     - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
     - [webpack调用和webpack-cli](#webpack调用和webpack-cli)
@@ -551,6 +560,7 @@
     - [模块热替换HMR](#模块热替换hmr)
     - [wbepack动态加载实现](#wbepack动态加载实现)
     - [split-chunks-plugin的使用](#split-chunks-plugin的使用)
+    - [splitChunksPlugin和dllPlugin能一起使用吗](#splitchunksplugin和dllplugin能一起使用吗)
     - [打包的js有个别需要defer延迟加载，有的需要直接加载，怎么设置](#打包的js有个别需要defer延迟加载有的需要直接加载怎么设置)
     - [webapck tree-shaking](#webapck-tree-shaking)
     - [vite为什么比webpack快](#vite为什么比webpack快)
@@ -603,7 +613,7 @@
 
 ## html
 
-### 如何理解html语义化
+### `如何理解html语义化`
 1.	让人更容易读懂（增加代码可读性）
 2.	去掉或丢失样式的时候能够让页面呈现出清晰结构
 3.	让搜素引擎更容易理解（SEO优化）
@@ -653,7 +663,7 @@ meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页�
 
 尽管 `<meta>` 标签提供了许多有用的功能，但过度使用或滥用这些标签可能会导致搜索引擎或其他网络工具对网页产生负面印象。因此，在使用 `<meta>` 标签时，请确保仅包含必要和相关的元信息。
 
-#### HTML meta viewport属性
+#### `HTML meta viewport属性`
 常见的meta viewport属性值包括：
 
 1. width: 设置视口的宽度，可以使用具体的像素值比如width=600，也可以使用特定的关键字比如width=device-width表示视口宽度等于设备屏幕的宽度
@@ -722,7 +732,7 @@ window.onload = function() {
 };
 ```
 
-### H5新增属性
+### `H5新增属性`
 1. 语义标签 `<footer><nav>`等
 2. 表单功能增强 `<input type="submit"><input type="email">` oninvalid 当验证不通过时触发此事件等
 3. 新增了音频和视频
@@ -733,7 +743,7 @@ window.onload = function() {
 8. Web Storage
 9. WebSocket
 
-### 常见的浏览器内核有哪些
+### `常见的浏览器内核有哪些`
 
 主要分成两部分：渲染引擎(layout engineer或Rendering Engine)和JS引擎。
 
@@ -749,6 +759,189 @@ JS引擎则：解析和执行javascript来实现网页的动态效果。
 + Gecko 内核：Netscape6 及以上版本，FF, MozillaSuite / SeaMonkey 等
 + Presto 内核：Opera7 及以上。 [Opera内核原为：Presto，现为：Blink;]
 + Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支）]
+
+### h5新特性SharedWorker
+1. SharedWorker地址如果本地相对地址失效，可用http完整地址
+2. 在SharedWorker中，如果你想要将发送者的信息传播给其他页面（即连接到SharedWorker的其他端口），你不能直接通过port.postMessage发送消息给特定的其他端口，因为port对象只代表当前连接。但是，你可以设置一个机制来存储和广播消息给所有连接的端口。
+
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>SharedWorker Example</title>  
+</head>  
+<body>  
+  
+<h1>SharedWorker Example</h1>  
+  
+<button onclick="sendMessage()">Send Message to SharedWorker</button>  
+  
+<script>  
+// 连接到SharedWorker  
+var worker = new SharedWorker('http://127.0.0.1:8848/code/sharedworker.js');  
+  
+// 连接到SharedWorker的端口  
+var port = worker.port;  
+  
+// 监听从SharedWorker发送的消息  
+port.onmessage = function(e) {  
+  console.log('从sharedwork获取到信息', e.data);  
+  // 在这里，你可以根据接收到的消息更新页面或其他操作  
+};  
+  
+// 发送消息到SharedWorker的函数  
+function sendMessage() {  
+  port.postMessage('html页面发送的消息');  
+}  
+</script>  
+  
+</body>  
+</html>
+```
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>SharedWorker Example</title>  
+</head>  
+<body>  
+  
+<h1>SharedWorker Example</h1>  
+  
+<!-- <button onclick="sendMessage()">Send Message to SharedWorker</button>  -->
+  
+<script>  
+// 连接到SharedWorker  
+var worker = new SharedWorker('http://127.0.0.1:8848/code/sharedworker.js');  
+  
+// 连接到SharedWorker的端口  
+var port = worker.port;  
+  
+// 监听从SharedWorker发送的消息  
+port.onmessage = function(e) {  
+  console.log('从sharedwork获取到信息', e.data);  
+  // 在这里，你可以根据接收到的消息更新页面或其他操作  
+};  
+  
+// 发送消息到SharedWorker的函数  
+function sendMessage() {  
+  port.postMessage('index页面发送消息!');  
+}  
+</script>  
+  
+</body>  
+</html>
+```
+```js
+var ports = [];  
+  
+self.onconnect = function(e) {  
+  var port = e.ports[0];  
+    
+  // 将新端口添加到数组中  
+  ports.push(port);  
+  
+  port.onmessage = function(e) {  
+    var data = e.data;  
+    console.log('Received message from port: ', data);  
+  
+    // 广播消息给所有端口（除了发送者）  
+    ports.forEach(function(otherPort) {  
+      if (otherPort !== port) {  
+        otherPort.postMessage('sharedworkerjs接收到了信息并广播: ' + data);  
+      }  
+    });  
+  };  
+  
+  // 当端口关闭时，从数组中移除它  
+  port.onclose = function() {  
+    var index = ports.indexOf(port);  
+    if (index !== -1) {  
+      ports.splice(index, 1);  
+    }  
+  };  
+  
+  // 示例：向所有端口发送消息  
+  setInterval(function() {  
+    ports.forEach(function(p) {  
+      p.postMessage('Hello from the shared worker!');  
+    });  
+  }, 1000);  
+};
+```
+
+> 同一个页面开两个窗口，也是会支持，数据的同步和获取
+
+### webWorker
+Web Worker 的作用，就是为 JavaScript 创造多线程环境，允许主线程创建 Worker 线程，将一些任务分配给后者运行。在主线程运行的同时，Worker 线程在后台运行，两者互不干扰。
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Web Worker Example</title>  
+</head>  
+<body>  
+  
+<script>  
+// 创建一个新的 worker  
+var worker = new Worker('fibonacci-worker.js');  
+  
+// 监听来自 worker 的消息  
+worker.onmessage = function(e) {  
+  console.log('Main: Message received from worker', e.data);  
+  // 在这里，你可以将结果用于更新 DOM 或其他操作  
+  alert('Fibonacci(' + n + ') = ' + e.data);  
+};  
+  
+// 发送消息到 worker  
+var n = 10; // 你可以更改这个值来测试不同的斐波那契数  
+worker.postMessage(n);  
+  
+// 当我们不再需要 worker 时，应该将其终止  
+// 例如，当用户关闭包含 worker 的页面时  
+// window.addEventListener('beforeunload', function() {  
+//   worker.terminate();  
+// });  
+</script>  
+  
+</body>  
+</html>
+```
+```js
+// fibonacci-worker.js  
+  
+// 定义斐波那契函数  
+function fibonacci(n) {  
+  if (n <= 1) return n;  
+  return fibonacci(n - 1) + fibonacci(n - 2);  
+}  
+  
+// 监听主线程发送的消息  
+self.onmessage = function(e) {  
+  console.log('Worker: Message received from main script', e.data);  
+  
+  var n = e.data;  
+  var result = fibonacci(n);  
+  
+  // 将结果发送回主线程  
+  self.postMessage(result);  
+};
+```
+
+可以开启多个Web Worker，但具体数量应根据实际情况来决定。以下是一些关于Web Worker数量的考虑因素：
+
+1. 资源占用：每个Web Worker都会占用内存和其他系统资源。因此，不要创建过多的Web Worker，以免对性能造成负面影响。一般来说，不超过10个Web Worker是比较合适的。
+2. CPU核心数：Web Worker的数量也可以根据CPU的核心数来设置。例如，如果CPU有4核，那么4-6个Web Worker可能是不错的选择，这样可以最大限度地利用CPU资源，同时不会造成过多的资源消耗。
+3. 任务性质：
+	+ 对于CPU密集型任务（如计算Fibonacci数列、图片滤镜处理等），可以根据CPU核心数设置更多的Web Worker。
+	+ 对于IO密集型任务（如读取文件、发送AJAX请求、WebSocket通信等），Web Worker的数量不宜太多，否则可能造成过多的线程上下文切换，影响性能。一般来说，2-3个Web Worker就足够了。
+4. 动态调整：Web Worker的数量也可以动态调整。例如，根据系统负载情况，可以动态创建或终止Web Worker，以达到最优的线程数量。例如，在一个图像编辑网站中，当用户执行高消耗操作如图片滤镜或特效时，可以临时增加2-3个Web Worker，操作结束后再关闭这些额外的Web Worker。
 
 
 
@@ -802,6 +995,14 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各
 ```
 > offsetWidth 注意不同盒模型时结果，IE盒模型给的width已经包含了boder padding 故就是100
 
+### a标签伪类顺序
+lvha(love-ha)
+```css
+a:link{color:#f30;} 
+a:visited{color:#000;} 
+a:hover{color:#fff;} 
+a:active{color:#f99;}
+```
 
 ### margin负值
 1.	margin-top和margin-left为负值时，元素向上或者向左移动
@@ -1286,13 +1487,15 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 + rem
 + rpx全称“response pixel”，即响应式的px,小程序专用
 
-### 元素水平垂直居中
+### `元素水平垂直居中`
 + position 定位四个方向值一致，margin:auto
 + position + transform
 + position + margin负值(需知道宽高)
 + grid
-+ flex
++ flex 主轴侧轴居中
++ flex+margin auto
 + table
++ 伪类法
 
 ```css
 .father {  
@@ -1421,8 +1624,73 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 
 </body>
 </html>
+```
+
+flex+margin:auto
+```html
+<style type="text/css">
+	div.parent{
+	  display:flex;
+	  width:300px;
+	  height:300px;
+	  border:1px solid red
+	}
+	div.child{
+	  margin:auto;
+	  width:100px;
+	  height:100px;
+	  background: blue;
+	}
+	
+</style>
+<div class='parent'>
+	<div class='child'></div>
+</div>
 
 ```
+
+#### 伪类实现水平垂直居中
+
+```html
+<div class="wrapper">
+    <div>XGHYHRSB</div>
+</div>
+<style type="text/css">
+	.wrapper {
+	    width: 300px;
+	    height: 300px;
+	    border: 1px solid #ccc;
+	    text-align: center;
+		font-size: 0;
+	}
+	
+	.wrapper::after {
+	    content: '';
+	    display: inline-block;
+	    vertical-align: middle;
+	    height: 100%;
+		background-color: rgba(0, 0, 255, 0.2);
+		width: 10px;
+	}
+	
+	.wrapper > div {
+	    vertical-align: middle;
+		display: inline-block;
+		font-size: 20px;
+		width:150px;
+		height:200px;
+		line-height: 200px;
+		border:1px solid red
+	}
+</style>
+```
+
+![图](book_files/292.jpg)
+
+伪类中颜色和宽度只是为了更好的查看实现效果，实际不需要。
+
+当 .wrapper 内部的 .wrapper::after 伪元素和 .wrapper > div 都设置为 display: inline-block; 和 vertical-align: middle; 时，`它们就会在同一行内水平排列，并尝试在垂直方向上居中对齐`。因为 .wrapper::after 的高度是 `100%`，它会“推动” .wrapper > div 向上移动，直到它们都在 .wrapper 的垂直中心线上对齐。
+
 
 ### line-height继承
 1.	写具体数值，如30px，则继承父级该值
@@ -2218,6 +2486,27 @@ xhtml|p {
 opacity是一个属性。opacity属性的值，可以被其子元素继承，给父级div设置opacity属性，那么所有子元素都会继承这个属性，并且，该元素及其继承该属性的所有子元素的所有内容透明度都会改变。
 
 rgba是一个属性值。rgba设置的元素，只对该元素的背景色有改变，并且，该元素的后代不会继承该属性。
+
+### node-sass 和 dart-sass
+node-sass和dart-sass（现已更名为sass）是两种不同的Sass编译器，它们在实现方式、性能、兼容性以及使用上存在一些区别。
+
+1. 实现方式：
+	+ node-sass：基于LibSass，LibSass是一个用C++编写的Sass解析器。因此，node-sass依赖于C++环境，并通过Node.js的绑定与JavaScript交互。
+	+ dart-sass（现sass）：基于Dart语言编写，不依赖于C++环境。它直接由Dart语言编译成可执行代码，因此在性能上有所优化。
+2. 版本与兼容性：
+	+ node-sass：与Node.js的版本紧密相关，一旦Node.js升级，可能会出现node-sass无法工作的情况，因为需要对应版本的二进制依赖文件。
+	+ dart-sass（现sass）：不依赖于Node.js的版本，因此不存在版本兼容性问题。此外，dart-sass支持更多的Sass和CSS新特性。
+3. 性能：
+	+ node-sass：基于C++的LibSass，编译速度相对较快。
+	+ dart-sass（现sass）：由于基于Dart语言构建，其性能在解析和编译Sass代码时也非常快，甚至在某些情况下可能超过node-sass。
+4. 使用与配置：
+	+ node-sass：支持自定义导入器、函数和全局变量，提供了较高的灵活性。然而，由于其与Node.js版本紧密相关，可能会带来额外的配置和维护工作。
+	+ dart-sass（现sass）：`不支持/deep/语法，需要改为::v-deep`。此外，dart-sass（现sass）的API设计更为简洁，方便开发者进行扩展和定制。
+5. 更新与维护：
+	+ node-sass：由于依赖C++环境和Node.js版本，可能会遇到维护和更新困难的问题。
+	+ dart-sass（现sass）：作为Sass社区官方推荐的Sass编译器，得到了持续的更新和维护。
+
+推荐新项目用dart-sass，因为node-sass虽然继续维护，但是不会增加任何新的功能了，且和node版本绑定
 
 
 
@@ -4460,6 +4749,40 @@ function getWithExpiration(key) {
 } 
 ```
 
+#### localstorage监听
+localstorage是浏览器多个标签共用的存储空间，所以可以用来实现多标签之间的通信 直接在window对象上添加监听即可
+```js
+window.onstorage = (e) => {console.log(e)}
+// 或者这样
+window.addEventListener('storage', (e) => console.log(e))
+```
+onstorage以及storage事件， 针对都是**非当前页面**对localStorage进行修改时才会触发，当前页面修改localStorage不会触发监听函数。
+
+> sessionStorage不会触发该方法，而且，sessionStorage只是当前会话页面存储，不涉及跨页面存储
+
+#### 需要在本页监听localstorage数据变化方案
+```js
+var orignalSetItem = localStorage.setItem;
+	localStorage.setItem = function(key,newValue){
+		var setItemEvent = new Event("setItemEvent");
+		setItemEvent.key = key;
+		setItemEvent.newValue = newValue;
+		setItemEvent.oldValue = localStorage.getItem(key);
+		window.dispatchEvent(setItemEvent);
+		console.log(arguments)
+		orignalSetItem.apply(this,arguments);
+	}
+	window.addEventListener("setItemEvent", function (e) {
+		console.log('key: '+e.key);
+		console.log('newValue: '+e.newValue);
+		console.log('oldValue: '+e.oldValue);
+	});
+	localStorage.setItem("n1","1234");
+	localStorage.setItem("n2","1234");
+
+```
+
+> 如果一个页面开多个窗口，其他的窗口还是会收到当前页面的storage事件
 
 ### 单点登录
 单点登录（Single Sign-On，简称SSO）是一种在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统的技术。
@@ -8321,15 +8644,15 @@ Monorepo 的主要优势包括：
 	+ 更高效的组件初始化
 	+ update性能提高1.3~2倍
 	+ SSR速度提高了2~3倍
-	+ proxy
-	+ 将静态节点的定义，提升到父作用域，缓存起来
-	+ 缓存事件，空间换时间
+	+ `将静态节点的定义，提升到父作用域，缓存起来`
+	+ `缓存事件，空间换时间`
 2. 体积更小
-	+ 通过tree-shaking功能，可以将无用模块“剪辑”，仅打包需要的
+	+ 通过`tree-shaking`功能，可以将无用模块“剪辑”，仅打包需要的
 	+ 移除过滤器+内联模板+.sync+on.native等其他功能可替代的语法
-3. 更易维护：compositon Api + options Api
-4. 更好的Typescript支持
-5. 编译器重写
+3. 更易维护：`compositon Api` + options Api
+4. `响应式原理：Object.defineProperty + Proxy`
+5. 更好的`Typescript`支持
+6. 编译器重写
 
 ![diff](book_files/121.jpg)
 
@@ -14049,6 +14372,96 @@ cd /path/to/your/module
 npm unlink
 ```
 
+### 修改源码方案
+1. fork修改
+
+```json
+"dependencies": {  
+  "echarts": "git+https://git@github.com:your-username/echarts.git#your-branch-name"  
+}
+```
+
+2. 如果你想在项目中修改xxxECharts如并给它增加功能或重定义某些属性，而不想影响到其他开发者或未来的升级
+	+ 继承或扩展 ECharts 类
+	+ 使用 ECharts 的 option 进行扩展
+	+ 封装 ECharts 组件
+	+  patch-package
+
+```js
+// 你可以创建一个新的类，继承自 ECharts，然后在这个新类中重写你想要修改的方法或添加新功能。
+// 假设你已经通过 npm 或 yarn 安装了 ECharts  
+import * as echarts from 'echarts';  
+  
+// 继承 ECharts 类  
+class CustomECharts extends echarts.ECharts {  
+    // 重写或添加方法  
+    setOption(option, notMerge, lazyUpdate) {  
+        // 在这里你可以修改 option 或者添加一些自定义逻辑  
+        // 例如，你可以检查 option 并自动添加一些默认值  
+  
+        // 调用父类的 setOption 方法  
+        super.setOption(option, notMerge, lazyUpdate);  
+  
+        // 可以在这里添加一些额外的逻辑  
+    }  
+  
+    // 也可以添加新的方法  
+    customMethod() {  
+        // ...  
+    }  
+}  
+  
+// 使用你的 CustomECharts 类代替原生的 ECharts  
+// 注意：你可能需要稍微修改 ECharts 的初始化逻辑来适配你的 CustomECharts 类  
+let myChart = new CustomECharts(document.getElementById('main'));  
+myChart.setOption({  
+    // ... 你的图表配置  
+});  
+myChart.customMethod(); // 调用你添加的方法
+```
+
+```js
+// ECharts 可能提供了一些扩展机制，比如注册自定义组件、自定义系列类型等。
+// 你可以利用这些机制来扩展 ECharts 的功能，而不需要直接修改源码。
+echarts.registerSeriesType('customSeries', {  
+    // ... 实现自定义系列的逻辑  
+    // 这里你可以定义如何渲染数据、如何处理交互等  
+});  
+  
+// 在配置中使用自定义系列  
+let myChart = echarts.init(document.getElementById('main'));  
+myChart.setOption({  
+    series: [{  
+        type: 'customSeries',  
+        // ... 自定义系列的配置  
+    }]  
+});
+```
+patch-package
+```bash
+npm install patch-package --save-dev  
+# 或者  
+yarn add patch-package --dev
+```
+安装完 patch-package 后，你可以直接修改 node_modules 中的 npm 包。假设你要修改一个名为 some-package 的包，你可以直接编辑其源码。
+
+当你对 some-package 的源码做了修改并验证了效果后，可以使用 npx 调用 patch-package 来创建一个补丁文件：
+```
+npx patch-package some-package
+```
+这将会在项目根目录下创建一个 patches 目录，并在其中生成一个以 some-package 命名的补丁文件，通常这个文件会以 .patch 为后缀。
+
+为了让其他开发者或自动化构建系统能够应用这个补丁，你需要在 package.json 的 scripts 部分添加一个 postinstall 脚本：
+```json
+"scripts": {  
+  "postinstall": "patch-package"  
+}
+```
+
+
+
+
+
 ## http
 
 ### 从输入URL到渲染页面的整个过程
@@ -16061,6 +16474,27 @@ require('./index.css')
 	+ Loader的配置是在module.rules下进行。类型为数组，每项都是个 Object ，描述了对于什么类型的文件（ test ），使用什么加载( loader )和使用的参数（ options ） 。
 	+ Plugin的配置在plugins下。类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
 
+### postcss-loader cssloader sass-loader style-loader执行顺序
+```js
+// webpack.config.js  
+module.exports = {  
+  // ...  
+  module: {  
+    rules: [  
+      {  
+        test: /\.scss$/,  
+        use: [  
+          'style-loader', // 将 JS 字符串生成为 style 节点  
+          'css-loader',   // 将 CSS 转化成 CommonJS 模块  
+          'postcss-loader', // 使用 PostCSS 转换 CSS  
+          'sass-loader'   // 将 Sass 编译成 CSS  
+        ]  
+      }  
+    ]  
+  }  
+};
+```
+
 ### webpack的构建流程
 Webpack的构建流程主要包括以下几个步骤：
 
@@ -16789,6 +17223,65 @@ module.exports = {
 3. 项目需求：不同的项目有不同的需求和优化目标。有些项目可能更注重代码复用和打包效率，而有些项目可能更注重缓存效率和加载速度。因此，minChunks 的值应该根据项目需求进行灵活配置。
 4. 测试和性能分析：最终确定 minChunks 的值应该基于实际的测试和性能分析。你可以尝试不同的值，并观察对打包结果、代码复用率、缓存效率和加载速度的影响，从而找到最适合你项目的配置。
 
+### splitChunksPlugin和dllPlugin能一起使用吗
+splitChunksPlugin和dllPlugin***不建议一起使用***，因为这两者之间存在冲突。
+
+1. 功能差异：
+	+ splitChunksPlugin：这是webpack 4中用于代码分割的插件，它可以将公共库或模块分离到单独的bundle中，从而实现缓存复用和减少主bundle的体积。这个插件提供了丰富的配置选项，如chunks、minSize、minChunks、maxAsyncRequests、maxInitialRequests、name和cacheGroups等，用于定制代码分割的行为。
+	+ dllPlugin：这是webpack的一个插件，用于将特定的库或模块打包到一个单独的动态链接库（DLL）中。这样做可以使得这些库或模块在多个项目中复用，而不需要在每个项目中都重新打包它们。通过减少重复打包，可以提高构建速度。
+2. 冲突原因：
+	+ 两者都涉及到代码的分割和复用，但实现方式和目的有所不同。splitChunksPlugin是基于webpack的构建过程进行代码分割的，而dllPlugin则是通过创建单独的DLL文件来实现库的复用。如果同时使用这两个插件，可能会导致配置上的混乱和冲突，影响构建过程和结果。
+3. 推荐做法：
+	+ 在webpack 4及以后的版本中，官方推荐使用splitChunksPlugin进行代码分割和复用。该插件提供了更强大和灵活的配置选项，可以满足大多数项目的需求。
+	+ 如果需要复用特定的库或模块，可以考虑使用externals配置项将这些库或模块标记为外部依赖，然后在HTML文件中通过`<script>`标签引入这些库或模块的预构建版本。这样做可以实现与dllPlugin类似的效果，但更加简单和直接。
+
+1. splitchunksplugin单独提取vue/jquery等
+
+```js
+module.exports = {  
+  //...  
+  optimization: {  
+    splitChunks: {  
+      chunks: 'all',  
+      // 定义默认的缓存组  
+      cacheGroups: {  
+        // 默认的vendor组  
+        vendors: {  
+          test: /[\\/]node_modules[\\/]/,  
+          priority: -10,  
+          reuseExistingChunk: true,  
+        },  
+        // 排除Vue和jQuery的自定义组  
+        excludeVueJQuery: {  
+          test: /[\\/]node_modules[\\/](vue|jquery)[\\/]/,  
+          priority: -20, // 更高的优先级确保它先于vendors组处理  
+          reuseExistingChunk: true,  
+          enforce: true, // 强制将匹配的模块打包到已存在的chunk中，或者创建一个新的chunk  
+          // 重要的：设置minSize, minChunks等属性为0，以确保它们不会被分割  
+          minSize: 0,  
+          minChunks: 1,  
+          // 可以添加其他配置来确保这些库不会被进一步处理  
+        },  
+      },  
+    },  
+  },  
+  //...  
+};
+```
+2. 利用externals配置外部引用CDN方式
+
+```js
+// 这个库已经通过 <script> 标签嵌入到 HTML 中了
+// webpack.config.js  
+module.exports = {  
+  // ...  
+  externals: {  
+    jquery: 'jQuery' // 在全局作用域中访问 jQuery  
+  },  
+  // ...  
+};
+```
+
 ### 打包的js有个别需要defer延迟加载，有的需要直接加载，怎么设置
 1. 使用自定义模板
 
@@ -17327,6 +17820,7 @@ export default (options)=>{
 ```
 
 对服务做某些定制的操作
+
 ![其他钩子](book_files/2.png)
 
 ![vite](book_files/145.jpg)
@@ -17340,6 +17834,22 @@ export default (options)=>{
 ![GZIP](book_files/161.jpg)
 
 ![分包](book_files/148.jpg)
+
+```js
+// rollup
+rollupOptions: {  
+  output: {  
+    manualChunks(id) {  
+      if (id.includes('node_modules')) {  
+        // 对于来自 node_modules 的模块，按模块名称的第一个部分进行分组  
+        return id.toString().split('node_modules/')[1].split('/')[0].toString();  
+      }  
+      // 其他模块可以根据需要自定义分组逻辑  
+      return 'default';  
+    }  
+  }  
+}
+```
 
 ![CDN](book_files/3.png)
 
