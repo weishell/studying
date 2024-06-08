@@ -80,9 +80,9 @@
       - [margin重叠](#margin重叠)
     - [两三栏布局](#两三栏布局)
     - [粘连布局](#粘连布局)
-    - [清除浮动](#清除浮动)
+    - [`清除浮动`](#清除浮动)
     - [盒模型](#盒模型)
-    - [响应式设计](#响应式设计)
+    - [`响应式设计`](#响应式设计)
     - [`元素水平垂直居中`](#元素水平垂直居中)
       - [伪类实现水平垂直居中](#伪类实现水平垂直居中)
     - [line-height继承](#line-height继承)
@@ -92,11 +92,13 @@
     - [css选择器](#css选择器)
       - [css选择器读取顺序](#css选择器读取顺序)
       - [可继承](#可继承)
-    - [伪类和伪元素的区别](#伪类和伪元素的区别)
+    - [`伪类和伪元素的区别`](#伪类和伪元素的区别)
       - [伪类 伪元素有哪些](#伪类-伪元素有哪些)
     - [first-child和first-of-type/nth-child和nth-of-type](#first-child和first-of-typenth-child和nth-of-type)
     - [css元素隐藏](#css元素隐藏)
-    - [css画三角形](#css画三角形)
+    - [`css画三角形`](#css画三角形)
+      - [其他方案](#其他方案)
+      - [xywh()](#xywh)
     - [CSS动画是什么](#css动画是什么)
     - [css动画实现方式](#css动画实现方式)
       - [transition 实现渐变动画](#transition-实现渐变动画)
@@ -105,18 +107,22 @@
     - [css视差滚动实现方案](#css视差滚动实现方案)
     - [3D立体感绕x轴旋转](#3d立体感绕x轴旋转)
       - [transform-style立体交叉遮盖](#transform-style立体交叉遮盖)
-    - [css性能优化](#css性能优化)
+    - [`css性能优化`](#css性能优化)
     - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
     - [postcss](#postcss)
     - [@namespace @document @page @supports在css中的作用](#namespace-document-page-supports在css中的作用)
     - [CSS函数](#css函数)
     - [rgba和opacity的透明效果有什么不同？](#rgba和opacity的透明效果有什么不同)
     - [node-sass 和 dart-sass](#node-sass-和-dart-sass)
+    - [css换肤原理](#css换肤原理)
+    - [元素动画方案](#元素动画方案)
+      - [两种方案对比](#两种方案对比)
+    - [border-radius设置不同的顶点弧度不一致](#border-radius设置不同的顶点弧度不一致)
   - [js](#js)
     - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
     - [js 类型转换机制](#js-类型转换机制)
-    - [let const var](#let-const-var)
+    - [`let const var`](#let-const-var)
     - [函数和变量提升](#函数和变量提升)
     - [作用域的理解](#作用域的理解)
       - [词法作用域案例](#词法作用域案例)
@@ -124,7 +130,7 @@
       - [作用域链](#作用域链)
     - [执行上下文和执行栈](#执行上下文和执行栈)
       - [执行上下文的生命周期](#执行上下文的生命周期)
-    - [闭包](#闭包)
+    - [`闭包`](#闭包)
       - [不要滥用闭包](#不要滥用闭包)
       - [防抖和节流](#防抖和节流)
       - [闭包为什么会延长变量的生命周期](#闭包为什么会延长变量的生命周期)
@@ -147,28 +153,28 @@
     - [实现a==1\&\&a==2\&\&a==3](#实现a1a2a3)
     - [Object.is() 与比较操作符 “===”、“==” 的区别？](#objectis-与比较操作符--的区别)
     - [判断对象是空对象](#判断对象是空对象)
-    - [深拷贝和浅拷贝](#深拷贝和浅拷贝)
+    - [`深拷贝和浅拷贝`](#深拷贝和浅拷贝)
     - [数据类型](#数据类型)
-      - [判断数据类型的方法](#判断数据类型的方法)
+      - [`判断数据类型的方法`](#判断数据类型的方法)
     - [undefined和null的区别](#undefined和null的区别)
     - [数据结构](#数据结构)
       - [数组和链表的应用场景](#数组和链表的应用场景)
     - [字符串常用的方法](#字符串常用的方法)
       - [match matchAll](#match-matchall)
       - [substring slice字符串处理区别](#substring-slice字符串处理区别)
-    - [数组常用的方法](#数组常用的方法)
+    - [`数组常用的方法`](#数组常用的方法)
       - [影响到原数组的方法](#影响到原数组的方法)
       - [数组reduce方法应用场景](#数组reduce方法应用场景)
       - [数组扁平化实现方案](#数组扁平化实现方案)
     - [数组中对象的排序](#数组中对象的排序)
     - [函数缓存](#函数缓存)
-    - [event loop](#event-loop)
+    - [`event loop`](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
     - [Class和实例的关系以及原型链](#class和实例的关系以及原型链)
       - [函数的特殊性](#函数的特殊性)
     - [js如何实现继承](#js如何实现继承)
-      - [继承的方案](#继承的方案)
-    - [正则表达式](#正则表达式)
+      - [`继承的方案`](#继承的方案)
+    - [`正则表达式`](#正则表达式)
       - [正则的贪婪模式和懒惰模式](#正则的贪婪模式和懒惰模式)
     - [对象的一些方法](#对象的一些方法)
     - [new Object()和Object.cretate()以及Object.assign()区别](#new-object和objectcretate以及objectassign区别)
@@ -190,10 +196,10 @@
       - [阻止事件冒泡和默认事件](#阻止事件冒泡和默认事件)
     - [event.target和event.currentTarget二者含义](#eventtarget和eventcurrenttarget二者含义)
     - [判断一个元素是否在可视区](#判断一个元素是否在可视区)
-    - [监听一个div宽度变化](#监听一个div宽度变化)
+    - [`监听一个div宽度变化`](#监听一个div宽度变化)
     - [MutationObserver触发机制及应用场景](#mutationobserver触发机制及应用场景)
     - [Js单线程详解](#js单线程详解)
-    - [本地存储和场景](#本地存储和场景)
+    - [`本地存储和场景`](#本地存储和场景)
       - [cookie的修改注意](#cookie的修改注意)
       - [使用js-cooke插件](#使用js-cooke插件)
       - [cookie查看范围和跨域携带](#cookie查看范围和跨域携带)
@@ -201,19 +207,19 @@
       - [localstorage监听](#localstorage监听)
       - [需要在本页监听localstorage数据变化方案](#需要在本页监听localstorage数据变化方案)
     - [单点登录](#单点登录)
-    - [跨域](#跨域)
+    - [`跨域`](#跨域)
       - [解决方案](#解决方案)
-    - [web端常见的攻击方式](#web端常见的攻击方式)
+    - [`web端常见的攻击方式`](#web端常见的攻击方式)
     - [前端防护xss和xsrf攻击](#前端防护xss和xsrf攻击)
     - [如何捕获js异常](#如何捕获js异常)
-    - [js计算精度丢失问题](#js计算精度丢失问题)
+    - [`js计算精度丢失问题`](#js计算精度丢失问题)
     - [script异步加载顺序](#script异步加载顺序)
-    - [ajax fetch axios](#ajax-fetch-axios)
-    - [文件上传下载，原生js的实现原理](#文件上传下载原生js的实现原理)
-      - [文件上传](#文件上传)
+    - [`ajax fetch axios`](#ajax-fetch-axios)
+    - [`文件上传下载，原生js的实现原理`](#文件上传下载原生js的实现原理)
+      - [`文件上传`](#文件上传)
       - [文件下载](#文件下载)
     - [文件传输前后端](#文件传输前后端)
-    - [token无感刷新](#token无感刷新)
+    - [`token无感刷新`](#token无感刷新)
     - [js for 循环中break和return区别](#js-for-循环中break和return区别)
     - [前端控制并发请求](#前端控制并发请求)
     - [登录密码安全](#登录密码安全)
@@ -228,18 +234,18 @@
       - [weakSet weakMap](#weakset-weakmap)
     - [Decorator应用场景](#decorator应用场景)
     - [Proxy的应用场景](#proxy的应用场景)
-    - [ES6中的Module](#es6中的module)
+    - [`ES6中的Module`](#es6中的module)
     - [箭头函数与普通函数](#箭头函数与普通函数)
     - [Map与Object和 Set与Array的区别](#map与object和-set与array的区别)
-    - [Promise](#promise)
+    - [`Promise`](#promise)
       - [应用场景](#应用场景)
     - [async await](#async-await)
       - [async await异步本质](#async-await异步本质)
     - [Generator理解和应用](#generator理解和应用)
-    - [实现解构let \[a,b\] = {a:1,b:2}](#实现解构let-ab--a1b2)
+    - [`实现解构let [a,b] = {a:1,b:2}`](#实现解构let-ab--a1b2)
   - [Typescript](#typescript)
     - [never类型的应用场景](#never类型的应用场景)
-    - [联合类型的类型收窄操作](#联合类型的类型收窄操作)
+    - [`联合类型的类型收窄操作`](#联合类型的类型收窄操作)
     - [类型谓词is](#类型谓词is)
     - [unknow类型和any类型的区别](#unknow类型和any类型的区别)
     - [混入和类型拓展操作 交叉类型的应用](#混入和类型拓展操作-交叉类型的应用)
@@ -250,7 +256,7 @@
     - [keyof](#keyof)
     - [keyof any](#keyof-any)
     - [映射类型](#映射类型)
-    - [部分高级特性的实现](#部分高级特性的实现)
+    - [`部分高级特性的实现`](#部分高级特性的实现)
     - [Ts中的Pick，Omit，Extract和Exclude区别](#ts中的pickomitextract和exclude区别)
     - [infer 推断使用](#infer-推断使用)
     - [数组的只读和多维数组](#数组的只读和多维数组)
@@ -265,32 +271,32 @@
     - [TS类的重写](#ts类的重写)
     - [类和接口](#类和接口)
   - [Vue2](#vue2)
-    - [Vue 生命周期](#vue-生命周期)
+    - [`Vue 生命周期`](#vue-生命周期)
       - [mounted created 请求数据](#mounted-created-请求数据)
     - [数据双向绑定](#数据双向绑定)
-    - [Vue双向绑定的原理](#vue双向绑定的原理)
+    - [`Vue双向绑定的原理`](#vue双向绑定的原理)
     - [vue页面初始化闪烁](#vue页面初始化闪烁)
-    - [Vue组件通信方式](#vue组件通信方式)
-    - [data的写法是函数不是对象的原因](#data的写法是函数不是对象的原因)
+    - [`Vue组件通信方式`](#vue组件通信方式)
+    - [`data的写法是函数不是对象的原因`](#data的写法是函数不是对象的原因)
     - [vue直接给对象添加属性的问题](#vue直接给对象添加属性的问题)
-    - [v-if和v-for的优先级](#v-if和v-for的优先级)
+    - [`v-if和v-for的优先级`](#v-if和v-for的优先级)
     - [计算属性computed和methods的区别](#计算属性computed和methods的区别)
     - [v-show v-if的应用场景](#v-show-v-if的应用场景)
     - [vue中key的原理](#vue中key的原理)
     - [Vue.extend 和 Vue.component](#vueextend-和-vuecomponent)
-    - [vue中mixin的理解和应用场景](#vue中mixin的理解和应用场景)
+    - [`vue中mixin的理解和应用场景`](#vue中mixin的理解和应用场景)
       - [mixin注意事项](#mixin注意事项)
       - [mixins 和 composition api的优缺点](#mixins-和-composition-api的优缺点)
     - [vue中的修饰符](#vue中的修饰符)
       - [注意修饰符顺序](#注意修饰符顺序)
-    - [v-bind:value.sync](#v-bindvaluesync)
-    - [vue中的$nextTick](#vue中的nexttick)
+    - [`v-bind:value.sync`](#v-bindvaluesync)
+    - [`vue中的$nextTick`](#vue中的nexttick)
       - [为什么要有$nextTick](#为什么要有nexttick)
       - [使用场景](#使用场景)
-    - [v-model自定义组件实现](#v-model自定义组件实现)
+    - [`v-model自定义组件实现`](#v-model自定义组件实现)
       - [v-bind:sync](#v-bindsync)
       - [Vue3中的v-model不同之处](#vue3中的v-model不同之处)
-    - [diff算法](#diff算法)
+    - [`diff算法`](#diff算法)
       - [Vue中diff算法怎样降低时间复杂度](#vue中diff算法怎样降低时间复杂度)
     - [Vue中组件和插件有什么区别](#vue中组件和插件有什么区别)
     - [自定义指令的应用场景](#自定义指令的应用场景)
@@ -300,11 +306,11 @@
     - [Vue.observable](#vueobservable)
     - [vue处理错误](#vue处理错误)
       - [vue前端代码错误处理](#vue前端代码错误处理)
-    - [vue keep-alvie](#vue-keep-alvie)
+    - [`vue keep-alvie`](#vue-keep-alvie)
       - [缓存后如何获取数据](#缓存后如何获取数据)
     - [Keep-alive和v-if一起使用情况](#keep-alive和v-if一起使用情况)
     - [Vue动态组件和异步组件](#vue动态组件和异步组件)
-    - [Vuex的使用](#vuex的使用)
+    - [`Vuex的使用`](#vuex的使用)
     - [vuex辅助函数](#vuex辅助函数)
     - [介绍Vue的模板编译](#介绍vue的模板编译)
     - [SPA](#spa)
@@ -314,11 +320,11 @@
     - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
     - [vue项目性能优化](#vue项目性能优化)
   - [Vue3](#vue3)
-    - [与Vue2的不同](#与vue2的不同)
+    - [`与Vue2的不同`](#与vue2的不同)
       - [功能改变](#功能改变)
     - [v-on.native修饰符移除，怎么去操作组件的事件](#v-onnative修饰符移除怎么去操作组件的事件)
     - [vue2和vue3异步组件用法](#vue2和vue3异步组件用法)
-    - [vue3的Composition Api的好处](#vue3的composition-api的好处)
+    - [`vue3的Composition Api的好处`](#vue3的composition-api的好处)
       - [Composition API 和 React hooks 对比](#composition-api-和-react-hooks-对比)
     - [vue3性能提升主要体现在哪几个方面](#vue3性能提升主要体现在哪几个方面)
     - [vue3proxy取代defineProperty API原因](#vue3proxy取代defineproperty-api原因)
@@ -349,14 +355,14 @@
     - [事件参数](#事件参数)
     - [vue3生命周期](#vue3生命周期)
     - [defineModel() V3.4](#definemodel-v34)
-    - [vue2和vue3的依赖注入区别](#vue2和vue3的依赖注入区别)
+    - [`vue2和vue3的依赖注入区别`](#vue2和vue3的依赖注入区别)
     - [动态组件](#动态组件)
     - [全局注册和局部注册组件优缺点](#全局注册和局部注册组件优缺点)
     - [插槽的理解](#插槽的理解)
       - [条件插槽](#条件插槽)
       - [动态插槽](#动态插槽)
       - [作用域插槽](#作用域插槽)
-    - [pinia对比vuex](#pinia对比vuex)
+    - [`pinia对比vuex`](#pinia对比vuex)
     - [vue插件的场景](#vue插件的场景)
       - [插件中的 Provide / Inject](#插件中的-provide--inject)
     - [v-memo(v3.2)](#v-memov32)
@@ -402,7 +408,7 @@
       - [常见的hooks](#常见的hooks)
       - [hooks作用](#hooks作用)
       - [自定义hooks](#自定义hooks)
-    - [react 性能优化](#react-性能优化)
+    - [`react 性能优化`](#react-性能优化)
     - [react-router理解](#react-router理解)
       - [useSearchParams的应用](#usesearchparams的应用)
       - [react路由传参的形式](#react路由传参的形式)
@@ -410,8 +416,8 @@
     - [项目中使用redux，结构划分](#项目中使用redux结构划分)
       - [react-redux redux-thunk](#react-redux-redux-thunk)
   - [Angular](#angular)
-    - [angular生命周期](#angular生命周期)
-    - [angular组件通信](#angular组件通信)
+    - [`angular生命周期`](#angular生命周期)
+    - [`angular组件通信`](#angular组件通信)
       - [父组件传值(也可以是函数)给子组件](#父组件传值也可以是函数给子组件)
       - [子组件传值(函数)给父组件](#子组件传值函数给父组件)
       - [跨层级通信](#跨层级通信)
@@ -442,7 +448,7 @@
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
   - [小程序](#小程序)
-    - [登录](#登录)
+    - [`登录`](#登录)
       - [不同的登录方式](#不同的登录方式)
     - [小程序头像获取](#小程序头像获取)
     - [微信小程序使用微信的wx.openid 和自己的账号密码登录有什么区别](#微信小程序使用微信的wxopenid-和自己的账号密码登录有什么区别)
@@ -475,11 +481,11 @@
       - [解除项目和模块之间的链接](#解除项目和模块之间的链接)
     - [修改源码方案](#修改源码方案)
   - [http](#http)
-    - [从输入URL到渲染页面的整个过程](#从输入url到渲染页面的整个过程)
-    - [http状态码](#http状态码)
+    - [`从输入URL到渲染页面的整个过程`](#从输入url到渲染页面的整个过程)
+    - [`http状态码`](#http状态码)
     - [UDP TCP](#udp-tcp)
     - [http1.1 和 http2](#http11-和-http2)
-    - [浏览器缓存](#浏览器缓存)
+    - [`浏览器缓存`](#浏览器缓存)
       - [强缓存](#强缓存)
       - [协商缓存](#协商缓存)
     - [http头部字段](#http头部字段)
@@ -492,7 +498,7 @@
     - [长列表虚拟列表](#长列表虚拟列表)
     - [重排重绘](#重排重绘)
   - [数据结构](#数据结构-1)
-    - [树的遍历](#树的遍历)
+    - [`树的遍历`](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
       - [非递归实现先中后序遍历](#非递归实现先中后序遍历)
     - [把一个数组改成一个单向链表](#把一个数组改成一个单向链表)
@@ -513,7 +519,7 @@
     - [反转链表](#反转链表)
     - [链表相加案例](#链表相加案例)
     - [删除排序链表中的重复元素](#删除排序链表中的重复元素)
-    - [环形链表判断](#环形链表判断)
+    - [`环形链表判断`](#环形链表判断)
     - [二叉树的最大深度](#二叉树的最大深度)
     - [二叉树的最小深度](#二叉树的最小深度)
     - [二叉树层序遍历](#二叉树层序遍历)
@@ -526,7 +532,7 @@
     - [手写new操作符](#手写new操作符)
     - [手写call apply bind](#手写call-apply-bind)
     - [手写防抖节流](#手写防抖节流)
-    - [手写深拷贝](#手写深拷贝)
+    - [`手写深拷贝`](#手写深拷贝)
     - [手写Object.create](#手写objectcreate)
     - [手写简单axios](#手写简单axios)
     - [手写router](#手写router)
@@ -537,7 +543,7 @@
     - [谈谈webpack升级变化](#谈谈webpack升级变化)
     - [如何区分 Webpack 中的 hash/chunkhash/contenthash](#如何区分-webpack-中的-hashchunkhashcontenthash)
     - [说出几个常见的loader和plugin](#说出几个常见的loader和plugin)
-    - [loader和plugin](#loader和plugin)
+    - [`loader和plugin`](#loader和plugin)
     - [postcss-loader cssloader sass-loader style-loader执行顺序](#postcss-loader-cssloader-sass-loader-style-loader执行顺序)
     - [webpack的构建流程](#webpack的构建流程)
     - [bundle，chunk，module是什么](#bundlechunkmodule是什么)
@@ -566,7 +572,7 @@
     - [vite为什么比webpack快](#vite为什么比webpack快)
   - [Vite](#vite)
     - [构建工具](#构建工具)
-    - [vite为什么比webpack快](#vite为什么比webpack快-1)
+    - [`vite为什么比webpack快`](#vite为什么比webpack快-1)
     - [vite预构建](#vite预构建)
     - [vite环境变量设置](#vite环境变量设置)
       - [vite客户端配置环境变量](#vite客户端配置环境变量)
@@ -609,6 +615,9 @@
   - [css预编译语言](#css预编译语言)
   - [微前端](#微前端)
   - [单元测试](#单元测试)
+  - [其他](#其他)
+    - [`项目难点，亮点阐述`](#项目难点亮点阐述)
+    - [`函数好坏代码评审`](#函数好坏代码评审)
 
 
 ## html
@@ -1425,7 +1434,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 2. flex布局：footer的flex设为0，这样footer获得其固有的高度;content的flex设为1
 
-### 清除浮动
+### `清除浮动`
 1.	overflow:hidden
 2.	父级设置固定高度
 3.	clear:both;兼容性好，需要一个空div，语义化不好
@@ -1477,7 +1486,7 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ```
 
 
-### 响应式设计
+### `响应式设计`
 适配不同尺寸屏幕
 
 + flex弹性盒子 grid 网格布局
@@ -1974,7 +1983,7 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 + 不可继承的样式：border, padding, margin, width, height
 + 注意a标签不继承父级的`color`，h1-h6不继承font-size(是按照一定的em比例呈现的)
 
-### 伪类和伪元素的区别
+### `伪类和伪元素的区别`
 1. 用途：
 	+ 伪类主要用于为某些元素添加一些**特殊的效果**，这些效果通常是基于元素的某种状态来触发的，例如用户与元素的交互行为（如鼠标悬停、点击等）或元素的**特定状态**（如链接被访问过、元素获得焦点等）。伪类可以用于改变这些状态下元素的样式。
 	+ 伪元素则用于在某些元素的前面或后面添加一些**内容或样式**，这些内容或样式是虚拟的，不会出现在DOM结构中，但可以通过CSS进行样式控制。伪元素通常用于向元素添加装饰性的内容或样式，如添加下划线、背景图像等。
@@ -2089,10 +2098,29 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 
 ![对比](book_files/18.jpg)
 
-### css画三角形
+### `css画三角形`
 可以看到,设置不同颜色的各个边框，就会发现边框是梯形，极限情况下，width height为0，其他边框颜色留一个边框就可以得到三角形
 
 ![三角形](book_files/19.jpg)
+
+#### 其他方案
+1. svg 
+2. canvas
+3. clip-path：clip-path CSS 属性使用裁剪方式创建元素的可显示区域。区域内的部分显示，区域外的隐藏。
+
+#### xywh()
+```css
+clip-path: xywh(0px 5px 100% 75% round 5% 5% 0% 5%);
+/**
+ * x起点 
+ * y起点
+ * 宽度：x终点
+ * 高度：y终点
+ * round：弧度
+ * 两个值：左上+右下 和 右上+左下 设置
+ * 四个值：左上+右上+右下+左上
+ * */
+```
 
 
 ### CSS动画是什么
@@ -2364,7 +2392,7 @@ transform-style 属性指定嵌套元素是怎样在三维空间中呈现。
 ![图](book_files/23.jpg)
 
 
-### css性能优化
+### `css性能优化`
 1. 内联首屏`关键css`，可下载完html立刻渲染，不需要外链下载再渲染，但是不能缓存且代码不能过多(阻塞)
 2. **异步加载css**
 ```js
@@ -2413,6 +2441,8 @@ esheet'">
 1. css module
 2. scoped
 3. css in js 库，如styled-components 
+4. oocss模式
+5. BEM设计模式
 
 scoped 的实现原理是，Vue 会为每个组件生成一个唯一的 data-v-hash 属性（其中 hash 是基于组件选项计算得出的一个唯一值），并在编译时将组件的 CSS 选择器添加这个属性，以确保这些选择器只选中当前组件的元素。这样，即使两个组件使用了相同的类名，也不会发生样式冲突，因为它们的 CSS 选择器实际上并不相同。
 
@@ -2421,6 +2451,12 @@ scoped 的实现原理是，Vue 会为每个组件生成一个唯一的 data-v-h
 css-module流程
 
 ![流程](book_files/129.jpg)
+
+oocss：1.容器与内容分离 2.结构（基础对象）与皮肤分离(比如换肤，不影响原先基础代码，但是在新对象可覆盖和可扩展)
+![1](book_files/295.jpg)
+
+BEM:块(block)+元素(element__)+修饰符(modifier--):命名规范，让结构清晰，是类oocss模式
+![2](book_files/296.jpg)
 
 ### postcss
 PostCSS 是一个使用 JavaScript 工具和插件转换 CSS 代码的工具。它允许你使用未来的 CSS 语法，并为你提供许多有用的功能，如变量、嵌套规则、混合（mixins）、函数等，这些功能在原生 CSS 中是不可用的，并且可以添加前缀和低浏览器适配。
@@ -2508,8 +2544,113 @@ node-sass和dart-sass（现已更名为sass）是两种不同的Sass编译器，
 
 推荐新项目用dart-sass，因为node-sass虽然继续维护，但是不会增加任何新的功能了，且和node版本绑定
 
+### css换肤原理
+1. 利用css变量去实现换肤功能
+2. 利用sass定义变量去更好的使用
+3. 在js根据切换属性更新主题 + localstorange存储或者后台传输主题
+```css
+/* var.scss */
+/** 根据设计规范定义全局变量声明 **/
+/** 跟主题无关的变量放到root里**/
+:root {
+    // 后续
+    --text-hover-color:#40A9FF;
+}
+// // 跟主题相关变量，通过属性选择器提升优先级
+html[data-theme='light']:root {
+    --bg-color:#FFF;
+}
+html[data-theme='dark']:root {
+    --bg-color:#000;
+	--container-bg:url('../assets/images/bg.png') repeat repeat;
+}
+$bg-color:var(--bg-color);
+```
+```css
+/* common.scss */
+.ant-radio-wrapper {
+	color:$bg-text-color-main
+}
+```
+```js
+// 页面使用
+<html lang="en" data-theme="dark"></html>
+const changeTheme =()=>{
 
+	if(document.documentElement.getAttribute('data-theme') === 'dark'){
+		document.documentElement.setAttribute('data-theme','light')
+		eventBus.emit('changeTheme','light')
+	}else{
+		document.documentElement.setAttribute('data-theme','dark')
+		eventBus.emit('changeTheme','dark')
+	}
+}
+```
 
+### 元素动画方案
+1. transition + transform + translate
+2. transition + offset
+
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<title>Offset Animation Control</title>  
+<style>  
+@keyframes move {  
+  from {  
+    offset-distance: 0%;  
+  }  
+  to {  
+    offset-distance: 100%;  
+  }  
+}  
+#offsetElement {  
+  width: 50px;  
+  height: 50px;  
+  background-color: blue;  
+  offset-path: path("M 100 100 L 300 100 L 200 300 z");  
+  animation: move 3s linear infinite;  
+  animation-play-state: running; /* Default state is running */  
+}  
+</style>  
+</head>  
+<body>  
+  
+<div id="offsetElement"></div>  
+<button id="pauseBtn">Pause</button>  
+<button id="playBtn">Play</button>  
+  
+<script>  
+document.getElementById('pauseBtn').addEventListener('click', function() {  
+  document.getElementById('offsetElement').style.animationPlayState = 'paused';  
+});  
+  
+document.getElementById('playBtn').addEventListener('click', function() {  
+  document.getElementById('offsetElement').style.animationPlayState = 'running';  
+});  
+</script>  
+  
+</body>  
+</html>
+```
+
+#### 两种方案对比
+offset-distance与offset-path：这组属性的兼容性相对较差，尤其在一些旧版本的浏览器中可能不被支持。
+
+translate transform：translate transform的兼容性较好，被广泛支持于现代浏览器中。
+
+`offset-distance与offset-path：能够创建出沿着复杂路径移动的动画效果，具有更高的灵活性和创意性。`
+
+translate transform：只能实现线性移动的动画效果，对于需要复杂路径的动画，其表现力相对较弱。
+
+translate transform通常比offset-distance与offset-path具有更高的渲染效率
+
+### border-radius设置不同的顶点弧度不一致
+
+![1](book_files/293.jpg)
+![2](book_files/294.jpg)
 
 
 ## js
@@ -2593,7 +2734,7 @@ null+1 //1
 undefined+1//NaN
 ```
 
-### let const var
+### `let const var`
 + let: 块级作用域 无变量提升 暂时性死域
 + const: 块级作用域 定义后不可更改
 + var: 全局作用域，可重复定义
@@ -2724,7 +2865,7 @@ JavaScript中有三种类型的执行上下文：
 + 回收阶段：在这个阶段，JavaScript引擎会进行垃圾回收，释放不再需要的内存和对象，清理执行上下文，并将其从执行栈中弹出。
 
 
-### 闭包
+### `闭包`
 ***函数嵌套函数，闭包就是将函数内部和函数外部连接起来的一座桥梁。***
 
 ![闭包](book_files/36.jpg)
@@ -3228,7 +3369,7 @@ if(a==1&&a==2&&a==3){
 2. JSON.stringify():不能包含复杂的结构，如函数等
 3. for...in + **obj.hasOwnProperty(key)**
 
-### 深拷贝和浅拷贝
+### `深拷贝和浅拷贝`
 
 ![深拷贝浅拷贝](book_files/24.jpg)
 
@@ -3267,7 +3408,7 @@ let intNum = 55 // 10进制 55
 let num1 = 070 // 8进制 56 (0开头)
 let hexNum1 = 0xA //16进制 10(0x开头)
 ```
-#### 判断数据类型的方法
+#### `判断数据类型的方法`
 + typeof可判断基础类型，函数类型和其他引用类型都返回object，注意null的特殊性
 + instanceOf可以用来测试构造函数的prototype属性是否出现在对象的`原型链`中的`任何位置`，它可以对引用类型准确判断，但是不能判断基础类型
 + Object.prototype.toString [object xxx]
@@ -3432,7 +3573,7 @@ console.log(...str.matchAll(/(hel)(lo)/g))
 + slice支持负值，就是字符串末尾开始计算，而substring遇到负值自动归为0
 
 
-### 数组常用的方法
+### `数组常用的方法`
 + 增 push unshift splice `concat(只有它不影响原数组)`
 + 删 pop shift splice `slice(只有它不影响原数组)`
 + 改 splice
@@ -3624,7 +3765,7 @@ const memoize = function (func, content) {
 	console.warn(num1,num2)
 ```
 
-### event loop
+### `event loop`
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
 + 同步任务：都在主线程(这里的主线程就是JS引擎线程)上执行，会形成一个执行栈
@@ -3726,7 +3867,7 @@ console.log(Object.prototype.__proto__ === null)// true
 ### js如何实现继承
 它允许创建一个新的类（或对象），该类（或对象）可以继承另一个类（或对象）的属性和方法。
 
-#### 继承的方案
+#### `继承的方案`
 + 原型链继承：复用prototype方法，缺点：1.对象类型的属性会被其他实例修改2.打印无法直接看到继承的属性3.原型创建时无法传参
 ```js
 // 无法定制化传参
@@ -3795,7 +3936,7 @@ console.log(person6);
 
 ![整体思路](book_files/35.jpg)
 
-### 正则表达式
+### `正则表达式`
 正则表达式使用一种特殊的语法来定义模式，这些模式可以被用来搜索、匹配或替换文本。
 
 ```js
@@ -4553,7 +4694,7 @@ observeElement(myElement);
 
 + 滚动事件监听去判断 offsetTop scrollTop
 
-### 监听一个div宽度变化
+### `监听一个div宽度变化`
 ```js
 const ro = new ResizeObserver((entries, observer) => {  
 	console.log(entries,observer)
@@ -4634,7 +4775,7 @@ GUI 渲染线程与 JS 引擎线程是互斥的，当 JS 引擎执行时 GUI 线
 + **异步 http 请求线程**:在 XMLHttpRequest 在连接后是通过浏览器新开一个线程请求
 将检测到状态变更时，如果设置有回调函数，异步线程就产生状态变更事件，将这个回调再放入事件队列中。再由 JavaScript 引擎执行。
 
-### 本地存储和场景
+### `本地存储和场景`
 + Cookies：它是由服务器发送到浏览器，并保存在浏览器上的一小段数据。Cookies主要用于跟踪会话信息，但由于其大小限制（通常不超过`4KB`）和每次`请求`都会发送到服务器的特性，不适合`大量数据`的存储。【标记用户和跟踪用户行为】
 + Web Storage API：包括localStorage和sessionStorage。提供了更大的存储空间，并且数据只保存在客户端，不会发送到服务器。
 	- localStorage：数据没有过期时间，会一直保存在浏览器中，直到用户手动清除或通过JavaScript代码清除。它非常适合存储那些不需要经常变动的数据，如[用户设置、主题偏好、登录令牌]等。
@@ -4812,7 +4953,7 @@ window.addEventListener('message', function (event) {
 }, false);
 ```
 
-### 跨域
+### `跨域`
 跨域本质是浏览器基于同源策略的一种安全手段,端口域名协议一个不相同即为跨域.
 
 一定要注意跨域是浏览器的限制，用抓包工具抓取接口数据，是可以看到接口已经把数据返回回来了，只是浏览器的限制，我们获取不到数据。
@@ -4960,7 +5101,7 @@ otherWindow.postMessage(message, targetOrigin, [transfer]);
 
 ![postMessage](book_files/50.jpg)
 
-### web端常见的攻击方式
+### `web端常见的攻击方式`
 
 + 跨站脚本攻击（XSS攻击），攻击者利用Web应用未对用户提交的数据进行过滤或转义的漏洞，向网页中注入恶意脚本代码。（xss两大要素：攻击者输入恶意代码，浏览器执行恶意代码）前端校验只能解决输入的，如果绕开前端请求，直接构造请求就需要额外处理了。
 	- 存储型：存储在数据库【论坛 私信】
@@ -5080,7 +5221,7 @@ XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
 
 全局还可以使用window.onerror进行检测，压缩后的代码需要配合sourceMap找出对应的行列（对第三方库的定位不会太准确）
 
-### js计算精度丢失问题
+### `js计算精度丢失问题`
 ```js
 0.1+0.2=== 0.3 false 
 ```
@@ -5113,7 +5254,7 @@ console.log(add(0.1,0.2))
 
 ![图片](book_files/184.jpg)
 
-### ajax fetch axios
+### `ajax fetch axios`
 1. AsynchronousJavascriptAndXML,异步 JavaScript 和XML
 2. Fetch 的代码结构比起 ajax 简单多。fetch 不是 ajax 的进一步封装，而是原生 js，没有使用 XMLHttpRequest 对象.
 	+ fetch 的优点：
@@ -5136,10 +5277,10 @@ console.log(add(0.1,0.2))
 	+ **自动转换 json 数据**
 	+ **客户端支持抵御 XSRF 攻击**	
 
-### 文件上传下载，原生js的实现原理
+### `文件上传下载，原生js的实现原理`
 文件上传和下载在原生JavaScript中的实现原理主要涉及到HTML表单的`<input type="file">`元素，用于用户选择文件，以及XMLHttpRequest（或现代的fetch API）或FormData对象用于发送文件到服务器，还有Blob和URL.createObjectURL用于处理和下载文件。
 
-#### 文件上传
+#### `文件上传`
 HTML表单：使用`<input type="file">`元素允许用户选择一个或多个文件。
 ```html
 <input type="file" id="fileInput" name="file">  
@@ -5593,7 +5734,7 @@ await instance.post('/upload_single', formData, {
 })();
 ```
 
-### token无感刷新
+### `token无感刷新`
 1. token
 2. refresh token
 
@@ -6097,7 +6238,7 @@ function set(target, key, value, receiver) {
 }
 ```
 
-### ES6中的Module
+### `ES6中的Module`
 模块，是能够单独命名独立完成一定功能的程序语句的集合。
 
 作用：代码抽象，封装，复用，依赖管理。
@@ -6185,7 +6326,7 @@ console.timeEnd('set find')
 
 ![arr](book_files/71.jpg)
 
-### Promise
+### `Promise`
 + 三种状态 pending resolved rejected
 + then函数正常返回resolved，里面有报错返回rejected[如果有返回值，那么对应的then或者catch能拿到]
 + catch函数正常返回resolved，里面有报错返回rejected[同上]
@@ -6380,7 +6521,7 @@ console.warn(v1,v2,v3)
 
 > for...of循环可以 自动遍历 Generator 函数运行时生成的Iterator对象，且此时不再需要调用next方法。
 
-### 实现解构let [a,b] = {a:1,b:2}
+### `实现解构let [a,b] = {a:1,b:2}`
 
 ```js
 // Object.prototype[Symbol.iterator] = function (){
@@ -6432,7 +6573,7 @@ function handleValue(val: All) {
   }
 ```
 
-### 联合类型的类型收窄操作
+### `联合类型的类型收窄操作`
 联合类型可以使用`typeof instanceof 等值 真值 in操作符 赋值语句`等进行收窄操作，帮助代码正常运行
 ```js
 function printId(id: number | string) {
@@ -6775,7 +6916,7 @@ type Partial<T> = {
 }
 ```
 
-### 部分高级特性的实现
+### `部分高级特性的实现`
 ts内置的一些常用工具类型，简化ts的操作。它们都是基于泛型实现的，并且内置的，可直接使用。
 
 + Exclude<T, U> – 从 T 中剔除可以赋值给 U 的类型。
@@ -7195,7 +7336,7 @@ class JsShuai extends Jspang{
 
 ## Vue2
 
-### Vue 生命周期
+### `Vue 生命周期`
 Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 
 ![生命周期](book_files/58.jpg)
@@ -7211,7 +7352,7 @@ Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 ![1](book_files/60.jpg)
 ![2](book_files/61.jpg)
 
-### Vue双向绑定的原理
+### `Vue双向绑定的原理`
 
 ![数据双向绑定](book_files/59.jpg)
 
@@ -7231,7 +7372,7 @@ display: none;
 <div v-cloak>{{ message }}</div>
 ```
 
-### Vue组件通信方式
+### `Vue组件通信方式`
 1. props 和 $emit
 2. ref:父组件通过获取子节点的引用`this.refs.xx.childmethods`，子组件可以`this.$parent.fathermethods`,注意时间，父组件如果调用子组件的方法，不要不要选择在created的时候，而是应该放在**mouted**时候，而子组件调用父组件的方法可以写在created时候，类似koa的洋葱模型。
 
@@ -7383,14 +7524,14 @@ this.$parent.on('add',this.add)
 this.$parent.emit('add')
 ```
 
-### data的写法是函数不是对象的原因
+### `data的写法是函数不是对象的原因`
 + 如果根实例对象，data可以使函数也可以是对象
 + 如果是组件实例对象，则必须是函数，目的是为了防止公用data会造成数据污染，使用函数返回一个全新的data对象
 
 ### vue直接给对象添加属性的问题
 vue2的响应式依赖Object.defineProperty去添加`依赖收集触发`，但是这个操作是在编译模板时已经触发了，现在手动添加，无法感知到，所以vue2提供了Vue.set()方法，去再次触发`收集依赖`。
 
-### v-if和v-for的优先级
+### `v-if和v-for的优先级`
 vue2中通过编译后发现，v-for的优先级高于v-if，vue3中v-if高于v-for，但是不建议v-if和v-for放在一个层级.
 
 如果是items这个数据内部某些值不展示，则可以考虑借助computed去过滤掉
@@ -7447,7 +7588,7 @@ const instance = new MyComponent().$mount();
 
 Vue.component：在内部，它实际上也调用了 Vue.extend 来创建一个构造器，但随后它还进行了组件的注册和命名等额外操作。因此，你可以将 Vue.component 看作是 Vue.extend 和组件注册的结合体。
 
-### vue中mixin的理解和应用场景
+### `vue中mixin的理解和应用场景`
 Mixin是面向对象程序设计语言中的类，提供了方法实现。`其他类可以访问mixin类的方法而不必成为其子类。`
 
 Mixin类通常作为功能模块使用，在需要该功能时“混入”，有利于代码复用有避免多继承的复杂。
@@ -7565,7 +7706,7 @@ Mixins 在 Vue.js 中的实现原理主要基于 `JavaScript 的对象合并和�
 + @click.prevent.self(阻止所有点击) 
 + @click.self.prevent(阻止当前元素的点击)
 
-### v-bind:value.sync
+### `v-bind:value.sync`
 简易写法，这样子组件需要通知父组件改变值时，`只需简单触发事件`即可，不过vue3由于加强了v-model，不需要.sync这种用法。
 ```html
 // 父组件操作
@@ -7586,7 +7727,7 @@ func2(){
 }
 ```
 
-### vue中的$nextTick
+### `vue中的$nextTick`
 在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM。
 
 nextTick的核心是利用了如 `Promise、MutationObserver、setImmediate、setTimeout` 的原生 JavaScript 方法来模拟对应的微/宏任务的实现，本质是为了利用JavaScript的这些异步回调任务队列来实现 Vue 框架中自己的异步回调队列。
@@ -7662,7 +7803,7 @@ await this.$nextTick()
 console.log(this.$el.textContent) // => '最新值'
 ```
 
-### v-model自定义组件实现
+### `v-model自定义组件实现`
 1. v-model是语法糖，可以用在自定义组件中，会被解析为value和@input事件
 2. 如果子组件中完全没用到input，select，textarea，checkbox也是可以用v-model，如例myinput.vue
 3. 默认子组件接受value，触发事件input，但是可以通过子组件中的model修改props中的名字和事件触发的名字，如myinput2.vue
@@ -7753,7 +7894,7 @@ export default {
 
 ```
 
-### diff算法
+### `diff算法`
 diff 算法是一种通过同层的树节点进行比较的高效算法
 
 其有两个特点：
@@ -8119,7 +8260,7 @@ Vue.component('kitten', {
 // info: render
 ```
 
-### vue keep-alvie
+### `vue keep-alvie`
 keep-alive是vue中的内置组件，能在组件切换过程中将状态保留在内存中，防止重复渲染DOM
 
 keep-alive 包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们
@@ -8300,7 +8441,7 @@ data(){
 ```
 Vue.js中的异步组件可以通过使用import()方法来实现。import()方法是ES2015中的一个语法，用于动态地加载JavaScript模块。在Vue.js中，可以使用import()方法来动态地加载和渲染组件。
 
-### Vuex的使用
+### `Vuex的使用`
 Mutations：处理原子操作
 
 Actions：可以处理多个Mutations和异步操作
@@ -8637,7 +8778,7 @@ Monorepo 的主要优势包括：
 + 依赖管理：所有项目或包使用相同的依赖版本，减少了版本冲突和兼容性问题。
 + 统一构建和测试：可以对整个 monorepo 进行统一的构建和测试，提高开发效率。
 
-### 与Vue2的不同
+### `与Vue2的不同`
 1. 速度更快
 	+ 重写了虚拟Dom实现
 	+ 编译模板的优化（PatchFlag）
@@ -8857,7 +8998,7 @@ const AsyncComp = defineAsyncComponent({
 })
 ```
 
-### vue3的Composition Api的好处
+### `vue3的Composition Api的好处`
 1. 不需要像options API一个功能代码跳转很多地方
 2. 当混入时，不会像mixins存在数据来源不清晰，和多个混入容易冲突的情况
 
@@ -9807,7 +9948,7 @@ defineModel 是一个便利宏。编译器将其展开为以下内容：
 
 ![图](book_files/205.jpg)
 
-### vue2和vue3的依赖注入区别
+### `vue2和vue3的依赖注入区别`
 
 ***在Vue 2中，provide 和 inject 的绑定本身并不是可响应的*** 。这是因为Vue 2的响应式系统是基于 Object.defineProperty 实现的，它只能检测到对象属性的读写操作，但不能检测到新属性的添加或旧属性的删除。因此，如果你使用 provide 提供了一个对象，并在后续修改了该对象的属性，这个变化是不会自动传递给通过 inject 接收该对象的子组件的。
 
@@ -9934,7 +10075,7 @@ export default {
 
 ![图](book_files/284.jpg)
 
-### pinia对比vuex
+### `pinia对比vuex`
 
 Vuex和Pinia都是Vue.js的状态管理库，但它们在设计、使用、体积和社区支持等方面存在一些区别。以下是关于Vuex和Pinia的主要区别：
 
@@ -11919,7 +12060,7 @@ function CounterComponent() {
 export default CounterComponent;
 ```
 
-### react 性能优化
+### `react 性能优化`
 当想要更新一个子组件的时候，如下图绿色部分：
 
 ![1](book_files/87.jpg)
@@ -12306,7 +12447,7 @@ Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redu
 ## Angular
 Angular 是一个应用设计框架与开发平台，旨在创建高效而精致的单页面应用。
 
-### angular生命周期
+### `angular生命周期`
 
 ![1](book_files/280.jpg)
 
@@ -12314,7 +12455,7 @@ Angular 是一个应用设计框架与开发平台，旨在创建高效而精致
 
 ![2](book_files/281.jpg)
 
-### angular组件通信
+### `angular组件通信`
 
 #### 父组件传值(也可以是函数)给子组件
 父组件js
@@ -13390,7 +13531,7 @@ window.onresize = setAppropriateImageSrc;
 ![小程序](book_files/173.jpg)
 
 
-### 登录
+### `登录`
 小程序登录是通过微信官方提供的登录能力, 获取微信提供的用户身份标识。通俗一点，	`也就是获取openId, unionId。`
 
 1.登录流程
@@ -14464,7 +14605,7 @@ npx patch-package some-package
 
 ## http
 
-### 从输入URL到渲染页面的整个过程
+### `从输入URL到渲染页面的整个过程`
 1. DNS解析：域名=>IP地址
 2. 浏览器根据IP地址向服务器发起http请求
 3. 服务器处理http请求，并将对应资源返回给浏览器
@@ -14474,7 +14615,7 @@ npx patch-package some-package
 7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
 8. 直至整个Render 渲染完成
 
-### http状态码
+### `http状态码`
 
 状态码 |	状态码英文名称|	中文描述
 -|-|-
@@ -14512,7 +14653,7 @@ UDP（`User Datagram Protocol，用户数据报协议`）和TCP（`Transmission 
 总的来说，HTTP/2在多个方面对HTTP/1.1进行了改进和优化，提供了更高的效率、更低的延迟和更好的兼容性。这使得HTTP/2成为现代Web应用中更受欢迎的选择。
 
 
-### 浏览器缓存
+### `浏览器缓存`
 浏览器缓存（Browser Caching）是为了节约网络资源、加速浏览而设计的一种机制。
 
 ![缓存](book_files/100.jpg)
@@ -14876,7 +15017,7 @@ console.log(a)
 
 + 树：一种分层的数据抽象模型，如DOM树，级联菜单，树型控件，JS中没有树的结构，不过可以用Object和Array来实现
 
-### 树的遍历
+### `树的遍历`
 1. 深度优先遍历
 2. 广度优先遍历
 
@@ -15658,7 +15799,7 @@ var deleteDuplicates = function(head) {
 };
 ```
 
-### 环形链表判断
+### `环形链表判断`
 ![如图](book_files/240.jpg)
 
 > 普通哈希表算法：存储每个数据，直到next是null，如果对比没有重复，即为不环，有的话就是环形链表
@@ -16078,7 +16219,7 @@ Function.prototype.myBind = function(context, ...args) {
 </html>
 ```
 
-### 手写深拷贝
+### `手写深拷贝`
 原理：遍历属性，遇到对象数组`递归`
 ```js
 //定义检测数据类型的功能函数
@@ -16461,7 +16602,7 @@ require('./index.css')
 	+ webpack.HotModuleReplacementPlugin (webpack内置热更新组件，新版webpack-dev-server根据devserver中hot值为true会自动调用)
 	+ terser-webpack-plugin： w5内置，w4需要安装，处理多进程打包，可以配置在plugins中，也可以在optimization中配置(如果配置了css压缩，这个就算不需要配置多进程打包也最好要配置)
 
-### loader和plugin
+### `loader和plugin`
 + loader：模块转换器，用于特定的模块类型进行转换，原内容按照需要转成想要的内容
 + plugin：可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等，在webpack构建流程中的特定时机注入扩展逻辑，来改变构建结果，是用来自定义webpack打包过程的方式，一个插件是含有apply方法的一个对象，通过这个方法可以参与到整个webpack打包的各个流程(生命周期)。
 
@@ -17399,7 +17540,7 @@ Webpack 是基于 Node.js 构建的，而 Vite 则是基于 esbuild 进行预构
 	- HMR
 	- 跨域
 
-### vite为什么比webpack快
+### `vite为什么比webpack快`
 webpack考虑了服务端兼容性问题，支持esModule和commonjs等规范，在启动编译时，还需要额外操作将多种模块化规范统一。
 
 ![1](book_files/123.jpg)
@@ -18630,12 +18771,10 @@ myChart.setOption(option);
 > 需要了解的主要配置：`series` `xAxis` `yAxis` `grid` `tooltip` `title` `legend` `color` 
 
 - series
-
   - 系列列表。每个系列通过 `type` 决定自己的图表类型
   - 大白话：图标数据，指定什么类型的图标，可以多个图表重叠。
 
 - xAxis：直角坐标系 grid 中的 x 轴
-
   - boundaryGap: 坐标轴两边留白策略 true，这时候刻度只是作为分隔线，标签和数据点都会在两个刻度之间的带(band)中间。
 
 - yAxis：直角坐标系 grid 中的 y 轴
@@ -18729,3 +18868,46 @@ option = {
 ## 微前端
 
 ## 单元测试
+
+## 其他
+
+### `项目难点，亮点阐述`
+根据具体情况来说
+
+### `函数好坏代码评审`
+在前端代码评审中，评定一个函数写得好不好，通常需要考虑多个方面。以下是一些评估标准，你可以根据这些标准来评价一个函数的质量：
+
+1. 函数命名：
+	+ 函数名是否清晰、准确地描述了函数的功能？
+	+ 命名是否符合团队的命名规范？
+2. 参数列表：
+	+ 函数的参数是否都有明确的含义？
+	+ 参数的数量是否适中，既不过多也不过少？
+	+ 是否使用了适当的参数类型注解或文档说明？
+3. 函数长度：
+	+ 函数是否过长？一般来说，函数应该尽可能短小精悍，只做一件事情。
+	+ 如果函数过长，是否考虑将其拆分成更小的函数？
+4. 可读性：
+	+ 函数内部的代码是否易于阅读和理解？
+	+ 是否有足够的注释来解释复杂的逻辑或不易理解的代码段？
+	+ 变量和函数的命名是否一致且有意义？
+5. 复用性：
+	+ 函数是否具有通用性，可以在多个地方复用？
+	+ 是否避免了硬编码，使得函数更加灵活？
+6. 性能：
+	+ 函数中是否存在不必要的计算或重复计算？
+	+ 是否有可能导致性能瓶颈的代码段，如嵌套循环、不必要的DOM操作等？
+7. 错误处理：
+	+ 函数是否对可能的错误情况进行了处理？
+	+ 是否有适当的错误日志记录或异常抛出？
+8. 测试：
+	+ 函数是否有相应的单元测试来验证其功能？
+	+ 测试是否覆盖了函数的所有重要分支和边界情况？
+9. 可扩展性：
+	+ 函数的设计是否考虑了未来的扩展性？
+	+ 是否容易添加新的功能或修改现有功能？
+10. 安全性：
+	+ 函数中是否存在潜在的安全风险，如XSS攻击、SQL注入等？
+	+ 是否对用户输入进行了适当的验证和清理？
+
+根据以上标准，你可以对函数进行全面的评估。需要注意的是，这些标准并不是孤立的，而是需要综合考虑。一个优秀的函数应该在多个方面都表现出色。同时，也要根据实际情况和项目的具体需求来灵活应用这些标准。
