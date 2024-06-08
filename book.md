@@ -156,6 +156,7 @@
     - [`深拷贝和浅拷贝`](#深拷贝和浅拷贝)
     - [数据类型](#数据类型)
       - [`判断数据类型的方法`](#判断数据类型的方法)
+    - [js内置对象](#js内置对象)
     - [undefined和null的区别](#undefined和null的区别)
     - [数据结构](#数据结构)
       - [数组和链表的应用场景](#数组和链表的应用场景)
@@ -226,6 +227,9 @@
       - [CryptoJS](#cryptojs)
     - [对象保护不被修改](#对象保护不被修改)
     - [onload 和 DOMContentLoaded](#onload-和-domcontentloaded)
+    - [ajax](#ajax)
+    - [JWT](#jwt)
+    - [token放在cookie还是localstorange](#token放在cookie还是localstorange)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -319,6 +323,7 @@
       - [hisotory路由404](#hisotory路由404)
     - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
     - [vue项目性能优化](#vue项目性能优化)
+    - [vue路由传参方式](#vue路由传参方式)
   - [Vue3](#vue3)
     - [`与Vue2的不同`](#与vue2的不同)
       - [功能改变](#功能改变)
@@ -447,6 +452,7 @@
     - [`rem em vw vh dpr`](#rem-em-vw-vh-dpr)
       - [移动端1px实现](#移动端1px实现)
       - [移动端2X3X图](#移动端2x3x图)
+    - [移动端兼容问题](#移动端兼容问题)
   - [小程序](#小程序)
     - [`登录`](#登录)
       - [不同的登录方式](#不同的登录方式)
@@ -492,6 +498,7 @@
       - [if-match的用法](#if-match的用法)
     - [https加密方式和证书](#https加密方式和证书)
       - [加密算法有哪几种](#加密算法有哪几种)
+    - [get post区别](#get-post区别)
   - [性能优化](#性能优化)
     - [为什么css在页面head，js在body尾部](#为什么css在页面headjs在body尾部)
     - [浅谈前端性能优化](#浅谈前端性能优化)
@@ -1481,10 +1488,11 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 ### 盒模型
 盒模型指的是HTML元素在渲染时所占据的空间，包括元素的内容（content）、内边距（padding）、边框（border）和外边距（margin）。
 
+所有元素都可以看成是一个盒子
+
 ```
 box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ```
-
 
 ### `响应式设计`
 适配不同尺寸屏幕
@@ -3431,6 +3439,22 @@ console.log(f1.constructor) //不注释的话为F1,注释的话为F2
 console.log(f1 instanceof F1)//true
 console.log(f1 instanceof F2)//true
 ```
+
+### js内置对象
++ String
++ Boolean
++ Number
++ Array
++ Object
++ Function
++ Date
+	- getYear
++ Math
+	- abs
+	- sqrt
+	- max
+	- min
++ RegExp
 
 ### undefined和null的区别
 + undefined是声明后未赋值，而null通常表示一个空的对象引用(空指针)
@@ -5737,6 +5761,7 @@ await instance.post('/upload_single', formData, {
 ### `token无感刷新`
 1. token
 2. refresh token
+3. 拦截器中当401时使用refresh token去获取最新的token值
 
 ### js for 循环中break和return区别
 在JavaScript中，for 循环中的 break 和 return 语句有着显著的区别，它们的行为和用途完全不同。
@@ -5995,7 +6020,34 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 ```
 
+### ajax
+在不刷新页面的前提下，与服务器交换数据并更新部分内容
 
+通过XmlHttpRequest对象向服务器发送异步请求，然后从服务器拿到数据，最后通过JS操作DOM
+
+创建xmh=> open=> send => state
+
+### JWT
+JWT (JSON Web Token) 是一种开放标准（RFC 7519）的方法，用于在双方之间安全地传输信息。这些信息可以是验证、授权、信息交换等。
+
+JWT 的主要特点是其紧凑性、自包含性和安全性，使得它可以在不同的系统和服务之间轻松地进行身份验证和授权。
+
+JWT 通常由三部分组成，它们之间用点（.）分隔：
+
++ Header：包含元数据，如签名算法的类型和JWT的类型。
++ Payload：包含需要传递的信息，如用户ID、权限等。
++ Signature：使用Header和Payload，以及一个密钥（secret）来生成，用于验证JWT的完整性和真实性。
+
+在后续的请求中，前端需要将JWT包含在请求头中发送给后端，以便后端验证用户的身份和权限。
+
+具体实现方式可能因前端框架和后端API的不同而有所差异。例如，在Axios等HTTP客户端库中，可以通过设置请求头中的Authorization字段来携带JWT。
+
+### token放在cookie还是localstorange
+都可以
+
+放在cookie会自动发送，跨域需要单独配置，不过放cookie容易被CSRF攻击
+
+localstorange需要手动添加，一般会加载axios请求拦截器中，虽然也存在xss攻击的可能，不过比较好防御
 
 
 
@@ -8764,6 +8816,66 @@ Scope Hoisting：
 ![1](book_files/275.jpg)
 
 ![2](book_files/276.jpg)
+
+### vue路由传参方式
+
+路由的一部分
+```js
+{
+  path: '/qq',
+  name: 'Qq',
+  component:Qq
+},
+```
+> 当需要跳转的时候，既可以用path跳转也可以用name跳转
+
+
+1. params模式
+
+```js
+//params传参 使用name
+this.$router.push({
+  name:'second',
+  params: {
+    id:'20180822',
+    name: 'query'
+  }
+})
+
+//params接收参数
+this.id = this.$route.params.id ;
+this.name = this.$route.params.name ;
+
+//路由
+
+{
+path: '/second/:id/:name',
+name: 'second',
+component: () => import('@/view/second')
+}
+```
+
+2. query模式：问号的形式拼接在路由后
+
+```js
+//传参: 
+this.$router.push({
+        path:'/xxx',
+        query:{
+          id:id
+        }
+      })
+  
+//接收参数:
+this.$route.query.id
+```
+```js
+router.push(`/meetingdetail?id=${v}`)
+```
+
+
+
+
 
 ## Vue3
 vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
@@ -13521,6 +13633,22 @@ window.onload = setAppropriateImageSrc;
 window.onresize = setAppropriateImageSrc;
 ```
 
+### 移动端兼容问题
+1. 当设置overflow：scroll/auto,在ios上会卡顿
+	+ -webkit-overflow-scrolling:touch
+2. 安卓环境placeholder文字设置会偏上
+	+  input有placeholder不设置行高
+3. 移动端字体小于12px异常提示
+	+ 把字体放大一倍，再使用transform缩小
+4. ios下input按钮设置为disabled属性为true显示异常
+	+ input[type=button]{opacity:1}
+5. 安卓手机下取消语音输入按钮
+	+ input::-webkit-input-speech-button{display:none}
+6. ios下取消input输入框在输入英文首字母默认大写
+	+ `<input autocapitaliz='off' autocorrect='off'>`
+7. 禁止ios识别长串数字为电话
+	+ `<meta content='telephone=no' name='format-detection'/>`
+
 
 
 
@@ -14607,13 +14735,14 @@ npx patch-package some-package
 
 ### `从输入URL到渲染页面的整个过程`
 1. DNS解析：域名=>IP地址
-2. 浏览器根据IP地址向服务器发起http请求
-3. 服务器处理http请求，并将对应资源返回给浏览器
-4. 根据HTML代码生成DOM Tree，根据CSS代码生成CSSOM（css对象模型）
-5. 将DOM Tree和 CSSOM整合形成Render Tree
-6. 根据Render Tree渲染页面
-7. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
-8. 直至整个Render 渲染完成
+2. 建立TCP连接
+3. 浏览器根据IP地址向服务器发起http请求
+4. 服务器处理http请求，并将对应资源返回给浏览器
+5. 根据HTML代码生成DOM Tree，根据CSS代码生成CSSOM（css对象模型）
+6. 将DOM Tree和 CSSOM整合形成Render Tree
+7. 根据Render Tree渲染页面
+8. 遇到script标签停止渲染，加载并执行js，完成后再继续执行
+9. 直至整个Render 渲染完成
 
 ### `http状态码`
 
@@ -14748,6 +14877,20 @@ server.listen(3000);
 + 实体首部字段
 ![5](book_files/106.jpg)
 
+1. 请求头信息：
+	+ Accept：浏览器告诉服务器所支持的数据类型
+	+ Host：浏览器告诉服务器我想访问服务器哪台主机
+	+ Referer：浏览器告诉服务器我从哪里来（防盗链）
+	+ User-Agent：浏览器类型，版本信息
+	+ Date：浏览器告诉服务器访问时间
+	+ Connection:连接方式
+	+ Cookie
+	+ X-Request-With:请求方式
+2. 响应头信息
+	+ Location：告诉浏览器你要找谁
+	+ Server:告诉浏览器服务类型
+	+ Content-Type：告诉浏览器返回的数据类型
+	+ Refresh:刷新时间
 
 #### if-match的用法
 
@@ -14822,6 +14965,13 @@ https采用的是：结合`对称加密+非对称加密`这两种方式，可以
 1. 对称加密算法也叫共享密钥加密算法、单密钥加密算法。采用单密钥的加密方法，同一个密钥可以同时用作信息的加密和解密，即解密算法为加密算法的逆算法。因此在知道了加密算法后也就知道了解密算法。对称加密算法有DES、3DES、AES等。
 2. 非对称加密算法又叫公开密钥算法。采用的是公钥和私钥相结合的加密方法。公钥和私钥是两个完全不同的密钥，一个用于加密，一个用于解密。同时这两个密钥在数学上是关联的。即解密算法不是加密算法的逆算法，因此在知道了加密算法后也无法知道解密算法，保证了安全性。有RSA、ECC等。
 3. 数字摘要算法又称哈希算法、散列算法，是一种单向算法，它通过对数据内容进行散列得到一个固定长度的密文信息（信息是任意长度，而摘要是定长）。即用户可以通过哈希算法对目标信息生成一段特定长度的唯一的Hash值，却不能通过这个Hash值重新获得目标信息。该算法不可逆。哈希算法有MD5、SHA-1、SHA-256等。
+
+### get post区别
+1. get一般获取数据 post提交
+2. get放在url，安全性较差，post放在body
+3. get缓存，post一般不会
+4. get请求会在浏览记录中，post不会
+5. post请求支持的content-type很多
 
 
 
