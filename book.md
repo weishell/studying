@@ -169,6 +169,7 @@
       - [数组扁平化实现方案](#数组扁平化实现方案)
     - [数组中对象的排序](#数组中对象的排序)
     - [函数缓存](#函数缓存)
+    - [函数柯里化作用](#函数柯里化作用)
     - [`event loop`](#event-loop)
       - [event loop 宏任务 微任务 和dom渲染的关联](#event-loop-宏任务-微任务-和dom渲染的关联)
     - [Class和实例的关系以及原型链](#class和实例的关系以及原型链)
@@ -247,6 +248,7 @@
       - [async await异步本质](#async-await异步本质)
     - [Generator理解和应用](#generator理解和应用)
     - [`实现解构let [a,b] = {a:1,b:2}`](#实现解构let-ab--a1b2)
+    - [Reflect作用](#reflect作用)
   - [Typescript](#typescript)
     - [never类型的应用场景](#never类型的应用场景)
     - [`联合类型的类型收窄操作`](#联合类型的类型收窄操作)
@@ -324,6 +326,8 @@
     - [第三方库没有babel降级，vuecli怎么处理](#第三方库没有babel降级vuecli怎么处理)
     - [vue项目性能优化](#vue项目性能优化)
     - [vue路由传参方式](#vue路由传参方式)
+    - [vue-router导航守卫](#vue-router导航守卫)
+      - [路由守卫的应用场景](#路由守卫的应用场景)
   - [Vue3](#vue3)
     - [`与Vue2的不同`](#与vue2的不同)
       - [功能改变](#功能改变)
@@ -373,6 +377,7 @@
     - [v-memo(v3.2)](#v-memov32)
     - [vue高阶组件](#vue高阶组件)
     - [vue渲染机制](#vue渲染机制)
+    - [vue模板编译原理](#vue模板编译原理)
   - [React](#react)
     - [说说React特性](#说说react特性)
     - [React18更新了哪些](#react18更新了哪些)
@@ -3789,6 +3794,24 @@ const memoize = function (func, content) {
 	console.warn(num1,num2)
 ```
 
+### 函数柯里化作用
+目的是避免频繁调用相同的参数又能复用代码
+
+```js
+function curryArea(width) {  
+    return function(height) {  
+        return width * height;  
+    };  
+}  
+  
+// 使用柯里化函数   calculateAreaWithWidth5可以出现很多宽为5的数据，这样不需要传5了
+const calculateAreaWithWidth5 = curryArea(5);  
+console.log(calculateAreaWithWidth5(3)); // 输出：15  
+  
+const calculateAreaWithWidth10 = curryArea(10);  
+console.log(calculateAreaWithWidth10(7)); // 输出：70
+```
+
 ### `event loop`
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
@@ -6586,6 +6609,25 @@ let [a,b] = {a:1,b:3}
 console.log(a,b)
 ```
 
+### Reflect作用
+可以草率的理解为对object的封装
+
+1. Reflect.has(obj, name) 是 name in obj 指令的 函数化 ，用于查找 name 属性在 obj 对象中是否存在。返回值为 boolean。
+
+2. Reflect.construct,创建一个对象，方法的行为有点像 new 操作符 构造函数，相当于运行 new target(...args).
+
+```js
+	function fn(a,b){
+		this.a = a
+		this.b = b
+	}
+	function fn2(){
+		
+	}
+	
+	let res = Reflect.construct(fn,[1,2])
+	console.log(res)//fn {a: 1, b: 2}
+```
 
 
 
@@ -8824,7 +8866,8 @@ Scope Hoisting：
 {
   path: '/qq',
   name: 'Qq',
-  component:Qq
+  component:Qq,
+  meta:'xxx'// 可做标记位
 },
 ```
 > 当需要跳转的时候，既可以用path跳转也可以用name跳转
@@ -8872,6 +8915,99 @@ this.$route.query.id
 ```js
 router.push(`/meetingdetail?id=${v}`)
 ```
+
+```js
+// 假设有以下路由定义  
+const routes = [  
+  { path: '/search', name: 'Search', component: SearchComponent },  
+  // ... 其他路由  
+];  
+  
+// 在某个方法中，通过 name 和 query 导航到 /search 并传递查询参数  
+this.$router.push({ name: 'Search', query: { q: 'vue router' } });
+```
+
+### vue-router导航守卫
+
+1. 全局前置守卫：在路由跳转前触发，通常用于***验证用户是否登录、判断是否有权限访问某个路由***等。
+
+```js
+const router = new VueRouter({ ... })  
+  
+router.beforeEach((to, from, next) => {  
+  // ... 逻辑判断  
+  // 确保一定要调用 next 方法  
+  // 否则路由会停留在这里  
+  // 也可以调用 next(false) 来中断当前的导航  
+  // 或者 next('/') 跳转到其他路由  
+})
+```
+
+2. 全局后置守卫：在路由跳转后触发，通常用于一些需要在路由跳转后执行的逻辑，比如`页面跳转后的动画效果等`。
+
+```js
+router.afterEach((to, from) => {  
+  // ... 逻辑处理  
+})
+```
+
+3. 路由独享的守卫：在路由配置中直接定义 beforeEnter 守卫，只会在该路由下触发。
+
+```js
+const router = new VueRouter({  
+  routes: [  
+    {  
+      path: '/foo',  
+      component: Foo,  
+      beforeEnter: (to, from, next) => {  
+        // ... 逻辑判断  
+      }  
+    }  
+  ]  
+})
+```
+4. beforeRouteEnter：在渲染该组件的对应路由被 confirm 前调用，此时组件实例还未被创建，`不`能访问 this`。可以通过传一个回调给 next 来访问组件实例。
+5. beforeRouteUpdate (2.2+)：在当前路由改变，但是该组件被复用时调用，例如对于带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+6. beforeRouteLeave：导航离开该组件的对应路由时调用。
+
+```js
+export default {  
+  beforeRouteEnter(to, from, next) {  
+    // 在渲染该组件的对应路由被 confirm 前调用  
+    // 不能获取组件实例 `this`  
+    // 因为当守卫执行前，组件实例还没被创建  
+    next(vm => {  
+      // 通过 `vm` 访问组件实例  
+    })  
+  },  
+  beforeRouteUpdate(to, from, next) {  
+    // 在当前路由改变，但是该组件被复用时调用  
+    // 例如，对于带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，  
+    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。  
+  },  
+  beforeRouteLeave(to, from, next) {  
+    // 导航离开该组件的对应路由时调用  
+    // 可以访问组件实例 `this`  
+  }  
+}
+```
+这些钩子函数允许你在 Vue 应用程序中控制路由的行为，从而实现诸如用户认证、权限检查、数据预取、重定向等复杂的功能。
+
+#### 路由守卫的应用场景
+1. 登录验证和权限控制/页面跳转和重定向
+
+```js
+router.beforeEach((to, from, next) => {  
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);  
+  if (requiresAuth && !isAuthenticated) {  
+    next('/login'); // 重定向到登录页  
+  } else {  
+    next(); // 允许继续导航  
+  }  
+});
+```
+2. 参数校验和错误处理
+3. 异步数据预取
 
 
 
@@ -10389,6 +10525,53 @@ const LoggedMyComponent = withLogging(MyComponent);
 3. 更新：当一个依赖发生变化后，副作用会重新运行，这时候会创建一个更新后的虚拟 DOM 树。运行时渲染器遍历这棵新树，将它与旧树进行比较，然后将必要的更新应用到真实 DOM 上去。
 
 ![vue](book_files/285.jpg)
+
+### vue模板编译原理
+Vue模板编译原理是指将Vue的模板转换为渲染函数的过程。以下是Vue模板编译原理的详细解释：
+
+1. 模板解析：
+
+Vue的编译器首先会将模板解析为抽象语法树（AST），这是一个以JavaScript对象形式表示的抽象语法结构。
+
+在解析阶段，编译器会对模板进行逐个字符的解析，识别模板中的各种语法，如指令（v-if、v-for等）、插值表达式、文本等，并将其转化为AST节点。
+
+同时，为每个AST节点添加对应的属性和指令。
+2. 优化：
+
+编译器会对生成的AST节点进行静态优化处理，以减少运行时的性能开销。
+
+优化措施包括静态节点提升、静态属性提升、缓存节点、diff算法优化等。
+
+通过遍历AST节点，识别其中不必要的节点（如静态文本节点、静态表达式节点等），并将其删除，以减少DOM操作的开销。
+3. 生成渲染函数：
+
+将优化后的AST转换为可执行的渲染函数。
+
+这个渲染函数以虚拟DOM作为参数，用于生成组件的真实DOM并更新视图。
+
+在生成代码阶段，通过对AST进行遍历，将AST中的每个节点都转化为相应的JavaScript代码，并将其添加到最终的渲染函数中。
+
+4. 渲染：
+
+通过执行渲染函数生成虚拟DOM，并和旧的虚拟DOM进行对比，找出差异并局部更新视图。
+
+渲染函数本身不执行diff算法，而是生成虚拟DOM树来描述页面结构。
+
+diff算法是在虚拟DOM树生成后，Vue对比新旧虚拟DOM树的过程中执行的。
+
+5. 编译时机：
+
+模板编译是在构建时完成的，而不是在运行时。
+
+这可以避免运行时解析和编译模板的性能损耗，提升应用的性能。
+
+6. Vue实例与模板：
+
+当Vue实例化时，会将模板编译为渲染函数。
+
+Vue实例对象控制一个特定的DOM元素，并与该元素关联，以实现响应式数据绑定、事件处理和其他功能。
+
+通过以上步骤，Vue模板编译原理可以简化为将模板转换为渲染函数的过程，通过渲染函数生成虚拟DOM，并根据变化的状态更新视图。这种机制使得Vue能够高效、灵活地处理用户界面的渲染和更新。
 
 
 
