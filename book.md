@@ -2124,6 +2124,48 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 ![三角形](book_files/19.jpg)
 
 #### 其他方案
+1. clip-path
+2. svg line
+3. svg 多边形
+4. svg path
+5. canvas
+6. webgl
+7. overflow：hidden + transform：rotate +translate
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<style>
+			#k{
+				width:300px;
+				height:300px;
+				border:1px solid red;
+				overflow: hidden;
+			}
+			#k1{
+				width:200px;
+				height:200px;
+				background:blue;
+				transform: rotate(45deg) translate(283px);
+			}
+		</style>
+	</head>
+	<body>
+			<div id="k">
+				<div id="k1">
+					
+				</div>
+			</div>
+	</body>
+</html>
+```
+
+
+#### 其他方案
 1. svg 
 2. canvas
 3. clip-path：clip-path CSS 属性使用裁剪方式创建元素的可显示区域。区域内的部分显示，区域外的隐藏。
