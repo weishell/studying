@@ -15552,9 +15552,49 @@ li {
 	eventCenter.publish('event', 'some data'); // 发布事件  
 ```
 
+### 策略模式
+减少ifelse判断，减少嵌套层级
 
+```js
+/**  一大堆的if-else  **/
+//level 评级 basicBonus 基础奖金
+const computeBonus(level, basicBonus) = () => {
+	if(level === 'A') {
+        return basicBonus * 1;
+    } else if(level === 'B') {
+        return basicBonus * 2;
+    } else if(level === 'C') {
+        return basicBonus * 3;
+    } else if(level === 'D') {
+        return basicBonus * 4;
+    }
+}
+computeBonus('A', 1000);//1000
+ 
+/** 策略模式改写 **/
+//定义策略类
 
-
+// js 天然特性的策略模式
+const strategies = {
+    'A': function(basicBonus) {
+        return basicBonus * 1;
+    },
+    'B': function(basicBonus) {
+        return basicBonus * 2;
+    },
+    'C': function(basicBonus) {
+        return basicBonus * 3;
+    },
+    'D': function(basicBonus) {
+        return basicBonus * 4;
+    },
+}
+//使用环境类
+const computeBonus = (level, basicBonus) {
+    return strategies[level](basicBonus);
+}
+computeBouns('A', 1000);//1000
+```
 
 ## 数据结构
 
