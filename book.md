@@ -98,6 +98,7 @@
     - [css元素隐藏](#css元素隐藏)
     - [`css画三角形`](#css画三角形)
       - [其他方案](#其他方案)
+      - [其他方案](#其他方案-1)
       - [xywh()](#xywh)
     - [CSS动画是什么](#css动画是什么)
     - [css动画实现方式](#css动画实现方式)
@@ -514,6 +515,8 @@
     - [浅谈前端性能优化](#浅谈前端性能优化)
     - [长列表虚拟列表](#长列表虚拟列表)
     - [重排重绘](#重排重绘)
+  - [设计模式](#设计模式)
+    - [观察者模式和发布订阅区别和联系](#观察者模式和发布订阅区别和联系)
   - [数据结构](#数据结构-1)
     - [`树的遍历`](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
@@ -15416,6 +15419,138 @@ li {
 使用GPU加速：当元素被赋予transform或某些其他属性（如opacity低于1、filter、will-change等）时，浏览器可能会将其提升到一个独立的复合层上。这个层独立于常规的文档流渲染过程，并由GPU进行加速。由于GPU加速的存在，transform: translate的移动操作可以非常快速且高效地完成，而不需要重新计算整个文档流。
 
 性能优化：通过将需要动画或频繁更新的元素提升到`复合层上`，浏览器可以避免对这些元素进行昂贵的重排和重绘操作。这可以`显著提高页面的滚动、动画和交互性能`。
+
+
+
+
+
+## 设计模式
+
+### 观察者模式和发布订阅区别和联系
+观察者模式和发布订阅模式在软件设计中都是用于处理对象间一对多依赖关系的重要设计模式，它们有着紧密的联系，但也有一些关键的区别。以下是它们之间的区别和联系的详细分析：
+
+1. 联系：
+
+核心思想：两者都定义了一种一对多的依赖关系，即当一个对象（被观察者/发布者）的状态发生改变时，所有依赖于它的对象（观察者/订阅者）都会得到通知并可能进行相应的更新或处理。
+
+目的：都是为了降低对象之间的耦合度，提高系统的可维护性和扩展性。
+
+2. 区别：
+
++ 耦合度：	
+	- 观察者模式通常是一种强耦合的设计，因为观察者和被观察者之间通常有直接的依赖关系。在观察者模式中，被观察者（Subject）会保持对观察者的记录，并在状态改变时直接调用观察者的方法。
+	- 发布订阅模式则是一种更为松散的耦合设计。在发布订阅模式中，发布者和订阅者之间并不知道对方的存在，它们通过一个共同的调度中心（事件总线）进行通信。
++ 实现方式：
+	- 观察者模式通常包含两个角色：观察者和被观察者。被观察者管理观察者的列表，并在状态改变时通知所有观察者。
+	- 发布订阅模式则包括发布者（Publisher）、订阅者（Subscriber）和事件总线（Event Bus）。发布者发布事件，订阅者订阅感兴趣的事件，事件总线负责事件的分发。
++ 通信方式：
+	- 在观察者模式中，被观察者直接调用观察者的方法来进行通知。这通常是同步的，即状态改变后立即通知观察者。
+	- 发布订阅模式则更为灵活，它支持异步通信。发布者发布事件后，订阅者可以在任何时间进行处理，不一定需要立即响应。
++ 灵活性：
+	- 发布订阅模式通常比观察者模式更为灵活。在观察者模式中，观察者只能执行特定的更新方法，而在发布订阅模式中，订阅者可以基于不同的事件主题执行不同的处理逻辑。
+	- 此外，发布订阅模式还支持更复杂的通信模式，如多对多、多对一等。
++ 使用场景：
+	- 观察者模式适用于需要明确知道被观察者和观察者之间关系的情况，如Vue的依赖追踪和原生事件处理。
+	- 发布订阅模式则更适用于需要解耦和异步通信的场景，如React的合成事件和Vue组件间的通信。
+
+总结：
+
+观察者模式和发布订阅模式都是处理对象间一对多依赖关系的重要设计模式。它们的核心思想相似，但实现方式、耦合度、通信方式和灵活性等方面有所不同。在选择使用哪种模式时，需要根据具体的应用场景和需求进行权衡和选择。
+
+```js
+	class Subject {
+		constructor() {
+			this.observers = [];
+			this.state = 'initial';
+		}
+		// 注册观察者  
+		registerObserver(observer) {
+			this.observers.push(observer);
+		}
+		// 移除观察者  
+		unregisterObserver(observer) {
+			this.observers = this.observers.filter(obs => obs !== observer);
+		}
+
+		// 通知所有观察者  
+		notifyObservers() {
+			this.observers.forEach(observer => {
+				observer.update(this.state);
+			});
+		}
+		// 改变状态  
+		setState(state) {
+			this.state = state;
+		}
+	}
+
+	class Observer {
+		constructor(name) {
+			this.name = name;
+		}
+		// 更新方法，由Subject调用  
+		update(state) {
+			console.log(`${this.name} received state: ${state}`);
+		}
+
+	}
+
+	// 使用示例  
+	const subject = new Subject();
+	const observer1 = new Observer('Observer 1');
+	const observer2 = new Observer('Observer 2');
+
+	subject.registerObserver(observer1);
+	subject.registerObserver(observer2);
+
+	subject.setState('new state'); // 触发通知  
+
+	// 输出:  
+	// Observer 1 received state: new state  
+	// Observer 2 received state: new state
+```
+```js
+	class EventCenter {  
+	  constructor() {  
+	    this.subscribers = {};  
+	  }  
+	  // 订阅事件  
+	  subscribe(event, callback) {  
+	    if (!this.subscribers[event]) {  
+	      this.subscribers[event] = [];  
+	    }  
+	    this.subscribers[event].push(callback);  
+	  }  
+	  // 取消订阅  
+	  unsubscribe(event, callback) {  
+	    if (this.subscribers[event]) {  
+	      this.subscribers[event] = this.subscribers[event].filter(cb => cb !== callback);  
+	    }  
+	  }  
+	  // 发布事件  
+	  publish(event, data) {  
+	    if (this.subscribers[event]) {  
+	      this.subscribers[event].forEach(callback => {  
+	        callback(data);  
+	      });  
+	    }  
+	  }  
+	}  
+
+	// 使用示例  
+	const eventCenter = new EventCenter();  
+	function subscriber1(data) {  
+	  console.log('Subscriber 1 received data:', data);  
+	}  
+	function subscriber2(data) {  
+	  console.log('Subscriber 2 received data:', data);  
+	}  
+	  
+	eventCenter.subscribe('event', subscriber1);  
+	eventCenter.subscribe('event', subscriber2);  
+	  
+	eventCenter.publish('event', 'some data'); // 发布事件  
+```
 
 
 
