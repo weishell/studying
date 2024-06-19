@@ -517,6 +517,7 @@
     - [重排重绘](#重排重绘)
   - [设计模式](#设计模式)
     - [观察者模式和发布订阅区别和联系](#观察者模式和发布订阅区别和联系)
+    - [策略模式](#策略模式)
   - [数据结构](#数据结构-1)
     - [`树的遍历`](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
@@ -15553,7 +15554,7 @@ li {
 ```
 
 ### 策略模式
-减少ifelse判断，减少嵌套层级
+减少ifelse判断，减少嵌套层级,代码可读性，扩展性，复用性都会得到提升
 
 ```js
 /**  一大堆的if-else  **/
@@ -15595,6 +15596,51 @@ const computeBonus = (level, basicBonus) {
 }
 computeBouns('A', 1000);//1000
 ```
+
+```js
+class BonusStrategy {  
+    calculate(salary) {  
+        throw new Error('子类必须实现此方法');  
+    }  
+}  
+  
+class LevelA extends BonusStrategy {  
+    calculate(salary) {  
+        return salary * 4;  
+    }  
+}  
+  
+class LevelB extends BonusStrategy {  
+    calculate(salary) {  
+        return salary * 3;  
+    }  
+}  
+  
+// 假设需要添加新的绩效等级D  
+class LevelD extends BonusStrategy {  
+    calculate(salary) {  
+        // 新的计算逻辑  
+        return salary * 1.5;  
+    }  
+}  
+  
+// 然后，我们可以根据需要动态选择策略  
+function calcBonus(level, salary, strategy) {  
+    return strategy.calculate(salary);  
+}  
+  
+const levelAStrategy = new LevelA();  
+const levelBStrategy = new LevelB();  
+const levelDStrategy = new LevelD();  
+  
+// 使用策略  
+console.log(calcBonus('A', 4000, levelAStrategy)); // 16000  
+console.log(calcBonus('D', 3000, levelDStrategy)); // 4500
+```
+
+
+
+
 
 ## 数据结构
 
