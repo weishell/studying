@@ -74,6 +74,8 @@
     - [webWorker](#webworker)
   - [css](#css)
     - [offsetWidth](#offsetwidth)
+    - [clientX、offsetX、screenX](#clientxoffsetxscreenx)
+    - [clientX、offsetTop、offsetLeft、offsetWidth、offsetHeight](#clientxoffsettopoffsetleftoffsetwidthoffsetheight)
     - [a标签伪类顺序](#a标签伪类顺序)
     - [margin负值](#margin负值)
     - [BFC](#bfc)
@@ -1026,6 +1028,12 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各
 </html>
 ```
 > offsetWidth 注意不同盒模型时结果，IE盒模型给的width已经包含了boder padding 故就是100
+
+### clientX、offsetX、screenX
+![1](book_files/298.jpg)
+
+### clientX、offsetTop、offsetLeft、offsetWidth、offsetHeight
+![2](book_files/299.jpg)
 
 ### a标签伪类顺序
 lvha(love-ha)
@@ -5086,7 +5094,7 @@ window.addEventListener('message', function (event) {
 
 #### 解决方案
 + jsonp
-+ websocket
++ websocket??
 + 跨域资源共享
 + nginx反向代理(Proxy方案1)
 + 本地服务器代理-webpack/vite(Proxy方案2)
@@ -6120,6 +6128,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	... 
 })
 ```
+![jquery](book_files/297.jpg)
 
 ### ajax
 在不刷新页面的前提下，与服务器交换数据并更新部分内容
@@ -19615,3 +19624,5 @@ option = {
 	+ 是否对用户输入进行了适当的验证和清理？
 
 根据以上标准，可以对函数进行全面的评估。需要注意的是，这些标准并不是孤立的，而是需要综合考虑。一个优秀的函数应该在多个方面都表现出色。同时，也要根据实际情况和项目的具体需求来灵活应用这些标准。
+
+## 鸿蒙
