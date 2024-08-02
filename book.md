@@ -50,7 +50,9 @@
 		background:none !important
 	}
 	li a code:after,h3 code:after,h4 code:after{
-		content:"☆"
+		content:"☆";
+		position:relative;
+		top:-1px
 	}
 </style>
 
