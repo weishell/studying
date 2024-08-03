@@ -2993,6 +2993,7 @@ console.log(a); // 2
 #### 作用域链
 当尝试访问一个变量或函数时，JavaScript引擎会首先在当前的执行环境中进行查找。如果在当前环境中找到了对应的标识符，那么就直接使用它；如果没有找到，则会沿着作用域链向上一级作用域进行查找，这个过程会一直持续到找到对应的标识符或到达全局作用域为止。
 
+
 ### 执行上下文和执行栈
 执行上下文是JavaScript引擎在执行代码时的内部概念，执行上下文提供了`代码执行的环境`，而作用域则决定了在这个环境中`哪些变量和函数是可访问的`。每一个执行上下文都是与特定的`变量对象`（Variable Object）相关联的。变量对象是一个`包含`了执行上下文中所有变量和函数声明的对象。当JavaScript代码执行时，它会创建一个或多个执行上下文，这些上下文按照特定的顺序（称为执行栈）进行管理。
 
@@ -3214,6 +3215,7 @@ bar()
 
 ![闭包](book_files/257.jpg)
 
+
 ### 内存泄漏
 内存泄漏（Memory Leak）是指在程序运行过程中，动态分配的内存没有得到及时的释放，从而导致系统内存的浪费，甚至可能导致程序运行缓慢、崩溃或系统资源耗尽。
 
@@ -3300,7 +3302,7 @@ b = null 	 	// 此对象的引用计数为 0（无引用）
 2. `分配速度慢`，因为即便是使用 First-fit 策略，其操作仍是一个 O(n) 的操作，最坏情况是每次都要遍历到最后，同时因为碎片化，大对象的分配效率会更慢
 
 ##### 优化方案：标记整理
-标记整理（Mark-Compact）算法 就可以有效地解决，它的标记阶段和标记清除算法没有什么不同，只是标记结束后，标记整理算法会将活着的对象（即不需要清理的对象）向内存的一端移动，最后清理掉边界的内存
+**标记整理（Mark-Compact）算法** 就可以有效地解决，它的标记阶段和标记清除算法没有什么不同，只是标记结束后，标记整理算法会将活着的对象（即不需要清理的对象）向内存的一端移动，最后清理掉边界的内存
 
 ![移动](book_files/196.jpg)
 
@@ -3414,15 +3416,25 @@ var sum = function (x, y) {
 + All parts of a ClassDeclaration or a ClassExpression are strict mode code.
 + `禁止意外创建全局变量，直接抛出错误`
 + `this 问题`
-+ arguments 和参数列表的独立性，并且 arguments 不可修改
++ arguments 和参数列表的独立性，并且 arguments 不可修改??(谷歌改了可以)
 + 给 NaN 赋值会抛出错误
 + 对象操作：给不可写属性赋值(writable: false)；给只读属性赋值(只有 get，没有 set)；给不可扩展对象新增属性
 + 严格模式要求参数名唯一，属性名唯一
-+ 禁止八进制数字
++ `禁止八进制数字`
 + 禁止对 primitive type 的变量加属性或方法
 + 禁止使用with
 + eval 不再为 surrounding scope 添加新的变量
 + **禁止delete 声明的变量，禁止delete 不可删除的属性或方法**
+
+```js
+function test(a) {  
+  'use strict';  
+  a = 42;  
+  console.log(arguments[0]); // 输出：10，而不是42  
+}  
+  
+test(10);
+```
 
 ### LHS 和 RHS 是什么？会造成什么影响
 LHS 是 Left Hand Side 的意思，左值查询一个变量，如果变量不存在，且在**非严格模式下，就会创建一个全局变量**。RHS 查询一个变量，如果变量不存在，就会报错 ReferenceError。
@@ -3653,6 +3665,7 @@ console.log(f1 instanceof F2)//true
 4. 总结
    
 在选择使用数组还是链表时，需要根据具体的应用场景和需求来权衡。在大多数情况下，数组是前端开发中更常用的数据结构，因为它们提供了直观的访问方式和丰富的API。但在某些特定场景下，如需要频繁地插入或删除元素，或者实现特定的数据结构时，链表可能会是一个更好的选择。
+
 
 ### 字符串常用的方法
 + 增：**concat(拼接，不影响原字符串)**
@@ -3935,6 +3948,7 @@ const memoize = function (func, content) {
 	console.warn(num1,num2)
 ```
 
+
 ### 函数柯里化作用
 目的是避免频繁调用相同的参数又能复用代码
 
@@ -3953,6 +3967,7 @@ const calculateAreaWithWidth10 = curryArea(10);
 console.log(calculateAreaWithWidth10(7)); // 输出：70
 ```
 
+
 ### `event loop`
 js是单线程，同一时间只能做一件事，而避免阻塞的方法就是事件循环
 
@@ -3965,7 +3980,6 @@ js是单线程，同一时间只能做一件事，而避免阻塞的方法就是
 ![同步异步](book_files/30.jpg)
 ![事件循环机制](book_files/29.jpg)
 ![宏任务与微任务](book_files/31.jpg)
-
 
 #### event loop 宏任务 微任务 和dom渲染的关联
 每一次 call stack（当前轮询结束） 结束，都会触发 DOM 渲染（**不一定非得渲染，就是给一次 DOM 渲染的机会！！！**）然后再进行 event loop。
@@ -4051,6 +4065,7 @@ console.log(Function.prototype.__proto__ === Object.prototype)// true
 console.log(Object.__proto__ === Function.prototype)// true
 console.log(Object.prototype.__proto__ === null)// true
 ```
+
 
 ### js如何实现继承
 它允许创建一个新的类（或对象），该类（或对象）可以继承另一个类（或对象）的属性和方法。
