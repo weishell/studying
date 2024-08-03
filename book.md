@@ -78,6 +78,7 @@
     - [offsetWidth](#offsetwidth)
     - [clientX、offsetX、screenX](#clientxoffsetxscreenx)
     - [clientX、offsetTop、offsetLeft、offsetWidth、offsetHeight](#clientxoffsettopoffsetleftoffsetwidthoffsetheight)
+    - [offset的理解](#offset的理解)
     - [a标签伪类顺序](#a标签伪类顺序)
     - [margin负值](#margin负值)
     - [BFC](#bfc)
@@ -645,21 +646,24 @@
   - [其他](#其他)
     - [`项目难点，亮点阐述`](#项目难点亮点阐述)
     - [`函数好坏代码评审`](#函数好坏代码评审)
+  - [鸿蒙](#鸿蒙)
 
 
 ## html
+
 
 ### `如何理解html语义化`
 1.	让人更容易读懂（增加代码可读性）
 2.	去掉或丢失样式的时候能够让页面呈现出清晰结构
 3.	让搜素引擎更容易理解（SEO优化）
 
+
 ### p标签里面不能嵌套ul、div等块级元素原因
 不符合语义化规定，w3c规定，对于P元素，它指定了以下内容，这表明P元素只允许包含内联元素（包括p元素本身也不行）。
 ```
 <!ELEMENT P - O (%inline;)* -- paragraph -->
 ```
-简而言之，不可能在DOM中放置`<div>`元素，因为开放的`<div>`标签会自动closures`<p>`元素。
+简而言之，不能在P标签中放置`<div>`元素，因为开放的`<div>`标签会自动closures`<p>`元素。
 ```js
 <p>
     11
@@ -670,12 +674,14 @@
 
 ![p标签](book_files/1.jpg)
 
+
 ### src 和 href 的区别
 它们都是 HTML 中特定元素的属性。
 
 src 是 source 的缩写，它通常用于 img、video、audio、script 元素，通过 src 属性，可以指定外部资源的来源地址。
 
-href 是 hyper reference 的缩写，意味「超引用」，它通常用于 a、link 元素，通过 href 属性，`可以标识文档中引用的其他超文本。`
+href 是 hyper reference 的缩写，意味`「超引用」`，它通常用于 a、link 元素，通过 href 属性，`可以标识文档中引用的其他超文本。`
+
 
 ### 说说常用的 meta 标签
 meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页面上，但是对于机器是可读的。它可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
@@ -685,13 +691,14 @@ meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页�
 2. http-equiv，把 content 属性连接到一个 HTTP 头部。
 3. name，把 content 属性连接到某个名称。
 
+
 ### meta作用
 
 + **字符集定义**：通过 `<meta charset="UTF-8">` 声明文档使用的字符集，这有助于确保网页内容在不同浏览器和设备上的正确显示。
 + **页面描述**：`<meta name="description" content="页面描述内容">` 用于为搜索引擎提供页面的简短描述，这通常显示在搜索结果页面中。
 + **关键词**：`<meta name="keywords" content="关键词1,关键词2,...">` 虽然现代搜索引擎不再像过去那样依赖此标签进行排名，但它仍然可以为搜索引擎提供一些关于页面内容的线索。
 + 作者信息：`<meta name="author" content="作者姓名">` 提供页面的作者信息。
-+ 页面刷新：`<meta http-equiv="refresh" content="5;URL=http://www.example.com">` 可以用于设置页面在指定的秒数后自动刷新并跳转到另一个 URL。
++ **页面刷新和跳转**：`<meta http-equiv="refresh" content="5;URL=http://www.example.com">` 可以用于设置页面在指定的秒数后自动刷新并跳转到另一个 URL。
 + **响应式设计**：`<meta name="viewport" content="width=device-width, initial-scale=1.0">` 用于设置网页在移动设备上的视口宽度和初始缩放级别，这是响应式设计的重要部分。
 + X-UA-Compatible：`<meta http-equiv="X-UA-Compatible" content="IE=edge">` 告诉 Internet Explorer 使用其最新的渲染引擎来渲染页面。
 + 社交媒体分享：`<meta property="og:title" content="网页标题"> 和 <meta property="og:image" content="图片URL">` 等标签用于为社交媒体平台（如 Facebook、Twitter 等）提供分享时的页面标题、图片等信息。
@@ -707,6 +714,7 @@ meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页�
 3. minimum-scale和maximum-scale：设置允许用户进行缩放的最小和最大比例
 4. user-scalable：设置用户是否可以手动缩放网，可以设置为yes或no，通过设置不同的meta viewport属性值，开发者可以实现响应式设计，使网页在不同设备上呈现出最佳的显示效果
 
+
 ### DOCTYPE的作用？严格模式和混杂模式的区别？
 ！DOCTYPE告诉浏览器以HTML5标准解析页面，`如果不写，则进入混杂模式`
 
@@ -716,10 +724,11 @@ meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页�
 
 HTML5 没有 DTD ，因此也就没有严格模式与混杂模式的区别，HTML5 有相对宽松的方法，实现时，已经尽可能大的实现了向后兼容(`HTML5 没有严格和混杂之分`)。
 
-### HTML5 为什么只需要写 !DOCTYPE HTML
-HTML（HyperText Markup Language）是人们从SGML中提取出来的一个微小子集。
 
-是因为 HTML5 不基于 SGML，所以不需要引用 DTD。
+### HTML5 为什么只需要写 !DOCTYPE HTML
+HTML（HyperText Markup Language）是从SGML中提取出来的一个微小子集。
+
+HTML5不是基于**SGML**（标准通用标记语言）的，因此它不再需要DTD来定义文档类型。HTML5有自己的一套规范，定义了哪些元素、属性和API是标准的一部分，所以不需要引用 DTD。
 
 在 HTML 4.01 中，<!DOCTYPE> 声明引用 DTD，因为 HTML 4.01 基于 SGML。
 
@@ -730,6 +739,7 @@ DTD 规定了标记语言的规则，这样浏览器才能正确地呈现内容�
 
 #### SGML
 Standard Generalized Markup language，标准通用标记语言
+
 
 ### iframe有哪些优点和缺点
 1. 优点：
@@ -768,6 +778,7 @@ window.onload = function() {
 };
 ```
 
+
 ### `H5新增属性`
 1. 语义标签 `<footer><nav>`等
 2. 表单功能增强 `<input type="submit"><input type="email">` oninvalid 当验证不通过时触发此事件等
@@ -778,6 +789,7 @@ window.onload = function() {
 7. Web Worker
 8. Web Storage
 9. WebSocket
+
 
 ### `常见的浏览器内核有哪些`
 
@@ -796,9 +808,10 @@ JS引擎则：解析和执行javascript来实现网页的动态效果。
 + Presto 内核：Opera7 及以上。 [Opera内核原为：Presto，现为：Blink;]
 + Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支）]
 
+
 ### h5新特性SharedWorker
 1. SharedWorker地址如果本地相对地址失效，可用http完整地址
-2. 在SharedWorker中，如果你想要将发送者的信息传播给其他页面（即连接到SharedWorker的其他端口），你不能直接通过port.postMessage发送消息给特定的其他端口，因为port对象只代表当前连接。但是，你可以设置一个机制来存储和广播消息给所有连接的端口。
+2. 在SharedWorker中，如果想要将发送者的信息传播给其他页面（即连接到SharedWorker的其他端口），不能直接通过port.postMessage发送消息给特定的其他端口，因为port对象只代表当前连接。但是，可以设置一个机制来存储和广播消息给所有连接的端口。
 
 ```html
 <!DOCTYPE html>  
@@ -912,6 +925,7 @@ self.onconnect = function(e) {
 
 > 同一个页面开两个窗口，也是会支持，数据的同步和获取
 
+
 ### webWorker
 Web Worker 的作用，就是为 JavaScript 创造多线程环境，允许主线程创建 Worker 线程，将一些任务分配给后者运行。在主线程运行的同时，Worker 线程在后台运行，两者互不干扰。
 ```html
@@ -985,6 +999,7 @@ self.onmessage = function(e) {
 
 ## css
 
+
 ### offsetWidth
 offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各浏览器的 offsetWidth `可能有所不同`）.offsetWidth = border + padding + scrollbar(竖直方向滚动条) + width.
 
@@ -1031,11 +1046,22 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各
 ```
 > offsetWidth 注意不同盒模型时结果，IE盒模型给的width已经包含了boder padding 故就是100
 
+
 ### clientX、offsetX、screenX
 ![1](book_files/298.jpg)
 
+
 ### clientX、offsetTop、offsetLeft、offsetWidth、offsetHeight
 ![2](book_files/299.jpg)
+
+
+### offset的理解
+字面意思为偏移。
+
++ offsetWidth/Height：元素占据的位置，直到边框为止
++ offsetLeft/offsetTop：和父级偏移的相对应位置
++ event.offsetX/event.offsetY: 和点击元素相对的偏移的x和y的值
+
 
 ### a标签伪类顺序
 lvha(love-ha)
@@ -1045,6 +1071,7 @@ a:visited{color:#000;}
 a:hover{color:#fff;} 
 a:active{color:#f99;}
 ```
+
 
 ### margin负值
 1.	margin-top和margin-left为负值时，元素向上或者向左移动
@@ -1129,6 +1156,7 @@ k1和k2是两个div
    + k2 margin-right 负值 k2不动 k2后如果有相邻的元素比如k3存在，则会向左移动
 
 实际应用：`圣杯布局+粘连布局`
+
 
 ### BFC
 在页面中元素都有一个隐含的属性叫作`Block Formatting Context`，即块级格式化上下文，简称BFC。该属性能够设置打开或关闭，默认是关闭的。页面上的一个`隔离渲染区域`，**容器里面的子元素不会在布局上影响到外面的元素**
@@ -1240,6 +1268,18 @@ k1和k2是两个div
 ![图片](book_files/7.jpg)
 ![图片](book_files/8.jpg)
 
+1. 使用clear: both;
+
+第四个`<div>`使用了clear: both;，这意味着它会**清除前面所有浮动元素的影响，并显示在新的一行上**。因此，它会出现在“2”和“3”的下方。
+
+2. 使用overflow: hidden;
+
+第四个`<div>`使用了overflow: hidden;。**虽然这个属性通常用于控制内容溢出容器的行为，但它也会创建一个块格式化上下文（Block Formatting Context, BFC），这可以间接地清除浮动**。
+
+但是，overflow属性清除浮动的效果主要体现在**它防止浮动元素覆盖或影响它**，而不是像clear属性那样将元素移动到新的一行。
+
+因此，尽管overflow: hidden;可以创建BFC并防止浮动元素的影响，但它不会像clear: both;那样显式地将元素移动到新的一行以清除前面的浮动。这就是为什么在这两种情况下效果不一致的原因。
+
 #### margin重叠
 margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 ```html
@@ -1291,9 +1331,9 @@ margin-top和margin-bottom重叠，空白p被忽略，所以最后相距`15px`
 ```
 flex可以说是最好的方案了，代码少，使用简单
 
-> 注意的是，flex容器的一个默认属性值:align-items: stretch;
+> 注意的是，flex容器的一个默认属性值:`align-items: stretch`;
 
-> 这个属性导致了列等高的效果。 为了让两个盒子高度自动，需要设置: align-items: flex-start
+> 这个属性导致了列等高的效果。 为了让两个盒子高度自动，需要设置: `align-items: flex-start`
 
 + 两边使用 float，中间使用 margin
 + absolute + margin
@@ -1412,6 +1452,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 </html>
 ```
 
+
 ### 粘连布局
 1. 为内容区域添加最小的高度
 	+ min-height
@@ -1467,6 +1508,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 2. flex布局：footer的flex设为0，这样footer获得其固有的高度;content的flex设为1
 
+
 ### `清除浮动`
 1.	overflow:hidden
 2.	父级设置固定高度
@@ -1520,6 +1562,7 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 ```
 
+
 ### `响应式设计`
 适配不同尺寸屏幕
 
@@ -1530,13 +1573,14 @@ box-sizing: content-box(标准盒模型)|border-box(IE盒模型)|inherit:
 + rem
 + rpx全称“response pixel”，即响应式的px,小程序专用
 
+
 ### `元素水平垂直居中`
 + position 定位四个方向值一致，margin:auto
 + position + transform
 + position + margin负值(需知道宽高)
 + grid
 + flex 主轴侧轴居中
-+ flex+margin auto
++ 父flex+子margin auto：`其原理主要基于flexbox布局的特性以及margin属性的自动分配机制。`
 + table
 + 伪类法
 
@@ -1713,7 +1757,7 @@ flex+margin:auto
 	    vertical-align: middle;
 	    height: 100%;
 		background-color: rgba(0, 0, 255, 0.2);
-		width: 10px;
+		width: 10px;/*为了展示，实际设置为0即可*/
 	}
 	
 	.wrapper > div {
@@ -1739,6 +1783,7 @@ flex+margin:auto
 1.	写具体数值，如30px，则继承父级该值
 2.	写比例如1/2/3.5等,则继承该比例（**自己的**font-size*父级中的比例）
 3.	写百分比,如200%,则继承计算出来的结果(**父级**的font-size*200%)
+
 
 ### css预处理语言
 扩充css语言，增加了变量，混合，函数，嵌套，代码模块化等功能，方便复用和开发
@@ -1831,7 +1876,6 @@ body
   font-size: 1.2em;
   color: #ff0000;
 }
-
 ```
 
 sass需要关键词@mixin和引入时@include
@@ -1998,9 +2042,9 @@ body {
 + align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性。默认值为auto，表示继承父元素的align-items属性，如果没有父元素，则等同于stretch。
 
 
-
 ### 元素竖向的百分比设定是相对于容器的高度吗？
 当按百分比设定一个元素的宽度时，它是相对于**父容器的宽度**计算的，但是，对于一些表示竖向距离的属性，例如 `padding-top , padding-bottom , margin-top , margin-bottom` 等，当按百分比设定它们时，依据的也是父容器的`宽度`，而不是高度。
+
 
 ### css选择器
 id选择器 标签选择器 类选择器 后代选择器 子选择器(div>p) 相邻选择器(a+div) 群组选择器(div,p 选择所有div和p) 伪类选择器 伪元素选择器 属性选择器 层级选择器(p~ul 选择前面有p元素的所有ul)
@@ -2016,6 +2060,7 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 + 可继承的属性：font-size, font-family, color
 + 不可继承的样式：border, padding, margin, width, height
 + 注意a标签不继承父级的`color`，h1-h6不继承font-size(是按照一定的em比例呈现的)
+
 
 ### `伪类和伪元素的区别`
 1. 用途：
@@ -2045,10 +2090,11 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 	- ::marker：选择列表项的标记，如无序列表中的项目符号点或有序列表中的数字。
 	- ::selection：选择用户选择的文本部分。
 
+
 ### first-child和first-of-type/nth-child和nth-of-type
 + :first-child: 表示在**一组兄弟元素**中的第一个元素，符合要求即匹配对应css样式,不符合就结束
 + :first-of-type:表示一组兄弟元素中**其类型**的第一个元素(存在一个查找的过程)匹配
-+ :nth-child(n)和:first-child(n)规则基本一直，只是要找的是第n个元素(按位置判断)
++ :nth-child(n)和:first-child(n)规则基本一致，只是要找的是第n个元素(按位置判断)
 + :nth-of-type同:first-of-type:规则，第n个该类型的元素(按类型判断)
 
 ```html
@@ -2121,7 +2167,6 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 ![first-of-type](book_files/266.jpg)
 
 
-
 ### css元素隐藏
 + display:none
 + visibility:hidden
@@ -2131,6 +2176,7 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 + clip-path
 
 ![对比](book_files/18.jpg)
+
 
 ### `css画三角形`
 可以看到,设置不同颜色的各个边框，就会发现边框是梯形，极限情况下，width height为0，其他边框颜色留一个边框就可以得到三角形
@@ -2177,7 +2223,6 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 	</body>
 </html>
 ```
-
 
 #### 其他方案
 1. svg 
@@ -2616,7 +2661,7 @@ node-sass和dart-sass（现已更名为sass）是两种不同的Sass编译器，
 	+ dart-sass（现sass）：`不支持/deep/语法，需要改为::v-deep`。此外，dart-sass（现sass）的API设计更为简洁，方便开发者进行扩展和定制。
 5. 更新与维护：
 	+ node-sass：由于依赖C++环境和Node.js版本，可能会遇到维护和更新困难的问题。
-	+ dart-sass（现sass）：作为Sass社区官方推荐的Sass编译器，得到了持续的更新和维护。
+	+ `dart-sass（现sass）：作为Sass社区官方推荐的Sass编译器，得到了持续的更新和维护。`
 
 推荐新项目用dart-sass，因为node-sass虽然继续维护，但是不会增加任何新的功能了，且和node版本绑定
 
@@ -2662,6 +2707,7 @@ const changeTheme =()=>{
 	}
 }
 ```
+
 
 ### 元素动画方案
 1. transition + transform + translate
@@ -2723,10 +2769,12 @@ translate transform：只能实现线性移动的动画效果，对于需要复�
 
 translate transform通常比offset-distance与offset-path具有更高的渲染效率
 
+
 ### border-radius设置不同的顶点弧度不一致
 
 ![1](book_files/293.jpg)
 ![2](book_files/294.jpg)
+
 
 ### link和@import的区别
 link和@import在多个方面存在显著的区别，以下是它们的区别：
@@ -2757,6 +2805,7 @@ link和@import在多个方面存在显著的区别，以下是它们的区别：
 
 ## js
 
+
 ### 获取伪类中的内容
 1. window.getComputedStyle(element):返回一个对象，可得到元素的所有 CSS 属性的值。私有的 CSS 属性值可以通过对象提供的 API 或通过简单地使用 CSS 属性名称进行索引来访问。
 
@@ -2781,6 +2830,7 @@ console.log(window.getComputedStyle(k1, ':before').getPropertyValue("content")) 
 //	console.log(window.getComputedStyle(k1, ':before').content)也可以这样写
 ```
 
+
 ### js中哪些会被判断为false
 以下这些都会： 0 null undefined **NaN** ""
 ```js
@@ -2804,6 +2854,7 @@ if ("") {
   console.log("This will not be logged because an empty string is falsy.");  
 }
 ```
+
 
 ### js 类型转换机制
 + 显式转换： Number() parseInt() Boolean() String()...
@@ -2835,6 +2886,7 @@ console.log(Number(arr))//1111
 null+1 //1
 undefined+1//NaN
 ```
+
 
 ### `let const var`
 + let: 块级作用域 无变量提升 暂时性死域
