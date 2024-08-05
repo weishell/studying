@@ -4241,7 +4241,7 @@ console.log(returnedTarget === target);
 ```
 
 ### 关于对象的遍历方案
-1. for-in 循环循环自身和原型上的属性,不包括Symbol，`如果该属性设置了不可遍历`，则会忽略，可结合obj.hasOwnProperty(key)去规避原型上的属性
+1. for-in 循环循环自身和原型上的属性,**不包括Symbol**，`如果该属性设置了不可遍历`，则会忽略，可结合obj.hasOwnProperty(key)去规避原型上的属性
 
 ```js
 	const desc = Object.getOwnPropertyDescriptor(Object.prototype, 'toString');  
@@ -4302,7 +4302,6 @@ Object.getOwnPropertySymbols(obj).forEach(el=>{
 6. **Reflect.ownKeys** 方法返回一个由目标对象自身的属性键组成的数组。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
 
 ![ownKeys](book_files/203.jpg)
-
 
 #### for...of 对象适配
 + 借助generator
@@ -4830,6 +4829,7 @@ div.addEventListener('click', function(event) {
 // 当 div 被点击时，控制台仅输出 "处理程序 1"，因为 stopImmediatePropagation() 阻止了冒泡和其他处理程序
 ```
 
+
 ### event.target和event.currentTarget二者含义
 Event 接口的只读属性 currentTarget 表示的，标识是当事件沿着 DOM 触发时事件的`当前目标`。它总是指向事件绑定的元素，而 Event.target 则是`事件触发`的元素。
 ```js
@@ -4851,6 +4851,7 @@ Event 接口的只读属性 currentTarget 表示的，标识是当事件沿着 D
   }
 </script>
 ```
+
 
 ### 判断一个元素是否在可视区
 对应的应用场景：【图片懒加载/列表的无限滚动/可点击链接的预加载】
@@ -4897,6 +4898,7 @@ observeElement(myElement);
 
 + 滚动事件监听去判断 offsetTop scrollTop
 
+
 ### `监听一个div宽度变化`
 ```js
 const ro = new ResizeObserver((entries, observer) => {  
@@ -4910,6 +4912,7 @@ const ro = new ResizeObserver((entries, observer) => {
 const div = document.querySelector('#myDiv');  
 ro.observe(div);
 ```
+
 
 ### MutationObserver触发机制及应用场景
 + 可以在`DOM修改`时`异步`执行回调
@@ -5063,7 +5066,6 @@ app.listen(3000, () => {
 });
 ```
 
-
 #### localstorange本地过期时间
 
 ```js
@@ -5128,6 +5130,7 @@ var orignalSetItem = localStorage.setItem;
 
 > 如果一个页面开多个窗口，其他的窗口还是会收到当前页面的storage事件
 
+
 ### 单点登录
 单点登录（Single Sign-On，简称SSO）是一种在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统的技术。
 
@@ -5139,7 +5142,7 @@ var orignalSetItem = localStorage.setItem;
 ```js
 // token
 var token = result.data.token;
-// iframe iframe HTML
+// iframe iframe HTML 父系统代码中创建iframe
 var iframe = document.createElement("iframe");
 iframe.src = "http://app1.com/localstorage.html";
 document.body.append(iframe);
@@ -5150,7 +5153,7 @@ setTimeout(function () {
 setTimeout(function () {
  iframe.remove();
 }, 6000);
-// iframe HTML token
+// iframe HTML token 子系统获取信息
 window.addEventListener('message', function (event) {
  localStorage.setItem('token', event.data)
 }, false);
@@ -5433,7 +5436,7 @@ XSRF攻击：【Cross Site Request Forgery】跨站点伪造请求
 ```
 可以有无限个3，但是计算机要存储，所以最后只能取`近似值`，当计算机存储后再取出就存在错误的可能。
 
-对于整数，很容易转换成十进制或者二进制，而浮点数则不知道小数位数多少位，采取的是科学计数法。因为存储时有位数限制，某些十进制转二进制存在无限循环，二进制会采取舍入操作。
+对于整数，很容易转换成十进制或者二进制，而浮点数则不知道小数位数多少位，采取的是`科学计数法`。因为存储时有位数限制，某些十进制转二进制存在无限循环，二进制会采取舍入操作。
 
 解决思路：转成整数
 ```js
@@ -5449,6 +5452,7 @@ console.log(add(0.1,0.2))
 
 > Math.js BigDecimal.js
 
+
 ### script异步加载顺序
 + 如果脚本是模块化的并且不依赖任何脚本，则使用async.
 + 如果脚本依赖或被另一个脚本依赖，则使用defer.
@@ -5456,6 +5460,7 @@ console.log(add(0.1,0.2))
 + 也就是说async是乱序的，而defer是顺序执行，这也就决定了async比较适用于谷歌分析这类不依赖其他脚本的库。
 
 ![图片](book_files/184.jpg)
+
 
 ### `ajax fetch axios`
 1. AsynchronousJavascriptAndXML,异步 JavaScript 和XML
@@ -5480,8 +5485,75 @@ console.log(add(0.1,0.2))
 	+ **自动转换 json 数据**
 	+ **客户端支持抵御 XSRF 攻击**	
 
+
 ### `文件上传下载，原生js的实现原理`
 文件上传和下载在原生JavaScript中的实现原理主要涉及到HTML表单的`<input type="file">`元素，用于用户选择文件，以及XMLHttpRequest（或现代的fetch API）或FormData对象用于发送文件到服务器，还有Blob和URL.createObjectURL用于处理和下载文件。
+
+```js
+// 假设你已经有了一个Blob对象，这里我们从一个文件输入中获取它  
+var fileInput = document.getElementById('fileInput');  
+  
+fileInput.addEventListener('change', function(e) {  
+    var file = e.target.files[0]; // 获取用户选择的文件  
+    if (!file) {  
+        alert('请选择文件！');  
+        return;  
+    }  
+  
+    // 这里我们直接使用file（它也是一个Blob对象）  
+    var blob = file; // 或者你可以对blob进行进一步处理，比如切片等  
+  
+    // 创建一个新的Blob对象（这一步其实是可选的，因为file已经是Blob了）  
+    // var blob = new Blob([file], { type: file.type });  
+  
+    // 使用fetch API发送Blob  
+    fetch('/upload', {  
+        method: 'POST',  
+        headers: {  
+            // 你可能需要设置适当的Content-Type，但请注意，对于文件上传，  
+            // 通常服务器期望的是multipart/form-data，而这里我们直接发送Blob，  
+            // 所以可能需要设置为'application/octet-stream'或让浏览器自动处理  
+            // 如果你不确定，可以尝试不设置这个头，让浏览器自动推断  
+            // 'Content-Type': 'application/octet-stream',  
+        },  
+        body: blob, // 直接将Blob作为请求体发送  
+    })  
+    .then(response => {  
+        if (!response.ok) {  
+            throw new Error('网络响应错误');  
+        }  
+        return response.text(); // 假设服务器返回文本  
+    })  
+    .then(data => {  
+        console.log('服务器响应:', data);  
+        alert('文件上传成功');  
+    })  
+    .catch(error => {  
+        console.error('上传失败:', error);  
+        alert('文件上传失败');  
+    });  
+});
+```
+
+```html
+<!-- 在不支持FormData的浏览器环境中，主要依赖的是表单的提交。
+确保后端能够接收并处理multipart/form-data类型的数据。 -->
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>文件上传示例</title>  
+</head>  
+<body>  
+  
+<form action="/upload" method="post" enctype="multipart/form-data">  
+    选择文件: <input type="file" name="file" id="fileInput">  
+    <input type="submit" value="上传文件">  
+</form>  
+  
+</body>  
+</html>
+```
 
 #### `文件上传`
 HTML表单：使用`<input type="file">`元素允许用户选择一个或多个文件。
@@ -5942,6 +6014,7 @@ await instance.post('/upload_single', formData, {
 2. refresh token
 3. 拦截器中当401时使用refresh token去获取最新的token值
 
+
 ### js for 循环中break和return区别
 在JavaScript中，for 循环中的 break 和 return 语句有着显著的区别，它们的行为和用途完全不同。
 
@@ -6065,7 +6138,8 @@ private String encryptPassword(String password, String salt) {
 ```
 
 #### CryptoJS
-  CryptoJS 是一个 JavaScript 库，提供了一系列密码学函数和工具，用于加密、解密、生成摘要等任务。它支持多种加密算法，包括常见的对称加密算法（如 AES、DES）和非对称加密算法（如 RSA）。
+
+CryptoJS 是一个 JavaScript 库，提供了一系列密码学函数和工具，用于加密、解密、生成摘要等任务。它支持多种加密算法，包括常见的`对称加密算法（如 AES、DES）和非对称加密算法（如 RSA）`。
 
 ```js
 import CryptoJS from 'crypto-js';
@@ -6149,6 +6223,7 @@ console.log('HMAC加密结果:', hmac.toString());
 // 9da40d794b56b945a8e382216b9778216326dd187f6b37e921ec28b63a09bdb0
 ```
 
+
 ### 对象保护不被修改
 + 闭包实现
 + Object.defineProperty
@@ -6198,6 +6273,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 ```
 ![jquery](book_files/297.jpg)
+
 
 ### ajax
 在不刷新页面的前提下，与服务器交换数据并更新部分内容
@@ -6249,7 +6325,11 @@ escape、encodeURI、encodeURIComponent这三个函数在JavaScript中用于处�
 	+ encodeURIComponent：优点是适用于编码URI的组件，缺点是如果用于编码整个URI，可能会导致错误。
 
 
+
+
+
 ## ES6
+
 
 ### 扩展运算符 剩余运算符
 + 扩展运算符用三个点（...）表示，它可以用于将一个数组或对象的所有元素/属性**展开**到新的数组或对象中。`可实现浅拷贝`
@@ -6270,6 +6350,7 @@ function sum(a, b, ...rest) {
   
 sum(1, 2, 3, 4, 5); // 返回 15
 ```
+
 
 ### 数组的静态方法
 + Array.isArray(obj):检测是否是数组
@@ -6294,6 +6375,7 @@ let arr = []
 arr.length =10
 console.log(arr) //[empty*10]
 ```
+
 
 ### Set和Map的应用
 Set是一种叫做集合的数据结构，而Map是一种叫做字典的数据结构。
@@ -6357,6 +6439,7 @@ const element = document.getElementById('example');
 wm.set(element, 'some information');
 wm.get(element) // "some information"
 ```
+
 
 ### Decorator应用场景
 装饰器，其本质就是一个普通的函数，用于扩展类属性和类方法。（装饰器模式）
@@ -6477,21 +6560,54 @@ Proxy.revocable(target, handler);
 + 在复杂操作前对操作进行校验和所需资源进行管理
 + 观察者模式
 
-```js
-const queuedObservers = new Set();
-const observe = fn => queuedObservers.add(fn);
-const observable = obj => new Proxy(obj, {set});
-function set(target, key, value, receiver) {
- const result = Reflect.set(target, key, value, receiver);
- queuedObservers.forEach(observer => observer());
- return result;
-}
+```html
+<div id="display"></div>  
+<script type="text/javascript">
+	// 定义Set来存储观察者  
+	const queuedObservers = new Set();  
+	  
+	// 定义一个函数来注册观察者  
+	const observe = fn => queuedObservers.add(fn);  
+	  
+	// 创建一个函数来生成可观察的对象  
+	const observable = obj => new Proxy(obj, {  
+	    set(target, key, value, receiver) {  
+	        const result = Reflect.set(target, key, value, receiver);  
+	        queuedObservers.forEach(observer => observer(key, value)); // 传递变化的键和值  
+	        return result;  
+	    }  
+	});  
+	  
+	// 示例对象  
+	let person = {  
+	    name: "Alice",  
+	    age: 30  
+	};  
+	  
+	// 转换为可观察对象  
+	person = observable(person);  
+	  
+	// 注册观察者  
+	observe((key, value) => {  
+	    console.log(`${key} changed to ${value}`);  
+	    document.getElementById('display').innerText = `Name: ${person.name}, Age: ${person.age}`;  
+	});  
+	observe((key, value) => {
+	    console.log(`${key} changed to ${value}`);  
+	    document.getElementById('display').innerText = `Name111: ${person.name}, Age111: ${person.age}`;  
+	}); 
+	  
+	// 修改属性以触发观察者  
+	person.name = "Bob";  
+	person.age = 35;
+</script>
 ```
+
 
 ### `ES6中的Module`
 模块，是能够单独命名独立完成一定功能的程序语句的集合。
 
-作用：代码抽象，封装，复用，依赖管理。
+作用：`代码抽象，封装，复用，依赖管理。`
 
 没有模块化，方法和变量不易维护，容易污染全局作用域。加载资源方式使用script从上往下，后期不容易维护。
 
@@ -6626,6 +6742,7 @@ const preloadImage = function (path) {
 };
 ```
 
+
 ### async await
 async 函数返回结果都是 `Promise 对象`（如果函数内没返回 Promise ，则自动封装一下）
 ```js
@@ -6700,13 +6817,15 @@ async1()
 console.log('script end')
 ```
 
+
 ### Generator理解和应用
 Generator通过yield标识位和next()方法调用，实现函数的分段执行。
 
 function与函数名之间有一个星号 * ；函数体内部使用 yield 表达式，定义不同的内部状态。箭头函数不能用来定义生成器函数。
 
 ```js
-//它内部有两个 yield表达式（hello和world），即该函数有三个状态：hello，world 和 return 语句（结束执行）。
+//它内部有两个 yield表达式（hello和world）
+//即该函数有三个状态：hello，world 和 return 语句（结束执行）。
 function* helloWorldGenerator() {
   yield 'hello';
   yield 'world';
@@ -6804,10 +6923,21 @@ console.log(a,b)
 	console.log(res)//fn {a: 1, b: 2}
 ```
 
+3. Reflect.set(target, key, value, receiver)类似Object.defineProperty
+
+```js
+1. target：目标对象，在其上设置属性。
+2. key：要设置的属性名（或Symbol）。
+3. value：要设置的新值。
+4. receiver：如果设置了 getter 或 setter，则 receiver 是 getter/setter 调用时 this 的值。如果未指定，则默认为 target。
+```
+
+
 
 
 
 ## Typescript
+
 
 ### never类型的应用场景
 
@@ -6842,6 +6972,7 @@ function handleValue(val: All) {
   }
 ```
 
+
 ### `联合类型的类型收窄操作`
 联合类型可以使用`typeof instanceof 等值 真值 in操作符 赋值语句`等进行收窄操作，帮助代码正常运行
 ```js
@@ -6858,6 +6989,7 @@ let x = Math.random()*10>5?100:'only';
 x=1000
 //x=true//不能将类型“boolean”分配给类型“string | number”。
 ```
+
 
 ### 类型谓词is
 isString 是一个类型守卫函数，它检查传入的 value 是否是字符串类型。**如果是，它返回 true，并且 TypeScript 编译器会将 value 的类型推断为 string。**
@@ -6958,6 +7090,7 @@ if (isOfType<interfaceB>(target, "phone")) {
 }
 ```
 
+
 ### unknow类型和any类型的区别
 + unknown：只能赋值给unknown或any类型的变量。any：可以赋值给任何类型的变量，也可以接收任何类型的值。
 + unknown 类型在被确定为某个类型之前，不能被进行诸如函数执行、实例化等操作，一定程度上对类型进行了保护
@@ -6979,6 +7112,7 @@ value = true             // OK
 value = []               // OK
 value = new TypeError()  // OK
 ```
+
 
 ### 混入和类型拓展操作 交叉类型的应用
 ```js
@@ -7024,6 +7158,7 @@ let n = jim.name
 jim.log()//log
 ```
 
+
 ### interface 和 type的各自应用场景
 + 接口可以实现 `extends 和 implements`,类型别名可以借助`&`进行继承,实现类应用type也可以借助implements
 + 类型别名并不会创建新类型，是对原有类型的引用，而接口会定义一个新类型。
@@ -7048,6 +7183,7 @@ const str: brand = 'imooc'
 const state: used = true
 ```
 
+
 ### 泛型Generics
 泛型就是类型的参数化：Generics是指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
 
@@ -7060,6 +7196,7 @@ class Generic<T> {}
 #### 泛型定义实际应用
 
 ![实际应用](book_files/191.jpg)
+
 
 ### 约束泛型
 有时候想操作某类型的一组值，并且知道这组值具有什么样的属性。在loggingIdentity例子中，想访问arg的length属性，但是编译器并不能证明每种类型都有length属性，所以就报错了。
@@ -7083,6 +7220,7 @@ function loggingIdentity<T extends LengthDefine>(arg: T): T {
 // loggingIdentity(1) //error 类型“number”的参数不能赋给类型“ILength”的参数。
 loggingIdentity([1,2,3])// 正确
 ```
+
 
 ### keyof
 keyof 可以获取对象/接口的**可访问索引字符串**字面量类型
@@ -7139,6 +7277,7 @@ let values: unknown[] = pluck(person, ['name', 'age'])
 console.log(values)//[ 'Evan', 27 ]
 ```
 
+
 ### keyof any
 ```js
 keyof any //string | number | symbol
@@ -7149,6 +7288,7 @@ keyof any //string | number | symbol
 虽然我们可以将布尔值作为属性访问器的参数，但它们实际上被当作字符串 'true' 和 'false' 来处理。
 
 因此，keyof 操作符返回的对象键类型不包括 boolean
+
 
 ### 映射类型
 映射类型可以将已知类型的每个属性都变为可选的或者只读的。**使用 Readonly 与 Partial 关键字**
@@ -7184,6 +7324,7 @@ type Partial<T> = {
   [K in keyof T]?: T[K]
 }
 ```
+
 
 ### `部分高级特性的实现`
 ts内置的一些常用工具类型，简化ts的操作。它们都是基于泛型实现的，并且内置的，可直接使用。
@@ -7268,6 +7409,7 @@ type Record<K extends keyof any, T> = {
 //   }
 ```
 
+
 ### Ts中的Pick，Omit，Extract和Exclude区别
 1. Pick(选择)
 
@@ -7339,6 +7481,7 @@ type B = "like" | "eat" | "name";
 type C = Extract<A, B>; //'name'
 ```
 
+
 ### infer 推断使用
 infer会根据当前场景推断出具体类型
 ```js
@@ -7378,6 +7521,7 @@ const app: k3 = {
 console.log(app); //{ name: 'k17', age: 30 }
 ```
 
+
 ### 数组的只读和多维数组
 ```js
 var arr_name:number[][][]=[ [[1]],[[2,3,4]] ]
@@ -7413,6 +7557,7 @@ console.log(list)
 // list = [10]
 ```
 
+
 ### ts函数
 ```js
 const add: (x: number, y: number) => string = function(x: number, y: number): string {
@@ -7445,6 +7590,7 @@ eating.apply({name: "james"}, ["嘿嘿嘿"])
 ![类型注解this](book_files/187.jpg)
 
 ![使用this的意义](book_files/188.jpg)
+
 
 ### 构造函数定义
 ```js
@@ -7483,6 +7629,7 @@ const fn = Fn(Ctor)
 console.log(fn.s);
 ```
 
+
 ### 函数中extends约束
 Type extends { length: number } 是一个泛型约束，它限制了泛型参数 Type 必须是一个拥有 length 属性的对象，并且这个 length 属性的类型是 number。
 ```js
@@ -7502,6 +7649,7 @@ const longerString = longest("alice", "bob");
 const notOK = longest(10, 100);
 // 类型“number”的参数不能赋给类型“{ length: number; }”的参数。
 ```
+
 
 ### 函数的重载
 注意重载的兼容性，以及参数和返回值的实现性
@@ -7523,6 +7671,7 @@ console.log(reverse('imooc'))   // coomi
 console.log(reverse(23874800))  // 847832
 ```
 
+
 ### TS类的关键字
 1. static: 关键字用于定义类的数据成员（属性和方法）为静态的，静态成员可以直接通过类名调用。
 2. public（默认） : 公有，可以在任何地方被访问。
@@ -7530,6 +7679,7 @@ console.log(reverse(23874800))  // 847832
 4. private : 私有，只能被其定义所在的类访问。
 5. 通过 readonly 关键字将属性设置为只读的。只读属性必须在声明时或构造函数里被初始化。
 	- readonly如果定义的是对象，和js一样，可以修改里面的属性值，但是不能直接改这个对象
+
 
 ### 抽象类的作用
 抽象类是一种特殊的类，它不能被实例化。抽象类主要用于为其他类提供一个基础的框架或结构，同时它可以包含一些抽象方法和非抽象方法。
@@ -7561,6 +7711,7 @@ dog.makeSound()  // bark bark bark...
 dog.move()       // roaming the earch...
 ```
 
+
 ### TS类的重写
 ```js
 class Jspang{
@@ -7591,6 +7742,7 @@ class JsShuai extends Jspang{
 }
 ```
 
+
 ### 类和接口
 类和接口都可以定义对象，但是类适合复杂情况，接口只是在编译阶段使用，最后打包回移除
 
@@ -7605,6 +7757,7 @@ class JsShuai extends Jspang{
 
 ## Vue2
 
+
 ### `Vue 生命周期`
 Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 
@@ -7615,11 +7768,13 @@ Vue生命周期是指Vue实例对象从创建开始到销毁的过程。
 + 如果mounted有对dom处理，那需放在mounted处理
 + 如果考虑到SSR，SSR 不支持 beforeMount 、mounted 钩子函数，放在 created 中有助于一致性。
 
+
 ### 数据双向绑定
 模型Model的变动会改变视图View,View变动会影响Model
 
 ![1](book_files/60.jpg)
 ![2](book_files/61.jpg)
+
 
 ### `Vue双向绑定的原理`
 
@@ -7643,7 +7798,7 @@ display: none;
 
 ### `Vue组件通信方式`
 1. props 和 $emit
-2. ref:父组件通过获取子节点的引用`this.refs.xx.childmethods`，子组件可以`this.$parent.fathermethods`,注意时间，父组件如果调用子组件的方法，不要不要选择在created的时候，而是应该放在**mouted**时候，而子组件调用父组件的方法可以写在created时候，类似koa的洋葱模型。
+2. ref:父组件通过获取子节点的引用`this.refs.xx.childmethods`，子组件可以`this.$parent.fathermethods`,注意时间，父组件如果调用子组件的方法，不要选择在created的时候，而是应该放在**mouted**时候，而子组件调用父组件的方法可以写在created时候，类似koa的洋葱模型。
 
 ```html
  <ChildData v-model="myapp" ref="zz"/>
@@ -7660,7 +7815,7 @@ display: none;
 ```
 
 3. EventBus
-4. parent root children
+4. parent root children(不推荐)
 5. **attrs 和listeners和inheritAttrs**
 
 inheritAttrs：默认为true, 会自动在挂载组件元素上属性值,如props声明了属性，则挂载未被声明的属性；false时会关闭自动挂载到组件根元素上属性。`注意：这个选项不影响 class 和 style 绑定。`
@@ -7996,6 +8151,7 @@ func2(){
 }
 ```
 
+
 ### `vue中的$nextTick`
 在下次DOM更新循环结束之后执行延迟回调，在修改数据之后立即使用这个方法，可以获取更新后的DOM。
 
@@ -8071,6 +8227,7 @@ console.log(this.$el.textContent) // => '原始值'
 await this.$nextTick()
 console.log(this.$el.textContent) // => '最新值'
 ```
+
 
 ### `v-model自定义组件实现`
 1. v-model是语法糖，可以用在自定义组件中，会被解析为value和@input事件
@@ -8342,6 +8499,7 @@ filters: {
 {{ message | filterA('arg1', arg2) }}
 ```
 
+
 ### vue插槽slot
 通过插槽可以让用户可以拓展组件，去更好地复用组件和对其做定制化处理
 
@@ -8529,6 +8687,7 @@ Vue.component('kitten', {
 // info: render
 ```
 
+
 ### `vue keep-alvie`
 keep-alive是vue中的内置组件，能在组件切换过程中将状态保留在内存中，防止重复渲染DOM
 
@@ -8678,6 +8837,7 @@ activated(){
 },
 ```
 
+
 ### Keep-alive和v-if一起使用情况
 ```html
 <keep-alive>
@@ -8692,6 +8852,7 @@ activated(){
 </keep-alive>
 ```
 注意点：正常理解v-if会删除dom重新创建，但是组件外套keep-alive之后，虽然确实会移除dom（可以打开控制台发现dom确实被移除了），但是dom结构会保存在缓存中，当被v-if为true时候直接搬回来，并不会再重新绘制dom，就**不会激发mounted生命周期**。
+
 
 ### Vue动态组件和异步组件
 ```html
@@ -8709,6 +8870,7 @@ data(){
 }
 ```
 Vue.js中的异步组件可以通过使用import()方法来实现。import()方法是ES2015中的一个语法，用于动态地加载JavaScript模块。在Vue.js中，可以使用import()方法来动态地加载和渲染组件。
+
 
 ### `Vuex的使用`
 Mutations：处理原子操作
@@ -8891,6 +9053,7 @@ new Vue({
 
 ![vue](book_files/96.jpg)
 
+
 ### SPA
 单页应用，它通过动态重写当前页面来与用户交互，这种方法避免了页面之间切换打断用户体验在单页应用中
 
@@ -8962,6 +9125,7 @@ server {
 
 > hash 模式下，仅 hash 符号之前的内容会被包含在请求中，如 website.com/#/login 只有 website.com 会被包含在请求中 ，因此对于服务端来说，即使没有配置location，也不会返回404错误
 
+
 ### 第三方库没有babel降级，vuecli怎么处理
 ```js
 // vue.config.js  
@@ -9012,6 +9176,7 @@ module.exports = {
 
 ![解决思路](book_files/167.jpg)
 
+
 ### vue项目性能优化
 1. 尽量减少 data 中的数据，data 中的数据都会增加 getter 和 setter，会收集对应的 watcher
 2. v-if 和 v-for 不能连用
@@ -9028,7 +9193,7 @@ module.exports = {
 13. 使用 cdn 加载第三方模块
 14. splitChunks 抽离公共文件
 
-Scope Hoisting：
+Scope Hoisting：【在webpack的配置文件中，将mode设置为production，webpack会自动启用Scope Hoisting。文心一言】
 
 ![1](book_files/275.jpg)
 
@@ -9101,6 +9266,7 @@ const routes = [
 // 在某个方法中，通过 name 和 query 导航到 /search 并传递查询参数  
 this.$router.push({ name: 'Search', query: { q: 'vue router' } });
 ```
+
 
 ### vue-router导航守卫
 
@@ -9189,7 +9355,7 @@ router.beforeEach((to, from, next) => {
 
 
 ## Vue3
-vue3 整个源码是通过 monorepo的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
+vue3 整个源码是通过 `monorepo`的方式维护的，根据功能将不同的模块拆分到packages目录下面不同的子目录中
 
 ![vue3](book_files/68.jpg)
 
@@ -9200,6 +9366,7 @@ Monorepo 的主要优势包括：
 + 代码共享：不同项目之间可以更容易地共享代码，减少重复劳动和代码冗余。
 + 依赖管理：所有项目或包使用相同的依赖版本，减少了版本冲突和兼容性问题。
 + 统一构建和测试：可以对整个 monorepo 进行统一的构建和测试，提高开发效率。
+
 
 ### `与Vue2的不同`
 1. 速度更快
@@ -9275,6 +9442,7 @@ Monorepo 的主要优势包括：
 
 ![suspense](book_files/119.jpg)
 
+
 ### v-on.native修饰符移除，怎么去操作组件的事件
 
 在 Vue 3 中，直接在父组件模板中监听子组件的原生事件（如 <Child @click="add"/>）通常不会工作，除非子组件的**根元素**实际上是一个**原生元素**
@@ -9330,6 +9498,7 @@ export default {
 }  
 </script>
 ```
+
 
 ### vue2和vue3异步组件用法
 在Vue 2中，你可以通过动态import()语法或工厂函数的方式来实现异步组件的加载。
@@ -9421,6 +9590,7 @@ const AsyncComp = defineAsyncComponent({
 })
 ```
 
+
 ### `vue3的Composition Api的好处`
 1. 不需要像options API一个功能代码跳转很多地方
 2. 当混入时，不会像mixins存在数据来源不清晰，和多个混入容易冲突的情况
@@ -9498,6 +9668,7 @@ export default {
 2. 前者无需useMemo useCallback缓存，因为setup只调用一次
 3. 前者无需顾虑调用顺序，而后者需要保证hooks的执行顺序
 4. ref+reactive理解难于useState
+
 
 ### vue3性能提升主要体现在哪几个方面
 回顾Vue2，每个组件实例都对应一个 watcher 实例，它会在组件渲染的过程中把用到的数据property记录为依赖，当依赖发生改变，触发setter，则会通知watcher，从而使关联的组件重新渲染
@@ -9782,6 +9953,7 @@ export default {
 
 ![value](book_files/110.jpg)
 
+
 ### computed和methods
 computed() 方法期望接收一个 getter 函数，返回值为一个计算属性 ref。和其他一般的 ref 类似，你可以通过 publishedBooksMessage.value 访问计算结果。计算属性 ref 也会在模板中自动解包，因此在模板表达式中引用时无需添加 .value。
 
@@ -9846,7 +10018,6 @@ const fullName = computed({
 ```
 
 
-
 ### Vue3中watch和watchEffect的区别
 1. 两者都可以监听data属性的变化
 2. Watch需要明确监听哪个属性，如果监听多个属性可第一个参数要写成数组形式，第二个处理函数的参数也要注意处理
@@ -9903,6 +10074,7 @@ watch(
     }
 )
 ```
+
 #### Watch监听多个
 ```js
  //监听两个值，fooRef，barRef;变化后foo bar值；变化前的值prevFoo prevBar
@@ -9919,6 +10091,7 @@ watchEffect(() => {
 watchEffect，则会在副作用发生期间追踪依赖。它会在同步执行过程中，自动追踪所有能访问到的响应式属性。这更方便，而且代码往往更简洁，`但有时其响应性依赖关系会不那么明确。`
 
 > watchEffect() 允许自动跟踪回调的响应式依赖。如果你需要侦听一个嵌套数据结构中的几个属性，watchEffect() 可能会比深度侦听器更有效，因为它将只跟踪回调中被使用到的属性，而不是递归地跟踪所有的属性。
+
 
 ### 侦听器触发时机和停止
 默认情况下，侦听器回调会在父组件更新 (如有) 之后、所属组件的 DOM 更新之前被调用。这意味着如果你尝试在侦听器回调中访问所属组件的 DOM，那么 DOM 将处于更新前的状态。
@@ -9985,6 +10158,7 @@ const unwatch = watchEffect(() => {})
 unwatch()
 ```
 
+
 ### Setup中如何获取组件实例
 ```js
 <script>
@@ -10019,6 +10193,7 @@ export default {
 }
 </script>
 ```
+
 
 ### reactive() 的局限性
 1. 有限的值类型：它只能用于对象类型 (对象、数组和如 Map、Set 这样的集合类型)。它不能持有如 string、number 或 boolean 这样的原始类型。
