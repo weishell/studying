@@ -70,8 +70,12 @@
     - [HTML5 为什么只需要写 !DOCTYPE HTML](#html5-为什么只需要写-doctype-html)
       - [SGML](#sgml)
     - [iframe有哪些优点和缺点](#iframe有哪些优点和缺点)
+      - [iframe安全问题](#iframe安全问题)
     - [`H5新增属性`](#h5新增属性)
     - [`常见的浏览器内核有哪些`](#常见的浏览器内核有哪些)
+    - [websocket](#websocket)
+      - [为什么需要pong响应机制？](#为什么需要pong响应机制)
+      - [是否监听ping响应失败可以执行重连？](#是否监听ping响应失败可以执行重连)
     - [h5新特性SharedWorker](#h5新特性sharedworker)
     - [webWorker](#webworker)
   - [css](#css)
@@ -691,6 +695,10 @@ meta 标签提供关于HTML文档的**元数据**。元数据不会显示在页�
 2. http-equiv，把 content 属性连接到一个 HTTP 头部。
 3. name，把 content 属性连接到某个名称。
 
+http-equiv 属性告诉浏览器，包含在 content 属性中的值应该被当作等同于哪个 HTTP `响应头字段`的值。这对于在 HTML 文档中设置一些通常由服务器发送的 HTTP 头字段非常有用，尤其是当你不控制服务器发送的响应头时。
+
+此外，随着 HTML5 的发展，许多原本需要通过 http-equiv 来模拟的 HTTP 头字段现在可以通过更直接或更标准的 HTML5 特性来实现。
+
 
 ### meta作用
 
@@ -744,7 +752,7 @@ Standard Generalized Markup language，标准通用标记语言
 ### iframe有哪些优点和缺点
 1. 优点：
 	+ 灵活性
-	+ **代码复用**(header和aside等可以不考虑)
+	+ **代码复用**
 	+ 独立性
 	+ 展现嵌入的网页
 	+ 加载速度较慢的内容，如广告
@@ -778,6 +786,74 @@ window.onload = function() {
 };
 ```
 
+#### iframe安全问题
+IFRAME安全隔离是指通过`<iframe>`标签在HTML文档中嵌入另一个文档时，这两个文档（即主文档和嵌入的`<iframe>`文档）在浏览器中被视为独立的安全上下文。
+
+这种隔离机制有助于防止潜在的安全问题从一个文档传播到另一个文档，从而保护用户数据和网站的安全。
+
+1. 域名隔离
+`<iframe>`可以在不同的域名下运行，这意味着嵌入的文档可以与主文档有不同的域名。这种域名隔离有助于防止跨站脚本攻击（XSS）和跨站请求伪造（CSRF）等安全威胁，因为攻击者需要分别针对每个域名进行攻击，而不能直接从一个文档跳转到另一个文档执行恶意代码。
+
+2. 内容安全策略（CSP）
+使用内容安全策略（CSP）可以进一步限制`<iframe>`中可以加载的内容类型。CSP是一种额外的安全层，它允许网站所有者定义哪些动态资源是可信的，并应该被允许加载。通过为`<iframe>`设置CSP，可以进一步降低安全风险，例如防止嵌入的文档加载不受信任的脚本或样式表。
+
+3. 防止恶意代码扩散
+如果嵌入的`<iframe>`中包含恶意代码，这些代码将被限制在`<iframe>`的范围内执行，而不会影响到主文档或其他部分的代码。这种隔离机制有助于防止恶意代码在主文档中扩散，从而保护用户数据和网站的整体安全。
+
+4. 提高安全性
+除了上述直接的隔离效果外，IFRAME安全隔离还通过减少不必要的跨域交互和限制第三方内容的加载来提高网站的整体安全性。例如，通过限制`<iframe>`的来源和大小，可以防止恶意网站利用`<iframe>`进行钓鱼攻击或覆盖网站的重要内容。
+
+5. 遵循最佳实践
+为了确保IFRAME的安全隔离效果，开发者应遵循一系列最佳实践，包括：
+
++ 限制iframe的来源：通过设置X-Frame-Options响应头来限制哪些域名可以将您的网站嵌入到`<iframe>`中。
++ 使用HTTPS：确保嵌入的`<iframe>`使用HTTPS协议，以防止中间人攻击。
++ 遵循同源策略：在允许第三方`<iframe>`时，确保遵循同源策略，以防止跨站脚本攻击（XSS）。
++ 定期更新和检查：确保您使用的第三方库和插件是最新的，并定期检查是否有安全更新。
++ 监控和记录：监控`<iframe>`的行为，并记录可能的安全事件，以便在发生安全问题时可以快速响应。
+
+综上所述，IFRAME安全隔离是保护网站和用户数据安全的重要机制之一。通过合理利用IFRAME的隔离特性，并采取适当的安全措施，可以有效地降低潜在的安全风险。
+
+X-Frame-Options 响应头是用来告诉浏览器是否允许一个页面被嵌入到 `<iframe>、<frame>、<embed> 或 <object>` 标签中。这个响应头是在服务器级别上配置的，而不是直接在 `<iframe>` 标签内部或通过客户端脚本设置的。
+
+```js
+const express = require('express');  
+const app = express();  
+  
+app.use((req, res, next) => {  
+  // 允许来自相同源的嵌入  
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');  
+  // 或者，禁止所有嵌入  
+  // res.setHeader('X-Frame-Options', 'DENY');  
+  next();  
+});  
+  
+// 其余的应用路由和中间件...
+```
+> 当你为页面设置 X-Frame-Options 响应头时，你实际上是在控制该页面是否可以被其他页面嵌入，而不是控制 `<iframe>` 标签的行为。
+
+为`<iframe>`设置内容安全策略（CSP，Content Security Policy）主要是通过在服务器响应头中添加Content-Security-Policy指令来实现的，而不是直接在`<iframe>`标签中设置。CSP是一种安全机制，用于减少XSS（跨站脚本攻击）和其他代码注入攻击的风险。
+
+```js
+const express = require('express');  
+const helmet = require('helmet'); // 需要安装helmet中间件  
+  
+const app = express();  
+  
+app.use(helmet.contentSecurityPolicy({  
+  directives: {  
+    frameAncestors: ["'self'", 'https://allowed-domain.com']
+	//这个指令指定了哪些网页可以嵌入当前应用的页面作为<iframe>、<object>、<embed>或<applet>元素。
+  }  
+}));  
+  
+// 其余的应用路由和中间件...
+```
+或者在nginx配置
+```shell
+add_header Content-Security-Policy "frame-ancestors 'self' https://allowed-domain.com;";
+```
+
 
 ### `H5新增属性`
 1. 语义标签 `<footer><nav>`等
@@ -807,6 +883,150 @@ JS引擎则：解析和执行javascript来实现网页的动态效果。
 + Gecko 内核：Netscape6 及以上版本，FF, MozillaSuite / SeaMonkey 等
 + Presto 内核：Opera7 及以上。 [Opera内核原为：Presto，现为：Blink;]
 + Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支）]
+
+
+### websocket
+
+WebSocket 是一种基于 TCP 的网络协议，用于在客户端和服务器之间建立持久连接，实现全双工通信。它允许服务器主动向客户端推送数据，同时也允许客户端向服务器发送数据，从而在Web应用程序中提供了实时、双向的通信能力。以下是对 WebSocket 的详细介绍：
+
+一、WebSocket 的基本概念
++ 协议基础：WebSocket 协议是独立于 HTTP 的，但握手阶段采用 HTTP 协议。它通过 HTTP/1.1 协议的 101 状态码进行握手，之后数据交换则遵循 WebSocket 的协议规范。
++ `全双工通信`：WebSocket 提供了全双工的通信模式，即数据可以在同一时间内双向流动，这使得实时交互变得更加高效和直接。
++ `持久连接`：WebSocket 连接一旦建立，就会保持长时间的连接状态，避免了传统 HTTP 请求中频繁建立和关闭连接的开销。
+
+二、WebSocket 的特点
++ `实时性`：由于 WebSocket 的持久化连接，它可以实现实时的数据传输，避免了 Web 应用程序需要不断地发送请求以获取最新数据的情况。
++ `双向通信`：WebSocket 协议支持双向通信，这意味着服务器可以主动向客户端发送数据，而不需要客户端发送请求。
++ `减少网络负载`：由于 WebSocket 的持久化连接，它可以减少 HTTP 请求的数量，从而减少了网络负载和带宽的消耗。
++ `更好的二进制支持`：WebSocket 定义了二进制帧，相对 HTTP，可以更轻松地处理二进制内容。
++ `跨域使用`：WebSocket 协议可以跨域使用，允许不同源的客户端与服务器进行通信。
+
+三、WebSocket 的工作原理
+WebSocket 的工作流程可以分为以下几个阶段：
+
++ 握手阶段：客户端通过发送一个 HTTP 请求给服务器来建立 WebSocket 连接。请求头中包含了一些特殊的字段，如 Upgrade 和 Connection 字段，告诉服务器它希望升级到 WebSocket 连接。服务器收到请求后，会进行相应的处理并返回一个 HTTP 响应，响应头中同样包含了一些特殊的字段，如 Upgrade 和 Connection 字段，以及一个 Sec-WebSocket-Accept 字段，用于验证请求的合法性。如果验证通过，WebSocket 连接就成功建立了。
++ 数据传输阶段：一旦 WebSocket 连接建立成功，客户端和服务器就可以通过该连接进行双向通信了。数据交换遵循 WebSocket 的协议规范，包括数据帧的发送和接收。
++ 连接关闭阶段：当客户端或服务器决定关闭连接时，可以发送一个特殊的消息（如 Close 帧），通知对方关闭连接。双方收到关闭消息后，会相应地关闭连接。
+
+四、WebSocket 的应用场景
+WebSocket 协议因其实时性和双向通信的特点，广泛应用于需要实时交互的 Web 应用程序中，如在线聊天、实时通知、实时游戏、远程控制等场景。
+
+五、WebSocket 的安全性
+虽然 WebSocket 协议本身提供了实时通信的能力，但在安全性方面仍需注意。由于 WebSocket 允许服务器主动向客户端发送数据，因此服务器必须确保只向合法的客户端发送数据，避免数据泄露或被恶意利用。此外，WebSocket 连接也可以通过 SSL/TLS 协议进行加密，以提高通信的安全性。
+
+六、WebSocket 的实现
+在 Web 应用程序中，WebSocket 可以通过浏览器提供的 WebSocket API 来实现。WebSocket API 提供了一系列的方法和事件处理程序，用于创建和管理 WebSocket 连接，以及通过该连接发送和接收数据。同时，服务器端也需要实现相应的 WebSocket 协议支持，以便与客户端进行通信。
+
+总之，WebSocket 是一种高效、实时的通信协议，它极大地改善了 Web 应用程序中客户端和服务器之间的交互方式。随着 Web 技术的不断发展，WebSocket 将在更多领域得到应用和推广。
+
+客户端
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+        url:<input id="url" value="ws://127.0.0.1:3000/"/>
+        <button onclick="svc_connectPlatform()"> connect</button><br/>
+        <br/>
+        <input id="msg" />
+        <button id="sendbtn"> send</button>
+        <script>
+            var url = document.getElementById("url");
+            var sendbtn = document.getElementById("sendbtn");
+            var inputmsg = document.getElementById("msg");
+            sendbtn.onclick = function(){
+                svc_send(inputmsg.value);
+            }
+            function svc_connectPlatform() {
+                //alert("");
+                var wsServer = url.value.trim();
+                try {
+                    svc_websocket = new WebSocket(wsServer);
+                } catch (evt) {
+                    console.log("new WebSocket error:" + evt.data);
+                    svc_websocket = null;
+                    if (typeof(connCb) != "undefined" && connCb != null)
+                        connCb("-1", "connect error!");
+                    return;
+                }
+                //alert("");
+                svc_websocket.onopen = svc_onOpen;
+                svc_websocket.onclose = svc_onClose;
+                svc_websocket.onmessage = svc_onMessage;
+                svc_websocket.onerror = svc_onError;
+            }
+            function svc_onOpen(evt) {
+                console.log("Connected to WebSocket server.");
+            }
+        
+            function svc_onClose(evt) {
+                console.log("Disconnected");
+            }
+        
+            function svc_onMessage(evt) {
+                console.log('Retrieved data from server: ' + evt.data);
+            }
+        
+            function svc_onError(evt) {
+                console.log('Error occured: ' + evt.data);
+            }
+        
+            function svc_send(msg) {
+                if (svc_websocket.readyState == WebSocket.OPEN) {
+                    svc_websocket.send(msg);
+                } else {
+                    console.log("send failed. websocket not open. please check.");
+                }
+            }
+        </script>
+    </body>
+</html>
+```
+
+服务端
+```js
+var ws = require('nodejs-websocket');
+var wsPort = 3000;
+var peers = [];
+var server = ws.createServer(function(conn){
+    peers.push(conn);
+    // 事件名称为text(读取字符串时，就叫做text)，读取客户端传来的字符串
+　  var count = 1;
+    conn.on('text', function(str) {
+　　     // 在控制台输出前端传来的消息　　
+        console.log(str);
+        //向前端回复消息
+        //conn.sendText('服务器端收到客户端端发来的消息了！' + count++);
+        //群发
+        for(let i=0,len=peers.length;i<len;i++){
+            if(peers[i]!=conn){
+                peers[i].sendText('转发客户端的消息：'+str);
+            }
+        }
+    });
+     conn.on('close',(code, reason)=>{
+        console.log("Connection closed")
+    }); 
+    
+    conn.on("error", function (code, reason) {
+            console.log("异常关闭")
+        });
+});
+server.listen(wsPort,'0.0.0.0',()=>{
+    console.log('websocket服务启动-使用端口',wsPort);
+});
+```
+
+#### 为什么需要pong响应机制？
+之所以需要 Pong 响应机制，是因为在 WebSocket 连接客户端和服务端之间发送数据时，底层的网络传输有可能会发生数据包丢失或延迟的情况，这可能导致客户端发送的 Ping 数据包无法成功送达服务端。如果只依靠客户端发送 Ping 数据包来保持 WebSocket 连接的活跃状态，那么不能可靠地判断连接是否正常。
+
+Pong 响应机制可以通过检查服务端返回的 Pong 数据包，判断服务端是否正常连接。如果客户端在指定时间内未接收到服务端返回的 Pong 数据包，则可以判断连接已断开，从而执行相应的重连操作，从而保证 WebSocket 连接的稳定性和可靠性，并防止因连接长时间闲置而被服务端断开的情况发生。
+
+#### 是否监听ping响应失败可以执行重连？
+ping响应失败无法判断服务端是否断开。有可能是因为网络传输问题（网络差）导致数据包丢失或者延迟情况导致发送失败，所以需要pong响应机制判断服务端的维护状态。
 
 
 ### h5新特性SharedWorker
