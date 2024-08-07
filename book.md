@@ -1028,6 +1028,19 @@ Pong 响应机制可以通过检查服务端返回的 Pong 数据包，判断服
 #### 是否监听ping响应失败可以执行重连？
 ping响应失败无法判断服务端是否断开。有可能是因为网络传输问题（网络差）导致数据包丢失或者延迟情况导致发送失败，所以需要pong响应机制判断服务端的维护状态。
 
+```js
+function checkPong() {  
+    if (Date.now() - lastPong > 5000) { // 假设5秒内没有收到pong则认为连接可能已断  
+        console.error('No pong received, considering the connection dead');  
+        socket.close(); // 或者尝试重新连接  
+    }  
+}  
+ 
+setInterval(checkPong, 1000); // 每秒检查一次 
+```
+
+> 拓展库：Strophe.js is a JavaScript library for speaking XMPP via BOSH (XEP 124 and XEP 206) and WebSockets (RFC 7395).It runs in both NodeJS and in web browsers, and its purpose is to enable real-time XMPP applications.
+
 
 ### h5新特性SharedWorker
 1. SharedWorker地址如果本地相对地址失效，可用http完整地址
@@ -6227,6 +6240,39 @@ await instance.post('/upload_single', formData, {
         upload_inp.click();
     });
 })();
+```
+
+
+### webWorker和断点续传
+在 Web Worker 的场景下，由于 Worker 线程执行的脚本文件需要与主线程的文件分开处理（例如，它们可能位于不同的目录中，或者需要被单独打包以优化加载性能），Webpack 需要通过特定的配置或插件来识别这些 Worker 脚本，并将它们打包成合适的格式供 Worker 线程使用。
+
+webworker可以承担一些耗时的计算，如计算hash值，压缩等等工作，但是无法进行上传工作，还是需要主线程支持。
+```hash
+npm install --save-dev worker-loader
+```
+```js
+module.exports = {
+  publicPath: './',
+
+  chainWebpack: config => {  
+    config.module  
+       .rule('worker')  
+      .test(/\.worker\.js$/)  // 如果需要.worker.js后缀
+      .use('worker-loader')  
+      .loader('worker-loader')
+      .options({ // 可以查阅worker-loader文档，根据自己的需求进行配置
+       })
+  }  
+}
+```
+```js
+  // 给webworker传file
+  worker.postMessage({
+      file,
+      chunkSize,
+      startIndex,
+      endIndex,
+    });
 ```
 
 ### `token无感刷新`
