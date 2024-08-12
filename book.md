@@ -96,6 +96,8 @@
       - [伪类实现水平垂直居中](#伪类实现水平垂直居中)
     - [line-height继承](#line-height继承)
     - [css预处理语言](#css预处理语言)
+    - [sass中的@extend](#sass中的extend)
+    - [sass 插值语句 #{}](#sass-插值语句-)
     - [flex布局](#flex布局)
     - [元素竖向的百分比设定是相对于容器的高度吗？](#元素竖向的百分比设定是相对于容器的高度吗)
     - [css选择器](#css选择器)
@@ -107,7 +109,6 @@
     - [css元素隐藏](#css元素隐藏)
     - [`css画三角形`](#css画三角形)
       - [其他方案](#其他方案)
-      - [其他方案](#其他方案-1)
       - [xywh()](#xywh)
     - [CSS动画是什么](#css动画是什么)
     - [css动画实现方式](#css动画实现方式)
@@ -232,6 +233,7 @@
       - [`文件上传`](#文件上传)
       - [文件下载](#文件下载)
     - [文件传输前后端](#文件传输前后端)
+    - [webWorker和断点续传](#webworker和断点续传)
     - [`token无感刷新`](#token无感刷新)
     - [js for 循环中break和return区别](#js-for-循环中break和return区别)
     - [前端控制并发请求](#前端控制并发请求)
@@ -1226,6 +1228,16 @@ self.onmessage = function(e) {
 	+ 对于IO密集型任务（如读取文件、发送AJAX请求、WebSocket通信等），Web Worker的数量不宜太多，否则可能造成过多的线程上下文切换，影响性能。一般来说，2-3个Web Worker就足够了。
 4. 动态调整：Web Worker的数量也可以动态调整。例如，根据系统负载情况，可以动态创建或终止Web Worker，以达到最优的线程数量。例如，在一个图像编辑网站中，当用户执行高消耗操作如图片滤镜或特效时，可以临时增加2-3个Web Worker，操作结束后再关闭这些额外的Web Worker。
 
+当不再需要Worker线程时，主线程应该调用terminate方法来关闭它，以释放系统资源。
+```js
+worker.terminate();
+```
+在Worker线程内部，可以使用self.close()方法来关闭自身。但通常，关闭Worker的操作由主线程控制更为合适。
+```js
+// 在worker.js中  
+self.close();
+```
+
 
 
 
@@ -1308,8 +1320,8 @@ a:active{color:#f99;}
 
 ### margin负值
 1.	margin-top和margin-left为负值时，元素向上或者向左移动
-2.	margin-bottom为负值时，下方元素上移，自身不受影响
-3.	margin-right为负值时，右侧元素左移，自身不受影响(margin-right负值也可以理解为自身在越来越小，当不占width又是float时可以浮动上去，三栏布局可应用到)
+2.	**margin-bottom**为负值时，下方元素上移，自身不受影响
+3.	**margin-right**为负值时，右侧元素左移，自身不受影响(margin-right负值也可以理解为自身在越来越小，当不占width又是float时可以浮动上去，三栏布局可应用到)
 
 ```html
 <!DOCTYPE html>
@@ -1403,14 +1415,14 @@ k1和k2是两个div
 
 1. 普通文档流布局规则
 	+ 浮动的元素是不会被父级计算高度
-	+ 非浮动元素会占据浮动元素的位置
+	+ **非浮动元素会占据浮动元素的位置**
 	+ margin会传递给父级[根据规范，一个盒子如果没有上补白和上边框，那么它的上边距应该和其文档流中的第一个孩子元素的上边距重叠。]
 	+ 两个相邻元素上下margin会重叠
 2. BFC布局规则
 	+ 浮动的元素会被父级计算高度（父级触发了BFC）
 	+ `非浮动元素不会占据浮动元素位置（非浮动元素触发了BFC）`
 	+ margin不会传递给父级（父级触发了BFC）
-	+ 两个相邻元素上下margin会重叠（给其中一个元素增加一个父级，然后让他的父级触发）【margin重叠三个条件:同属于一个BFC;相邻;块级元素】
+	+ 可解决两个相邻元素上下margin会重叠（给其中一个元素增加一个父级，然后让他的父级触发）【margin重叠三个条件:同属于一个BFC;相邻;块级元素】
 3. 产生方式
 	+ 根元素，即HTML元素
 	+ 浮动元素：float值为left、right
@@ -2227,6 +2239,70 @@ body {
 }
 ```
 
+### sass中的@extend
+在设计网页的时候常常遇到这种情况：一个元素使用的样式与另一个元素完全相同，但又添加了额外的样式。通常会在 HTML 中给元素定义两个 class，一个通用样式，一个特殊样式。
+
+使用 @extend 可以避免上述情况，告诉 Sass 将一个选择器下的所有样式继承给另一个选择器。
+
+@extend 的作用是将重复使用的样式 (.error) 延伸 (extend) 给需要包含这个样式的特殊样式（.seriousError）
+```css
+.error {
+ border: 1px #f00;
+ background-color: #fdd;
+}
+.error.intrusion {
+ background-image: url("/image/hacked.png");
+}
+.seriousError {
+ @extend .error;
+ border-width: 3px;
+}
+```
+编译后
+```css
+.error, .seriousError {
+ border: 1px #f00;
+ background-color: #fdd;}
+
+.error.intrusion, .seriousError.intrusion {
+ background-image: url("/image/hacked.png");}
+
+.seriousError {
+ border-width: 3px;}
+```
+
+
+### sass 插值语句 #{}
+通过 #{} 插值语句可以在选择器或属性名中使用变量
+```css
+$name: foo;
+$attr: border;
+p.# {
+ #-color: blue;
+}
+```
+编译为
+```css
+p.foo {
+ border-color: blue;}
+```
+
+```css
+$property: font-size;  
+$value: 16px;  
+$important: !important;  
+
+body {  
+  #{$property}: #{$value} #{$important}; 
+  /*注意：Sass不直接支持在属性值后添加!important，这里仅为展示插值能力 */ 
+}  
+ /*编译后（注意：这里的!important需要手动处理） */ 
+body {  
+  font-size: 16px !important; 
+  /*实际编写时，可能需要使用Sass的@at-root或自定义函数来处理!important*/  
+}
+```
+
 
 ### flex布局
 + flex-direction: 设置主轴的方向
@@ -2417,7 +2493,7 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 ![三角形](book_files/19.jpg)
 
 #### 其他方案
-1. clip-path
+1. clip-path:clip-path CSS 属性使用裁剪方式创建元素的可显示区域。区域内的部分显示，区域外的隐藏。
 2. svg line
 3. svg 多边形
 4. svg path
@@ -2457,10 +2533,131 @@ CSS选择器的解析是从右向左解析的。若从左向右的匹配，发�
 </html>
 ```
 
-#### 其他方案
-1. svg 
-2. canvas
-3. clip-path：clip-path CSS 属性使用裁剪方式创建元素的可显示区域。区域内的部分显示，区域外的隐藏。
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script type="text/javascript">
+  	function initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE) {
+  	  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  	  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  	
+  	  gl.shaderSource(vertexShader, VERTEX_SHADER_SOURCE) // 指定顶点着色器的源码
+  	  gl.shaderSource(fragmentShader, FRAGMENT_SHADER_SOURCE) // 指定片元着色器的源码
+  	
+  	  // 编译着色器
+  	  gl.compileShader(vertexShader)
+  	  gl.compileShader(fragmentShader)
+  	
+  	  // 创建一个程序对象
+  	  const program = gl.createProgram();
+  	
+  	  gl.attachShader(program, vertexShader)
+  	  gl.attachShader(program, fragmentShader)
+  	
+  	  gl.linkProgram(program)
+  	
+  	  gl.useProgram(program)
+  	
+  	  return program;
+  	}
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    canvas{
+      margin: 50px auto 0;
+      display: block;
+      background: yellow;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400">
+  此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+<script>
+
+  const ctx = document.getElementById('canvas')
+
+  const gl = ctx.getContext('webgl')
+
+  // 创建着色器源码
+  const VERTEX_SHADER_SOURCE = `
+    attribute vec4 aPosition;
+
+    varying vec4 vColor;
+
+    void main() {
+      vColor = aPosition;
+      gl_Position = aPosition;
+    }
+  `; // 顶点着色器
+
+  const FRAGMENT_SHADER_SOURCE = `
+    precision lowp float;
+    varying vec4 vColor;
+    void main() {
+      gl_FragColor = vColor;
+    }
+  `; // 片元着色器
+
+  const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+  const aPosition = gl.getAttribLocation(program, 'aPosition');
+
+  const points = new Float32Array([
+    -0.5, -0.5,
+    0.5, -0.5,
+    0.0,  0.5,
+  ])
+
+  const buffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+  gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+  gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+
+  gl.enableVertexAttribArray(aPosition)
+
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+</script>
+```
+
+![webgl](book_files/300.jpg)
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<style>
+		   div#k{
+		    width:100px;
+		    height:100px;
+		    background-color:red;
+		    -webkit-clip-path:polygon(50% 0px,100% 100%,0px 100%);
+		   }
+		</style>
+	</head>
+	<body>
+	<div id="k"></div>
+	</body>
+</html>
+```
+
+![clip-path](book_files/301.jpg)
 
 #### xywh()
 ```css
@@ -2821,7 +3018,7 @@ PostCSS 的主要功能只有两个：第一个就是前面提到的把 `CSS 解
 
 ![图](book_files/137.jpg)
 
-### @namespace @document @page @supports在css中的作用
+### at-rules @namespace @document @page @supports在css中的作用
 在 CSS 中，@namespace、@document、@page 和 @supports 都是特殊的“at-rules”，它们各自有不同的用途和上下文。然而，需要注意的是，并非所有的这些 at-rules 都在所有 CSS 版本或所有浏览器中得到广泛支持。
 
 在 HTML 文档中，通常不需要使用 @namespace，因为 HTML5 默认使用 HTML 命名空间。
@@ -2832,7 +3029,7 @@ xhtml|p {
   color: blue;  
 }
 ```
-@document 规则（也称为“文档查询”）允许你为特定的文档（或一组文档）定义样式。然而，这个规则并未在 CSS 标准中得到最终确定，因此在大多数浏览器中都不受支持。
+@document 规则（也称为“文档查询”）允许你为特定的文档（或一组文档）定义样式。然而，这个规则并未在 CSS 标准中得到最终确定，因此在大多数浏览器中都不受支持。[已弃用]
 
 @page 规则用于修改**打印文档**的页面布局。可以使用它来设置边距、孤行控制、页眉和页脚等。
 ```css
