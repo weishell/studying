@@ -11400,7 +11400,7 @@ React，用于构建用户界面的 JavaScript 库。遵循组件设计模式、
 + JSX 语法
 + 单向数据绑定:单向数据流比双向绑定更安全，速度更快
 + 虚拟 DOM
-+ 声明式编程:声明式编程是一种编程范式，它关注的是你要做什么，而不是如何做
++ `声明式编程`:声明式编程是一种编程范式，它关注的是你要做什么，而不是如何做
 + Component：可组合可复用可重用
 
 ### React18更新了哪些
@@ -11640,6 +11640,8 @@ class TestComponent extends React.Component {
 
 + 非受控组件，简单来讲，就是不受我们控制的组件，一般情况是在初始化的时候接受`外部数据`，然后自己在`内部存储其自身状态`，当需要时，可以使用 ref 查询 DOM并查找其当前值：
 
+> 组件值更新由组件自己维护，不需要将组件的值与状态进行绑定，而是以操作DOM的方式来获取组件的值。非受控组件一般在初始化时接受外部数据，然后在内部存储和管理自身状态。
+
 ```js
 import React, { Component } from 'react';
 
@@ -11689,7 +11691,7 @@ const handleClick = (e) => console.log(e.nativeEvent);;
 const button = <button onClick={handleClick}>按钮</button>
 ```
 
-虽然onclick看似绑定到DOM元素上，但实际并不会把事件代理函数直接绑定到真实的节点上，而是把所有的事件绑定到结构的最外层，使用一个统一的事件去监听
+虽然onclick看似绑定到DOM元素上，但实际并不会把事件代理函数直接绑定到真实的节点上，而是把所有的事件绑定到`结构的最外层`，使用一个统一的事件去监听
 
 这个事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
 
@@ -11806,6 +11808,8 @@ react16.4之后
 	- componentDidUpdate
 + 卸载阶段
 	- componentWillUnmount
+
+> getDerivedStateFromProps 在一定程度上可以用于性能优化，特别是当组件的state需要根据props的变化进行更新时。
 
 ![生命周期](book_files/74.jpg)
 
