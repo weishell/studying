@@ -121,7 +121,7 @@
     - [`css性能优化`](#css性能优化)
     - [协同开发css类名冲突解决方案](#协同开发css类名冲突解决方案)
     - [postcss](#postcss)
-    - [@namespace @document @page @supports在css中的作用](#namespace-document-page-supports在css中的作用)
+    - [at-rules @namespace @document @page @supports在css中的作用](#at-rules-namespace-document-page-supports在css中的作用)
     - [CSS函数](#css函数)
     - [rgba和opacity的透明效果有什么不同？](#rgba和opacity的透明效果有什么不同)
     - [node-sass 和 dart-sass](#node-sass-和-dart-sass)
@@ -436,9 +436,18 @@
     - [react-router理解](#react-router理解)
       - [useSearchParams的应用](#usesearchparams的应用)
       - [react路由传参的形式](#react路由传参的形式)
+      - [路由种类](#路由种类)
+      - [OutLet](#outlet)
+      - [路由懒加载](#路由懒加载)
+    - [react-router 路由守卫功能](#react-router-路由守卫功能)
+    - [react路由表管理](#react路由表管理)
     - [redux工作原理](#redux工作原理)
+      - [redux优点](#redux优点)
     - [项目中使用redux，结构划分](#项目中使用redux结构划分)
       - [react-redux redux-thunk](#react-redux-redux-thunk)
+    - [mobx](#mobx)
+    - [react实现keep-alive缓存机制](#react实现keep-alive缓存机制)
+    - [immer 好处](#immer-好处)
   - [Angular](#angular)
     - [`angular生命周期`](#angular生命周期)
     - [`angular组件通信`](#angular组件通信)
@@ -11843,8 +11852,30 @@ class MyComponent extends React.Component {
 + 父组件向子组件传递
 + 子组件向父组件传递
 + 兄弟组件之间的通信
++ 父组件接受props传递给子组件（爷孙层级）
++ props.children类似插槽
 + 父组件向后代组件传递: React.createContext() || useContext ,Context 提供了一种在组件之间共享值而无需显式地通过每一层组件传递 props 的方式
 + 非关系组件传递：redux
+
+```js
+const Children = (props) =>{
+  return(
+    <div >2222---{props.a}</div>
+  )
+}
+
+const Home = (props) => {
+  // 执行函数
+  console.log(props)
+  const navigate = useNavigate()
+  return (
+    <div>
+      <Children {...props}></Children>
+    </div>
+  )
+}
+
+```
 
 ```js
 // 兄弟组件借助父组件为中间层
@@ -11870,6 +11901,116 @@ class Parent extends React.Component {
   }
 }
 ```
+
+```js
+function ParentComponent() {  
+  return (  
+    <ChildComponent>  
+      <div>Hello, World!</div>  
+      <p>This is a paragraph inside ChildComponent.</p>  
+    </ChildComponent>  
+  );  
+}
+```
+```js
+class ChildComponent extends React.Component {  
+  render() {  
+    // 使用 this.props.children 访问子元素  
+    return (  
+      <div>  
+        <h2>Child Component</h2>  
+        {this.props.children}  
+      </div>  
+    );  
+  }  
+}
+```
+也可以增加条件渲染
+```js
+function ConditionalChildComponent(props) {  
+  if (props.shouldShowChildren) {  
+    return <div>{props.children}</div>;  
+  }  
+  return <div>No children to show.</div>;  
+}  
+  
+// 使用  
+<ConditionalChildComponent shouldShowChildren={true}>  
+  <p>This will be shown.</p>  
+</ConditionalChildComponent>
+```
+
+如果children是数组的话，且需要进行转化，可以借助React.Children.map API去处理
+```js
+import React from 'react';  
+  
+function List({ children }) {  
+  return (  
+    <ul>  
+      {React.Children.map(children, (child) => (  
+        <li>{child}</li>  
+      ))}  
+    </ul>  
+  );  
+}  
+  
+function App() {  
+  return (  
+    <List>  
+      <div>Item 1</div>  
+      <div>Item 2</div>  
+      <div>Item 3</div>  
+    </List>  
+  );  
+}  
+  
+export default App;
+```
+
+```js
+import React, { Component } from "react";
+import Layout from "./Layout";
+
+export default class HomePage extends Component {
+  render() {
+    return (
+      <Layout>
+		// 传对象写法
+        {{
+          content: (
+            <div>
+              <h3>HomePage</h3>
+            </div>
+          ),
+          txt: "这是个文本",
+          btnClick: () => {
+            console.log("btnClick");
+          }
+        }}
+      </Layout>
+    );
+  }
+}
+```
+```js
+// Layout.js
+import React, { Component } from "react";
+export default class Layout extends Component {
+  render() {
+    const { children} = this.props;
+    console.log("children", children);
+    return (
+      <div>
+        {children.content}
+        {children.txt}
+        <button onClick={children.btnClick}>button</button>
+      </div>
+    );
+  }
+}
+
+```
+
 
 #### context类组件和函数组件的使用
 + React.createContext
@@ -12281,6 +12422,7 @@ class ErrorBoundary extends React.Component {
 
 可以利用trycatch或者window.addEventListener('error', function(event) { ... })去处理
 
+
 ### 对React refs 的理解，应用场景
 React 中的 Refs提供了一种方式，`允许访问 DOM节点或在 render方法中创建的 React元素`
 
@@ -12374,6 +12516,7 @@ function App(props) {
 + 对Dom元素的内容设置及媒体播放
 + 对Dom元素的操作和对组件实例的操作
 + 集成第三方 DOM 库
+
 
 ### setState执行机制
 一个组件的显示形态可以由数据状态和外部参数所决定，而数据状态就是state
@@ -12487,7 +12630,7 @@ Object.assign(
   ...
 )
 ```
-如果是下一个state依赖前一个state的话，推荐给setState一个参数传入一个function
+如果是下一个state依赖前一个state的话，推荐给setState一个参数传入一个`function`
 ```js
 onClick = () => {
     this.setState((prevState, props) => {
@@ -12684,9 +12827,9 @@ export default  function ExpensiveComputationComponent({ numbers }) {
 
 
 ### React Jsx转换成真实DOM过程
-+ 使用React.createElement或JSX编写React组件，实际上所有的 JSX 代码最后都会转换成React.createElement(...) ，Babel帮助完成了这个转换的过程。
-+ createElement函数对key和ref等特殊的props进行处理，并获取defaultProps对默认props进行赋值，并且对传入的孩子节点进行处理，最终构造成一个虚拟DOM对象
-+ ReactDOM.render将生成好的虚拟DOM渲染到指定容器上，其中采用了批处理、事务等机制并且对特定浏览器进行了性能优化，最终转换为真实DOM
++ 使用React.createElement或JSX编写React组件，实际上所有的 JSX 代码最后都会转换成`React.createElement(...)` ，`Babel`帮助完成了这个转换的过程。
++ createElement函数对key和ref等特殊的props进行处理，并获取defaultProps对默认props进行赋值，并且对传入的孩子节点进行处理，最终构造成一个`虚拟DOM对象`
++ ReactDOM.render将生成好的虚拟DOM渲染到指定容器上，其中采用了`批处理、事务等机制并且对特定浏览器进行了性能优化`，最终转换为`真实DOM`
 
 jsx
 ```html
@@ -12993,8 +13136,27 @@ react中diff算法主要遵循三个层级的策略：
 + tree层级(对整个组件树进行遍历和比较的过程)
 	- DOM节点跨层级的操作不做优化，只会对相同层级的节点进行比较
 	- 只有删除、创建操作，没有移动操作
+
+![tree](book_files/302.jpg)
+
+A 子树从 root 节点下到了 B 节点下，在 react diff 过程中并不会直接将 A 子树移动到 B 子树下，而是进行如下操作：
+
+1. 在 root 节点下删除 A 节点
+2. 在 B 节点下创建 A 子节点
+3. 在新创建的 A 子节点下创建 C、D 节点
+
 + conponent 层级
 	- 如果是同一个类的组件，则会继续往下diff运算，如果不是一个类的组件，那么直接删除这个组件下的所有子节点，创建新的
+
+![component](book_files/303.jpg)
+
+1. 在 root 节点下创建 K 节点
+2. 在 K 节点下创建 E、F 节点
+3. 在 F 节点下创建 G、H 节点
+4. 在 root 节点下删除 B 子节点
+
+> 虽然如果在本例中改变类型复用子元素性能会更高一点，但是在时机应用开发中类型不一致子内容完全一致的情况极少，对这种情况过多判断反而会增加时机复杂度，降低平均性能。
+
 + element 层级:对于比较同一层级的节点们，每个节点在对应的层级用唯一的key作为标识;提供了 3 种节点操作，分别为 **INSERT_MARKUP(插入)、MOVE_EXISTING (移动)和 REMOVE_NODE (删除)**
 
 ![tree](book_files/77.jpg)
@@ -13027,7 +13189,7 @@ diff过程如下：
 
 当ABCD节点比较完成后，diff过程还没完，还会整体遍历老集合中节点，看有没有没用到的节点，有的话，就删除
 
-> old>max,max更新为新值，元素不懂，`当old<max`，则移动元素到对应的max标记的位置
+> old>max,max更新为新值，元素不动，`当old<max`，则移动元素到对应的max标记的位置
 
 #### 简单类型加key和不加key的性能
 
@@ -13112,6 +13274,46 @@ export default function Counter() {
   );  
 }
 ```
+类组件则需要自己模拟类似的方案
+```js
+class MyComponent extends React.Component {  
+  constructor(props) {  
+    super(props);  
+    this.state = {  
+      count: 0  
+    };  
+  }  
+  
+  reducer = (state, action) => {  
+    switch (action.type) {  
+      case 'increment':  
+        return { count: state.count + 1 };  
+      case 'decrement':  
+        return { count: state.count - 1 };  
+      default:  
+        throw new Error();  
+    }  
+  };  
+  
+  increment = () => {  
+    this.setState(prevState => this.reducer(prevState, { type: 'increment' }));  
+  };  
+  
+  decrement = () => {  
+    this.setState(prevState => this.reducer(prevState, { type: 'decrement' }));  
+  };  
+  
+  render() {  
+    return (  
+      <div>  
+        <p>Count: {this.state.count}</p>  
+        <button onClick={this.increment}>Increment</button>  
+        <button onClick={this.decrement}>Decrement</button>  
+      </div>  
+    );  
+  }  
+}
+```
 
 ![useReducer](book_files/213.jpg)
 ![reducer](book_files/215.jpg)
@@ -13192,16 +13394,22 @@ export default CounterComponent;
 
 从上图可见，黄色部分diff算法对比是明显的性能浪费的情况
 
-主要手段是通过shouldComponentUpdate、PureComponent、React.memo
+主要手段是通过**shouldComponentUpdate、PureComponent、React.memo**
 
 除此之外， 常见性能优化常见的手段有如下：
 + 避免使用内联函数
 + 使用 React Fragments 避免额外标记
-+ 使用 Immutable
-+ 懒加载组件
++ **使用 Immutable**
++ 懒加载组件：使用React.lazy和Suspense懒加载组件
 + 事件绑定方式
 + 服务端渲染
 + 组件拆分、合理使用hooks等性能优化手段
++ 使用context和hooks管理状态
++ 函数组件的： useMemo 和 useCallback useEffect 的依赖数组(虽然 useMemo 和 useCallback 不是直接用来减少组件的渲染次数的，但它们可以用来优化子组件的渲染，通过避免在每次父组件渲染时都创建新的函数或对象。这有助于减少不必要的子组件渲染，特别是当这些子组件是通过 React.memo 包装时。)
+	- useMemo：返回一个`缓存的值`，这个值只在它的依赖项发生变化时才会重新计算。
+	- useCallback：返回一个记忆化的回调函数，这个`回调函数`只有在它的依赖项发生变化时才会`重新创建`。
+	- useEffect 不是直接用来减少渲染次数的，但你可以通过精确控制其依赖项数组来避免在不需要时执行副作用
+
 
 如果使用内联函数，则每次调用render函数时都会创建一个新的函数实例
 ```js
@@ -13241,7 +13449,7 @@ export default class InlineFunctionComponent extends React.Component {
 }
 ```
 
-使用Reac.memo，只有当前props发生变化才重新渲染，注意：根据需求考虑使用
+使用React.memo，只有当前props发生变化才重新渲染，注意：根据需求考虑使用
 ```jsx
 import { useMemo,memo } from "react";
 
@@ -13261,6 +13469,24 @@ export default  memo(function XC1({count}:XC1Props){
     )
 })
 ```
+
+```js
+// 也可以使用自定义比较函数  
+function areEqual(prevProps, nextProps) {  
+  /*  
+   * 如果 props 相等（例如，对象具有相同的形状和内容），  
+   * 返回 true；否则，返回 false。  
+   * 当返回 false 时，组件将会更新。  
+   * 当返回 true 时，组件将不会更新。  
+   */  
+  return prevProps.value === nextProps.value;  
+}  
+  
+const MyComponent = React.memo(function MyComponent(props) {  
+  /* render using props */  
+}, areEqual);
+```
+
 使用PureComponent:同上
 ```js
 import React from 'react'
@@ -13488,12 +13714,292 @@ to传入对象或字符串
 <Route path="/detail2" component={Detail2}/>
 ```
 
+#### 路由种类
+![react-router](book_files/304.jpg)
+
+#### OutLet
+Outlet 组件扮演了一个重要的角色，它用于在嵌套路由中渲染子路由的匹配组件。当你在一个路由配置中设置了子路由时，Outlet 组件将作为父路由组件的占位符，用于渲染当前URL匹配到的子路由组件。
+
+```js
+import React from 'react';  
+import { BrowserRouter as Router, Routes, Route, Link, Outlet } from 'react-router-dom';  
+  
+function App() {  
+  return (  
+    <Router>  
+      <div>  
+        <nav>  
+          <ul>  
+            <li>  
+              <Link to="/">Home</Link>  
+            </li>  
+            <li>  
+              <Link to="/dashboard">Dashboard</Link>  
+            </li>  
+          </ul>  
+        </nav>  
+  
+        {/* 路由配置 */}  
+        <Routes>  
+          <Route path="/" element={<HomePage />} />  
+          <Route path="/dashboard" element={<Dashboard />}>  
+            {/* 嵌套路由 */}  
+            <Route path="/dashboard/profile" element={<Profile />} />  
+            <Route path="/dashboard/settings" element={<Settings />} />  
+          </Route>  
+        </Routes>  
+      </div>  
+    </Router>  
+  );  
+}  
+  
+function Dashboard() {  
+  return (  
+    <div>  
+      <h2>Dashboard</h2>  
+      {/* Outlet用于渲染子路由的匹配组件 */}  
+      <Outlet />  
+    </div>  
+  );  
+}  
+  
+// 其他组件定义...  
+  
+export default App;
+```
+
+Dashboard 组件内部使用了 `<Outlet />`。当URL匹配到 /dashboard/profile 或 /dashboard/settings 时，Profile 或 Settings 组件将被渲染到 Dashboard 组件中的 `<Outlet />` 位置。
+
+#### 路由懒加载
+路由懒加载（也称为代码分割）可以通过结合React Router和Webpack（或其他支持动态导入的模块打包器）来实现。
+```js
+import React, { Suspense } from 'react';  
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  
+  
+// 不懒加载的组件  
+import Home from './components/Home';  
+  
+// 懒加载的组件  
+const About = React.lazy(() => import('./components/About'));  
+const Dashboard = React.lazy(() => import('./components/Dashboard'));  
+  
+// 加载指示器  
+const LoadingComponent = () => <div>Loading...</div>;  
+  
+function App() {  
+  return (  
+    <Router>  
+      <Routes>  
+        {/* 不懒加载的Home组件 */}  
+        <Route path="/" element={<Home />} />  
+  
+        {/* 使用Suspense包裹懒加载的组件 */}  
+        <Suspense fallback={<LoadingComponent />}>  
+          <Route path="/about" element={<About />} />  
+          <Route path="/dashboard" element={<Dashboard />} />  
+          {/* 可以继续添加更多懒加载的路由 */}  
+        </Suspense>  
+  
+        {/* 注意：如果你有更多的不懒加载组件，直接添加它们即可，无需Suspense */}  
+      </Routes>  
+    </Router>  
+  );  
+}  
+  
+export default App;
+```
+
+组件懒加载类似
+```js
+import React, { Suspense, lazy } from 'react';  
+  
+// 懒加载组件  
+const LazyComponent = lazy(() => import('./LazyComponent'));  
+  
+// 加载指示器  
+const Loading = () => <div>Loading...</div>;  
+  
+function ParentComponent() {  
+  return (  
+    <div>  
+      {/* ...其他内容 */}  
+  
+      {/* 使用Suspense包裹懒加载的组件 */}  
+      <Suspense fallback={<Loading />}>  
+        <LazyComponent />  
+      </Suspense>  
+  
+      {/* ...更多内容 */}  
+    </div>  
+  );  
+}  
+  
+export default ParentComponent;
+```
+
+
+### react-router 路由守卫功能
+React-router 并没有像 Vue-router 那样直接提供全局守卫、独享守卫和组件守卫这样的内置功能。但可以通过其他方式来实现类似的功能。
+
+模拟全局守卫
+```js
+import React, { useEffect } from 'react';  
+import { useLocation } from 'react-router-dom';  
+  
+// 假设有一个全局守卫函数  
+function globalGuard() {  
+  // 在这里执行全局守卫逻辑，比如权限检查  
+  console.log('执行全局守卫逻辑');  
+  // 根据逻辑结果，你可能需要重定向或显示错误消息  
+  // 但由于这是全局的，你可能需要依赖于React Context或Redux来管理状态  
+}  
+  
+function App() {  
+  const location = useLocation();  
+  
+  useEffect(() => {  
+    // 当路由变化时执行  
+    globalGuard();  
+  }, [location]); // 依赖项数组中包含location，以确保在路由变化时重新运行  
+  
+  return (  
+    <Router>  
+      {/* 你的路由配置 */}  
+    </Router>  
+  );  
+}
+```
+
+组件守卫
+```js
+import React from 'react';  
+import { Navigate, Outlet } from 'react-router-dom';  
+  
+function PrivateRoute({ children }) {  
+  let isAuthenticated = /* 你的认证逻辑 */;  
+  
+  return isAuthenticated ? (  
+    <>{children}</> // 或者直接 <Outlet /> 如果你正在使用Outlet  
+  ) : (  
+    <Navigate to="/login" replace />  
+  );  
+}  
+  
+// 在你的路由配置中这样使用  
+function App() {  
+  return (  
+    <Routes>  
+      <Route path="/protected" element={  
+        <PrivateRoute>  
+          <ProtectedComponent /> {/* 注意这里没有将ProtectedComponent作为children传递给PrivateRoute */}  
+        </PrivateRoute>  
+      } />  
+      {/* 但实际上，由于上述方式的限制，你可能需要调整你的PrivateRoute组件来适应 */}  
+  
+      {/* 更常见的做法是将PrivateRoute作为Route的父组件 */}  
+      <Route path="/protected" element={<ProtectedComponent />}>  
+        {/* 使用Outlet在PrivateRoute中渲染子路由 */}  
+      </Route>  
+      {/* 但这需要你自定义一个包裹了Outlet的PrivateRoute组件，它检查权限并渲染或重定向 */}  
+  
+      {/* 或者，简单地在ProtectedComponent内部检查权限 */}  
+  
+      <Route path="/login" element={<LoginComponent />} />  
+    </Routes>  
+  );  
+}
+```
+
+### react路由表管理
+
+```js
+npm install react-router-config  
+```
+
+配置静态路由文件:每个路由配置都是一个对象，包含path（路由路径）、component（对应的组件）等属性。如果路由有嵌套，还需要在父路由对象中添加routes属性，该属性也是一个包含子路由配置的数组。
+
+```js
+import React from 'react';  
+import { Redirect } from 'react-router-dom';  
+import AdminLayout from '../layouts/AdminLayout';  
+import UserLayout from '../layouts/UserLayout';  
+import AdminControl from '../application/AdminControl';  
+import UserControl from '../application/UserControl';  
+import Home from '../application/Home';  
+import Login from '../application/Login';  
+  
+export default [  
+  {  
+    path: '/admin',  
+    component: AdminLayout,  
+    routes: [  
+      { path: '/admin', exact: true, render: () => <Redirect to="/admin/control" /> },  
+      { path: '/admin/control', component: AdminControl },  
+      // 其他子路由...  
+    ],  
+  },  
+  {  
+    path: '/user',  
+    component: UserLayout,  
+    routes: [  
+      { path: '/user', exact: true, render: () => <Redirect to="/user/control" /> },  
+      { path: '/user/control', component: UserControl },  
+      // 其他子路由...  
+    ],  
+  },  
+  { path: '/login', component: Login },  
+  { path: '/', component: Home },  
+];
+```
+```js
+import React from 'react';  
+import { renderRoutes } from 'react-router-config';  
+import routes from './routes/index'; // 假设你的路由配置文件名为index.js，并位于routes文件夹下  
+import { BrowserRouter } from 'react-router-dom';  
+  
+function App() {  
+  return (  
+    <BrowserRouter>  
+      {renderRoutes(routes)}  
+    </BrowserRouter>  
+  );  
+}  
+  
+export default App;
+```
+
+需要在父组件中设置占位符来渲染子路由。这通常是通过在父组件的JSX中调用renderRoutes(props.route.routes)来实现的
+```js
+//AdminLayout组件为例
+import React from 'react';  
+import { renderRoutes } from 'react-router-config';  
+  
+const AdminLayout = (props) => {  
+  return (  
+    <div>  
+      <h1>Admin Layout</h1>  
+      {renderRoutes(props.route.routes)}  
+    </div>  
+  );  
+};  
+  
+export default AdminLayout;
+```
+
+
 ### redux工作原理
 它基于一个称为存储的状态容器的概念，组件可以从该容器中作为 props 接收数据。
 
 更新存储区的唯一方法是向存储区发送一个操作，该操作被传递到一个reducer中。reducer接收操作和当前状态，并返回一个新状态，触发订阅的组件重新渲染。
 
 ![redux](book_files/269.jpg)
+
+#### redux优点
+1. 单一数据源：整个应用的状态存储在单一的 store 中，使得状态变得统一和可预测。
+2. 状态是只读的：唯一改变状态的方法是通过发送一个 action，这使得状态的改变可以被追踪和记录。
+3. 使用纯函数来执行状态的变化：通过 reducers（纯函数）来描述如何根据 action 更新状态，确保状态更新的可预测性。
+4. 可预测性：由于所有状态变更都通过 actions 和 reducers 进行，因此状态变化的过程变得可追踪和可预测。
+5. 时间旅行调试：Redux 提供了时间旅行调试的能力，可以轻松地回溯到之前的状态，这对于调试和测试非常有帮助。
 
 
 ### 项目中使用redux，结构划分
@@ -13556,6 +14062,210 @@ Redux 是一个用于可预测和可维护的全局状态管理的 JS 库。Redu
  	}
  }
 ```
+```js
+//App.js
+ componentDidMount(){
+ 	const action =getorgin();
+ 	store.dispatch(action)
+}
+```
+
+
+### mobx
+
+1. 简洁性：MobX通过响应式编程模型来简化状态管理，减少了样板代码的需要。开发者可以直接修改状态，而不需要编写额外的action creators或reducers。
+2. 性能：MobX只跟踪和更新实际发生变化的部分，而不是整个state树，这有助于提高大型应用的性能。
+3. 易于上手：MobX的API相对简单，易于理解和使用，特别是对于那些熟悉响应式编程模型的开发者来说。
+
+```js
+// store.js  
+import { makeAutoObservable } from 'mobx';  
+  
+class CounterStore {  
+  count = 0;  
+  
+  constructor() {  
+    makeAutoObservable(this);  
+  }  
+  
+  increment() {  
+    this.count++;  
+  }  
+  
+  decrement() {  
+    this.count--;  
+  }  
+}  
+  
+export const counterStore = new CounterStore();  
+  
+// App.js  
+import React from 'react';  
+import { observer } from 'mobx-react-lite';  
+import { counterStore } from './store';  
+  
+const App = observer(() => {  
+  return (  
+    <div>  
+      <h1>Count: {counterStore.count}</h1>  
+      <button onClick={() => counterStore.increment()}>Increment</button>  
+      <button onClick={() => counterStore.decrement()}>Decrement</button>  
+    </div>  
+  );  
+});  
+  
+export default App;
+```
+
+
+### react实现keep-alive缓存机制
++ react-activation：社区比较好的方案
++ 结合redux store缓存机制
+
+```js
+// 假设你有一个Redux store和reducer来处理状态  
+// reducer.js  
+const initialState = {  
+  // 假设这是我们需要缓存的某个组件的状态  
+  componentState: null,  
+};  
+  
+function reducer(state = initialState, action) {  
+  switch (action.type) {  
+    case 'SET_COMPONENT_STATE':  
+      return { ...state, componentState: action.payload };  
+    default:  
+      return state;  
+  }  
+}  
+  
+// App.js  
+import React from 'react';  
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';  
+import { useSelector, useDispatch } from 'react-redux';  
+import { setComponentState } from './actions'; // 假设你有一个action来设置状态  
+  
+const CachedComponent = () => {  
+  const dispatch = useDispatch();  
+  const componentState = useSelector(state => state.componentState);  
+  
+  // 假设这是组件的某个状态更新逻辑  
+  const updateState = () => {  
+    dispatch(setComponentState({ /* 新状态 */ }));  
+  };  
+  
+  return (  
+    <div>  
+      {/* 组件内容，使用componentState */}  
+      <button onClick={updateState}>Update State</button>  
+    </div>  
+  );  
+};  
+  
+const App = () => {  
+  return (  
+    <Router>  
+      <Routes>  
+        <Route path="/cached" component={CachedComponent} />  
+        {/* 其他路由 */}  
+      </Routes>  
+    </Router>  
+  );  
+};  
+  
+// 注意：上面的CachedComponent组件并没有直接实现缓存逻辑，  
+// 而是通过Redux store来保持状态，这样即使组件被卸载和重新挂载，  
+// 状态也可以从Redux store中恢复。  
+  
+// 你需要在你的应用中设置Redux store，并将Provider包裹在App组件外部。
+
+// 同时最好设置一个cache清除机制，如果缓存的数据过多，则需要手动清除
+```
+
++ React Router的location.key和自定义缓存逻辑
+
+```js
+// 假设你有一个全局的缓存对象  
+const cache = {};  
+  
+// 自定义Hook来从缓存中获取或设置状态  
+function useCachedState(key, defaultValue) {  
+  const [state, setState] = useState(() => {  
+    // 尝试从缓存中获取状态  
+    const cachedState = cache[key];  
+    if (cachedState !== undefined) {  
+      return cachedState;  
+    }  
+    // 否则返回默认值  
+    return defaultValue;  
+  });  
+  
+  useEffect(() => {  
+    // 在组件卸载时，将状态缓存起来  
+    return () => {  
+      cache[key] = state;  
+    };  
+  }, [key, state]); // 注意：这里的依赖项可能需要根据实际情况调整  
+  
+  return [state, setState];  
+}  
+  
+// 然后在你的组件中使用这个Hook  
+const MyComponent = () => {  
+  const [state, setState] = useCachedState('myComponentKey', { /* 初始状态 */ });  
+  
+  // ... 组件的其他部分  
+};  
+  
+// 注意：这个示例中的useCachedState Hook是一个简化的版本，  
+// 它没有处理所有可能的边缘情况（如缓存冲突、状态更新时的性能问题等）。  
+// 在实际应用中，你可能需要更复杂的逻辑来确保缓存的有效性和性能。
+```
+
+
+### immer 好处
+不使用immer或immutable.js的Redux Reducer
+```js
+const initialState = {  
+  users: [  
+    { id: 1, name: 'Alice', age: 30 },  
+    { id: 2, name: 'Bob', age: 25 }  
+  ]  
+};  
+  
+function usersReducer(state = initialState, action) {  
+  switch (action.type) {  
+    case 'UPDATE_USER_AGE':  
+      // 假设我们要更新Bob的年龄  
+      return {  
+        ...state,  
+        users: state.users.map(user =>  
+          user.id === action.payload.id ? { ...user, age: action.payload.age } : user  
+        )  
+      };  
+    default:  
+      return state;  
+  }  
+}
+```
+为了更新一个用户的年龄，我们需要对整个users数组进行遍历，并对每个用户对象进行深度克隆（使用展开语法...）。如果users数组很大，这种深度克隆的性能开销就会很大。此外，如果状态对象嵌套得更深，这种更新方式将变得更加复杂和难以维护。
+
+使用immer的Redux Reducer
+```js
+import produce from 'immer';  
+  
+function usersReducer(state = initialState, action) {  
+  return produce(state, draft => {  
+    const userIndex = draft.users.findIndex(user => user.id === action.payload.id);  
+    if (userIndex !== -1) {  
+      draft.users[userIndex].age = action.payload.age;  
+    }  
+  });  
+}
+```
+在这个使用immer的例子中，我们可以直接修改draft对象（它看起来是可变的），但实际上immer会在内部处理这些修改，并返回一个新的状态对象。这种方式既简洁又高效，避免了深度克隆的复杂性，并且保持了状态的不可变性。
+
+通过这两个例子的对比，你可以看到使用immer（或immutable.js）能够带来的好处：简化状态更新的逻辑，提高代码的可读性和可维护性，同时避免直接修改状态的风险，并在一定程度上优化性能。
 
 
 
@@ -20336,4 +21046,4 @@ option = {
 
 根据以上标准，可以对函数进行全面的评估。需要注意的是，这些标准并不是孤立的，而是需要综合考虑。一个优秀的函数应该在多个方面都表现出色。同时，也要根据实际情况和项目的具体需求来灵活应用这些标准。
 
-## 鸿蒙
+## 鸿蒙    
