@@ -15089,6 +15089,16 @@ Property：DOM属性，html标签对应的DOM节点属性，使用 .属性名 �
 另外，常用的Attribute，例如id、class等，已经被作为Property附加到DOM对象上，可以和Property一样取值和赋值。但是自定义的Attribute，就不会有这样的优待。
 
 
+### 加载慢白屏处理方案
+
+1. 优化资源加载：cdn+延迟加载非关键资源+合并代码
+2. 压缩和优化资源：优化图像
+3. 代码分割和懒加载
+4. 缓存机制
+5. 服务端渲染SSR
+6. 代码优化
+
+
 
 
 
@@ -15964,6 +15974,7 @@ onLoad(val){
 	console.log(val)
 }
 ```
+
 
 ### vue和nvue区别
 uni-app App 端内置了一个基于 weex 改进的原生渲染引擎，提供了原生渲染能力。
