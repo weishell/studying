@@ -469,6 +469,7 @@
     - [如何获取文档中任意一个元素距离文档 document 顶部的距离？](#如何获取文档中任意一个元素距离文档-document-顶部的距离)
     - [document.write 和 innerHTML 的区别](#documentwrite-和-innerhtml-的区别)
     - [property 和attribute](#property-和attribute)
+    - [加载慢白屏处理方案](#加载慢白屏处理方案)
   - [BOM](#bom)
     - [BOM的含义](#bom的含义)
       - [moveTo moveBy scrollTo scrollBy resizeTo resizeBy](#moveto-moveby-scrollto-scrollby-resizeto-resizeby)
