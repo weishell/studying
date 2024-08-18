@@ -332,6 +332,7 @@
     - [Vue动态组件和异步组件](#vue动态组件和异步组件)
     - [`Vuex的使用`](#vuex的使用)
     - [vuex辅助函数](#vuex辅助函数)
+    - [vuex浏览器开两个不同页面信息更新问题](#vuex浏览器开两个不同页面信息更新问题)
     - [介绍Vue的模板编译](#介绍vue的模板编译)
     - [SPA](#spa)
       - [原理和SEO优化](#原理和seo优化)
@@ -9501,6 +9502,33 @@ export default {
   }  
 }
 ```
+
+
+### vuex浏览器开两个不同页面信息更新问题
+1. 使用LocalStorage、SessionStorage或~~Cookies（太小）~~
+2. WebSocket或Server-Sent Events (SSE)：使用WebSocket或SSE可以在浏览器和服务器之间建立一个持久的连接，服务器可以主动向客户端发送数据。当Vuex状态更新时，服务器可以接收到这个更新，并通过WebSocket或SSE将更新推送到所有连接的客户端。
+3. BroadcastChannel API：这是一个较新的Web API，允许同源的不同页面之间通过简单的消息传递机制进行通信。
+4. window.postMessage() 
+
+```js
+// 假设iframe的窗口对象存储在iframeWindow变量中  
+iframeWindow.postMessage({ type: 'updateData', data: newData }, '*'); // 注意：'*' 表示不限制来源，但在生产环境中应该指定具体的源
+
+//接收消息并更新Vuex状态（子iframe或另一个标签页）：
+window.addEventListener('message', function(event) {  
+  // 验证消息来源  
+  if (event.origin !== 'expected-source-origin') {  
+    return;  
+  }  
+  
+  // 根据消息类型执行相应操作  
+  if (event.data.type === 'updateData') {  
+    // 假设你有一个名为store的Vuex store  
+    store.commit('updateSomeState', event.data.data);  
+  }  
+});
+```
+
 
 ### 介绍Vue的模板编译
 `模版指的就是template属性。vue内部会将template字符串转化成render函数进行渲染。render函数返回虚拟节点，再将虚拟节点转化成真实DOM。`（模版=>方法=>节点）
