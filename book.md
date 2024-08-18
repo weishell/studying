@@ -4205,7 +4205,7 @@ console.log(...str.matchAll(/(hel)(lo)/g))
 + 排序 sort reverse(会修改原数组)
 + 转换方法 join
 + 迭代方法 some every map forEach reduce filter 
-+ 其他 fill flat(函数扁平化) copyWithin arr.keys() arr.values() arr.entries()
++ 其他 fill flat(函数扁平化) copyWithin arr.keys() arr.values() arr.entries()toString() valueOf()
 
 ```js
 let arr = [4,1,3,5,7,9]
@@ -17114,8 +17114,8 @@ console.log(calcBonus('D', 3000, levelDStrategy)); // 4500
 
 ## 数据结构
 
-+ 栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。
-+ 队列：先进先出，js中没有队列这个数据结构，不过Array可以实现栈的所有功能。
++ 栈：先进后出，js中没有栈这个数据结构，不过Array可以实现栈的所有功能。（通过push和pop方法，就能用数组来模拟栈）
++ 队列：先进先出，js中没有队列这个数据结构，不过Array可以实现栈的所有功能。（通过shift和unshift方法，就能用数组模拟基本的队列数据结构）
 
 ![任务队列](book_files/229.jpg)
 
@@ -17159,6 +17159,108 @@ console.log(a)
 
 
 + 树：一种分层的数据抽象模型，如DOM树，级联菜单，树型控件，JS中没有树的结构，不过可以用Object和Array来实现
+
+
+### js写一个栈
+
+```js
+function Stack() {
+ var items = [];
+ this.push = function(element){
+	items.push(element);
+ };
+ this.pop = function(){
+	return items.pop();
+ };
+ // 查看栈顶元素
+ this.peek = function(){
+	return items[items.length-1];
+ };
+ this.isEmpty = function(){
+	return items.length == 0;
+ };
+ // 对于集合，最好用size代替length
+ this.size = function(){
+	return items.length;
+ };
+ this.clear = function(){
+	items = [];
+ };
+ this.print = function(){
+	console.log(items.toString());
+ };
+} 
+```
+
+#### 栈的应用
+十进制转二进制
+![十进制转二进制](book_files/305.jpg)
+
+
+### js队列
+```js
+function Queue() {
+ var items = [];
+ this.enqueue = function(element){
+	items.push(element);
+ };
+ this.dequeue = function(){
+	return items.shift();
+ };
+ this.front = function(){
+	return items[0];
+ };
+ this.isEmpty = function(){
+	return items.length == 0;
+ };
+ this.clear = function(){
+	items = [];
+ };
+ this.size = function(){
+	return items.length;
+ }; 
+ this.print = function(){
+  console.log(items.toString());
+  };
+ }
+```
+
+
+### 优先队列
+元素的添加和移除是基于优先级的。一个现实的例子就是机场登机的顺序。头等舱和商务舱乘客的优先级要高于经济舱乘客。
+
+实现一个优先队列，有两种选项：设置优先级，然后在正确的位置添加元素；或者用入列操
+作添加元素，然后按照优先级移除它们。
+
+```js
+function PriorityQueue() {
+ var items = [];
+ function QueueElement (element, priority){ // {1}
+	this.element = element;
+	this.priority = priority;
+ }
+ this.enqueue = function(element, priority){
+	var queueElement = new QueueElement(element, priority);
+	 if (this.isEmpty()){
+		items.push(queueElement); // {2}
+	 } else {
+		var added = false;
+		for (var i=0; i<items.length; i++){
+		if (queueElement.priority <items[i].priority){
+			items.splice(i,0,queueElement); // {3}
+			added = true;
+		break; // {4} 
+		}
+	  }
+		  if (!added){ //{5}
+			items.push(queueElement);
+		  }
+	  }
+	};
+ //其他方法和默认的Queue实现相同
+ }
+```
+
 
 ### `树的遍历`
 1. 深度优先遍历
