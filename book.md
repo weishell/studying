@@ -545,6 +545,11 @@
       - [栈的应用](#栈的应用)
     - [js队列](#js队列)
     - [优先队列](#优先队列)
+    - [链表](#链表)
+    - [字典和散列表](#字典和散列表)
+    - [散列表和优化](#散列表和优化)
+      - [分离链接](#分离链接)
+      - [线性探查](#线性探查)
     - [`树的遍历`](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
       - [非递归实现先中后序遍历](#非递归实现先中后序遍历)
@@ -662,11 +667,18 @@
   - [其他构建工具](#其他构建工具)
   - [koa express](#koa-express)
   - [css预编译语言](#css预编译语言)
+  - [3D开发](#3d开发)
+  - [低代码开发](#低代码开发)
+  - [前端gis开发](#前端gis开发)
+  - [服务端渲染开发](#服务端渲染开发)
+  - [AI前端开发](#ai前端开发)
   - [微前端](#微前端)
       - [为什么不考虑iframe](#为什么不考虑iframe)
+    - [qiankun](#qiankun)
   - [单元测试](#单元测试)
   - [其他](#其他)
     - [`项目难点，亮点阐述`](#项目难点亮点阐述)
+    - [态度和能力，哪个更重要](#态度和能力哪个更重要)
     - [`函数好坏代码评审`](#函数好坏代码评审)
   - [鸿蒙](#鸿蒙)
 
@@ -3796,6 +3808,12 @@ V8 增量回收使用 **写屏障** (Write-barrier) 机制，即一旦有黑色�
 + 意外的全局变量
 + this创建的意外的全局变量
 + 循环引用
++ 滥用的闭包
++ 未及时回收的大对象
++ 大量的不必要的深拷贝
++ 不合理的使用缓存
++ 未及时清除的定时器和事件监听
+
 ```js
 // 使用严格模式可避免
 function fun(){
@@ -17267,6 +17285,135 @@ function PriorityQueue() {
 ```
 
 
+### 链表
+
+```js
+this.insert = function(position, element){
+ //检查越界值
+ if (position >= 0 && position <= length){ //{1}
+	var node = new Node(element),
+	current = head,
+	previous,
+	index = 0;
+	 if (position === 0){ //在第一个位置添加
+		 node.next = current; //{2}
+		 head = node;
+	 } else {
+		 while (index++ < position){ //{3}
+			 previous = current;
+			 current = current.next;
+		 }
+		 node.next = current; //{4}
+		 previous.next = node; //{5}
+	 }
+	 length++; //更新列表的长度
+	 return true;
+ } else {
+	return false; //{6}
+ }
+}; 
+```
+
+![1](book_files/310.jpg)
+
+![2](book_files/311.jpg)
+
+![3](book_files/312.jpg)
+
+向双向链表中插入一个新项跟（单向）链表非常类似。区别在于，链表只要控制一个next指针，而双向链表则要同时控制next和prev（previous，前一个）这两个指针。
+
+```js
+while (index++ < position){ //{4}
+ previous = current;
+ current = current.next;
+ }
+ node.next = current; //{5}
+ previous.next = node;
+ current.prev = node; //新增的
+ node.prev = previous; //新增的
+```
+
+
+### 字典和散列表
+map.get() 使用哈希表（或类似的数据结构）来优化性能，而 obj.key 的性能则依赖于JavaScript引擎对对象属性访问的优化，这种优化可能（但并不总是）涉及到类似于哈希表的数据结构。
+
+![1](book_files/313.jpg)
+
+
+### 散列表和优化
+
+```js
+var loseloseHashCode = function (key) {
+ var hash = 0; //{1}
+ for (var i = 0; i < key.length; i++) { //{2}
+ hash += key.charCodeAt(i); //{3}
+ }
+ return hash % 37; //{4}
+}; 
+```
+
+优化散列表函数
+```js
+var djb2HashCode = function (key) {
+ var hash = 5381; //{1}
+ for (var i = 0; i < key.length; i++) { //{2}
+	hash = hash * 33 + key.charCodeAt(i); //{3}
+ }
+ return hash % 1013; //{4}
+}; 
+```
+
+使用相加的和与另一个随机质数（比我们认为的散列表的大小要大——在本例中，我们认为散列表的大小为1000）相除的余数。
+
+![1](book_files/314.jpg)
+
+处理冲突有几种方法：分离链接、线性探查和双散列法。
+
+#### 分离链接
+![1](book_files/315.jpg)
+
+```js
+var ValuePair = function(key, value){
+ this.key = key;
+ this.value = value;
+ this.toString = function() {
+ return '[' + this.key + ' - ' + this.value + ']';
+ }
+}; 
+```
+
+> 增加key值比对
+
+#### 线性探查
+当想向表中某个位置加入一个新元素的时候，如果索引为index的位置已经被占据了，就尝试index+1的位置。如果index+1的位置也被占据了，就尝试index+2的位置，以此类推。
+
+
+### 二叉树
+二叉树中的节点最多只能有两个子节点：一个是左侧子节点，另一个是右侧子节点。这些定义有助于写出更高效的向/从树中插入、查找和删除节点的算法。二叉树在计算机科学中的应用非常广泛。
+
+二叉搜索树（BST）是二叉树的一种，但是`它只允许在左侧节点存储（比父节点）小的值，在右侧节点存储（比父节点）大（或者等于）的值`。
+
+```js
+var insertNode = function(node, newNode){
+ if (newNode.key < node.key){ //{4}
+	 if (node.left === null){ //{5}
+		node.left = newNode; //{6}
+	 } else {
+		insertNode(node.left, newNode); //{7}
+	 }
+ } else {
+	 if (node.right === null){ //{8}
+		node.right = newNode; //{9}
+	 } else {
+		insertNode(node.right, newNode); //{10} 
+	 }
+ }
+};
+```
+
+![1](book_files/316.jpg)
+
+
 ### `树的遍历`
 1. 深度优先遍历
 2. 广度优先遍历
@@ -17276,6 +17423,8 @@ function PriorityQueue() {
 ![1](book_files/245.jpg)
 
 ![2](book_files/247.jpg)
+
+![3](book_files/317.jpg)
 
 ```js
 let  tree= {
