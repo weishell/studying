@@ -550,6 +550,7 @@
     - [散列表和优化](#散列表和优化)
       - [分离链接](#分离链接)
       - [线性探查](#线性探查)
+    - [二叉树](#二叉树)
     - [`树的遍历`](#树的遍历)
     - [二叉树先中后序遍历](#二叉树先中后序遍历)
       - [非递归实现先中后序遍历](#非递归实现先中后序遍历)
@@ -17491,6 +17492,32 @@ bfs(tree)
 
 ![后序遍历](book_files/250.jpg)
 
+中序遍历是一种以上行顺序访问BST所有节点的遍历方式，也就是以从最小到最大的顺序访问所有节点。中序遍历的一种应用就是对树进行排序操作。
+
+![中序遍历](book_files/318.jpg)
+
+```js
+this.inOrderTraverse = function(callback){
+ inOrderTraverseNode(root, callback); //{1}
+}; 
+var inOrderTraverseNode = function (node, callback) {
+ if (node !== null) { //{2}
+ inOrderTraverseNode(node.left, callback); //{3}
+ callback(node.key); //{4}
+ inOrderTraverseNode(node.right, callback); //{5}
+ }
+}; 
+function printNode(value){ //{6}
+ console.log(value);
+}
+tree.inOrderTraverse(printNode); //{7}
+```
+
+![先序遍历](book_files/319.jpg)
+
+![后序遍历](book_files/320.jpg)
+
+
 ```js
 const bs = {
 	val:1,
@@ -18352,12 +18379,43 @@ var inorderTraversal = function(root) {
 
 ![迭代实现](book_files/259.jpg)
 
+
 ### 路径之和
 ![路径之和](book_files/261.jpg)
 
 ![如图所示](book_files/260.jpg)
 
 
+### 排序方式
+
+#### 冒泡排序
+冒泡算法，在所有排序算法中最简单。然而，从运行时间的角度来看，冒泡排序是最差的一个。（复杂度是O(n2)）
+
+冒泡排序比较任何两个相邻的项，如果第一个比第二个大，则**交换**它们。元素项向上移动至正确的顺序，就好像气泡升至表面一样，冒泡排序因此得名。
+
+```js
+this.modifiedBubbleSort = function(){
+ var length = array.length;
+ for (var i=0; i<length; i++){
+	for (var j=0; j<length-1-i; j++ ){ //{1}
+		if (array[j] > array[j+1]){
+		swap(j, j+1);
+		}
+	}
+ }
+}; 
+```
+
+![冒泡排序](book_files/321.jpg)
+
+#### 选择排序
+选择排序算法是一种原址比较排序算法。选择排序大致的思路是找到数据结构中的最小值并将其放置在第一位，接着找到第二小的值并将其放在第二位，以此类推。
+
+选择排序同样也是一个复杂度为O(n2)的算法。和冒泡排序一样，它包含有嵌套的两个循环，这导致了二次方的复杂度。
+
+![2](book_files/322.jpg)
+
+#### 插入排序
 
 
 
