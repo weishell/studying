@@ -578,6 +578,13 @@
     - [二叉树层序遍历](#二叉树层序遍历)
     - [二叉树的中序遍历](#二叉树的中序遍历)
     - [路径之和](#路径之和)
+    - [排序方式](#排序方式)
+      - [冒泡排序](#冒泡排序)
+      - [选择排序](#选择排序)
+      - [插入排序](#插入排序)
+      - [归并排序](#归并排序)
+      - [快速排序](#快速排序)
+      - [搜索算法](#搜索算法)
   - [write](#write)
     - [封装一个通用的事件监听函数](#封装一个通用的事件监听函数)
     - [封装一个ajax函数](#封装一个ajax函数)
@@ -669,6 +676,7 @@
   - [koa express](#koa-express)
   - [css预编译语言](#css预编译语言)
   - [3D开发](#3d开发)
+    - [threejs初步渲染](#threejs初步渲染)
   - [低代码开发](#低代码开发)
   - [前端gis开发](#前端gis开发)
   - [服务端渲染开发](#服务端渲染开发)
@@ -18416,7 +18424,85 @@ this.modifiedBubbleSort = function(){
 ![2](book_files/322.jpg)
 
 #### 插入排序
+插入排序每次排一个数组项，以此方式构建最后的排序数组。假定第一项已经排序了，接着，它和第二项进行比较，第二项是应该待在原位还是插到第一项之前呢？这样，头两项就已正确排序，接着和第三项比较（它是该插入到第一、第二还是第三的位置呢？），以此类推。
 
+```js
+let array= [3,5,1,4,2]
+function insertionSort() {
+		var length = array.length, //{1}
+			j, temp;
+		for (var i = 1; i < length; i++) { //{2}
+			j = i; //{3}
+			temp = array[i]; //{4}
+			while (j > 0 && array[j - 1] > temp) { //{5}
+				array[j] = array[j - 1]; //{6}
+				j--;
+			}
+			array[j] = temp; //{7}
+		}
+	};
+insertionSort()
+console.warn(array)
+```
+
+排序小型数组时，此算法比选择排序和冒泡排序性能要好。
+
+#### 归并排序
+归并排序性能不错，其复杂度为O(nlogn)
+
+归并排序是一种分治算法。其思想是将原始数组切分成较小的数组，直到每个小数组只有一个位置，接着将小数组归并成较大的数组，直到最后只有一个排序完毕的大数组。
+```js
+ var array = [3, 5, 1, 4, 2]
+	 function mergeSortRec(array) {
+		var length = array.length;
+		if (length === 1) { //{1}
+			return array; //{2}
+		}
+		var mid = Math.floor(length / 2), //{3}
+			left = array.slice(0, mid), //{4}
+			right = array.slice(mid, length); //{5}
+		return merge(mergeSortRec(left), mergeSortRec(right)); //{6}
+	};
+
+	function merge(left, right) {
+		var result = [], // {7}
+			il = 0,
+			ir = 0;
+		while (il < left.length && ir < right.length) { // {8}
+			if (left[il] < right[ir]) {
+				result.push(left[il++]); // {9}
+			} else {
+				result.push(right[ir++]); // {10}
+			}
+		}
+		while (il < left.length) { // {11}
+			result.push(left[il++]);
+		}
+		while (ir < right.length) { // {12}
+			result.push(right[ir++]);
+		}
+		return result; // {13}
+	};
+	let arr1 = mergeSortRec(array)
+	console.warn(arr1)
+```
+
+![归并排序](book_files/323.jpg)
+
+#### 快速排序
+
+基本思想：在已知数据集合中随便去一个基准(pivot);将其余数据以基准为中心，大于分放右边，小于的放左边;将左右两个子集重复以上两个步骤
+
+(1) 首先，从数组中选择中间一项作为主元。
+
+(2) 创建两个指针，左边一个指向数组第一个项，右边一个指向数组最后一个项。移动左指针直到我们找到一个比主元大的元素，接着，移动右指针直到找到一个比主元小的元素，然后交换它们，重复这个过程，直到左指针超过了右指针。这个过程将使得比主元小的值都排在主元之前，而比主元大的值都排在主元之后。这一步叫作划分操作。
+
+(3) 接着，算法对划分后的小数组（较主元小的值组成的子数组，以及较主元大的值组成的子数组）重复之前的两个步骤，直至数组已完全排序。
+
+![1](book_files/2.gif)
+
+#### 搜索算法
+顺序搜索和二分搜索，这个算法要求被搜索的数据结构已排序。
 
 
 ## write
@@ -21353,7 +21439,14 @@ option = {
 
 ## css预编译语言
 
+
+
+
+
 ## 3D开发
+
+### threejs初步渲染
+![初步渲染](book_files/324.jpg)
 
 ## 低代码开发
 
@@ -21401,13 +21494,20 @@ iframe 最大的特性就是提供了浏览器原生的硬隔离方案，不论�
 
 ## 单元测试
 
+
+
+
+
 ## 其他
+
 
 ### `项目难点，亮点阐述`
 根据具体情况来说
 
+
 ### 态度和能力，哪个更重要
 根据具体情况来说
+
 
 ### `函数好坏代码评审`
 在前端代码评审中，评定一个函数写得好不好，通常需要考虑多个方面。以下是一些评估标准，你可以根据这些标准来评价一个函数的质量：
@@ -21452,3 +21552,5 @@ iframe 最大的特性就是提供了浏览器原生的硬隔离方案，不论�
 
 
 ## 鸿蒙    
+
+
