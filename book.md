@@ -6831,6 +6831,40 @@ escape、encodeURI、encodeURIComponent这三个函数在JavaScript中用于处�
 	+ encodeURIComponent：优点是适用于编码URI的组件，缺点是如果用于编码整个URI，可能会导致错误。
 
 
+### 浏览器消息通知
+
+```js
+	function notify() {
+	    // 先检查浏览器是否支持
+	    if (!("Notification" in window)) {
+	        alert("This browser does not support desktop notification");
+	    }
+	
+	    // 检查用户是否同意接受通知
+	    else if (Notification.permission === "granted") {
+	        // If it's okay let's create a notification
+	        var notification = new Notification("Hi there!");
+	    }
+	
+	    // 否则我们需要向用户获取权限
+	    else if (Notification.permission !== "denied") {
+	        Notification.requestPermission().then(function (permission) {
+	            // 如果用户接受权限，我们就可以发起一条消息
+	            if (permission === "granted") {
+	                var notification = new Notification("Hi there!");
+	            }
+	        });
+	    }
+		new Notification("wei!")
+		// setInterval(()=>{
+		// 	new Notification("wei!")
+		// },1000)
+	    // 最后，如果执行到这里，说明用户已经拒绝对相关通知进行授权
+	    // 出于尊重，我们不应该再打扰他们了
+	}
+	notify()
+```
+
 
 
 
