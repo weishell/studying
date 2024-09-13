@@ -130,6 +130,7 @@
       - [两种方案对比](#两种方案对比)
     - [border-radius设置不同的顶点弧度不一致](#border-radius设置不同的顶点弧度不一致)
     - [link和@import的区别](#link和import的区别)
+    - [关于样式被覆盖问题](#关于样式被覆盖问题)
   - [js](#js)
     - [获取伪类中的内容](#获取伪类中的内容)
     - [js中哪些会被判断为false](#js中哪些会被判断为false)
@@ -245,6 +246,7 @@
     - [JWT](#jwt)
     - [token放在cookie还是localstorange](#token放在cookie还是localstorange)
     - [escape encodeURI encodeURIComponent区别](#escape-encodeuri-encodeuricomponent区别)
+    - [浏览器消息通知](#浏览器消息通知)
   - [ES6](#es6)
     - [扩展运算符 剩余运算符](#扩展运算符-剩余运算符)
     - [数组的静态方法](#数组的静态方法)
@@ -3265,6 +3267,93 @@ link和@import在多个方面存在显著的区别，以下是它们的区别：
 6. 书写方式：
 	+ @import有多种书写方式，包括使用单引号、双引号或url()函数等。但不同的浏览器可能对这些书写方式的支持程度不同。
 	+ link则通过HTML标签直接引用CSS文件，书写方式相对简单。
+
+### 关于样式被覆盖问题
+样式被覆盖，导致自己的页面需要的颜色背景等无法设置，这个时候如果加了deep深度穿透都无法解决。
+
+1. 如果能找到原始干扰项，看是否可以对其改造，不影响现有的代码前提下，去支持自己的样式。
+
+```html
+<template>
+  <div id="app">
+    <router-view />
+  </div>
+</template>
+<style lang="scss" scoped>
+::v-deep td span{
+  font-size: small!important;
+  white-space: nowrap!important;
+  overflow: hidden!important;
+  text-overflow: ellipsis!important;
+}
+// 在自己页面配置穿透此时也无法其作用，因为不能动这个，所以可以在自己的页面利用插槽文字呈现改成其他标签实现
+
+</style>
+```
+```html
+<!-- 尝试给自己的组件穿透前配置一个单独的属性 -->
+<style lang='scss' scoped>
+#hepRisklistModal ::v-deep .el-cascader-node label{
+  margin-bottom: 0 !important
+}
+</style>
+```
+
+2. 在vue中可能写在scoped中并不会其作用，可考虑写在无scoped的style中
+
+el-cascader在项目中的样式改不了，采取了此方案
+```css
+<style lang="less">
+.el-cascader__dropdown{
+  background: rgba(3, 21, 32, 0.9);
+  color:white;
+  border:none
+}
+.el-cascader__dropdown .el-cascader-menu__list .el-radio{
+  margin-bottom:0
+}
+.el-cascader__dropdown .el-cascader-node{
+  color:#FFF
+}
+.el-cascader__dropdown .el-cascader-node:active{
+  background: rgba(108, 189, 235, 0.2);
+}
+.el-cascader__dropdown .el-cascader-node.is-selectable{
+  background: #6cbdeb33;
+}
+.el-cascader__dropdown .el-cascader-node:hover{
+  background:rgba(108, 189, 235, 0.5);
+}
+.el-cascader__dropdown .in-active-path{
+  color:white
+}
+.el-cascader__dropdown .el-cascader-node.is-selectable.is-active,
+.el-cascader__dropdown .el-cascader-node.is-selectable.in-checked-path {
+  color:#99CEFF
+}
+.el-cascader__dropdown .el-cascader-node.is-selectable.is-active .el-radio.is-checked .el-radio__inner,
+.el-cascader__dropdown .el-radio__input.is-checked .el-radio__inner{
+  border-color:#99CEFF;
+  background: #99CEFF;
+}
+</style>
+
+```
+
+3. 非常不适合的选项，但是某些场合可紧急使用,动态css去修改
+
+```js
+export default {  
+  mounted() {  
+    const input = this.$el.querySelector('#myInput');  
+    if (input) {  
+      // 现在你可以对 input 元素进行操作了  
+      console.log(input.value); 更改样式
+	  input.style.xxx ='yyy'
+    }  
+  }  
+}
+```
 
 
 
@@ -16822,6 +16911,8 @@ https采用的是：结合`对称加密+非对称加密`这两种方式，可以
 ## 性能优化
 ![性能优化](book_files/101.jpg)
 ![前端优化](book_files/5.png)
+
+LZ-string算法=>间接扩容本地存储
 
 ### 为什么css在页面head，js在body尾部
 CSS在加载过程中，不影响HTML的解析。但影响HTML渲染。
