@@ -73,6 +73,7 @@
       - [iframe安全问题](#iframe安全问题)
     - [`H5新增属性`](#h5新增属性)
     - [`常见的浏览器内核有哪些`](#常见的浏览器内核有哪些)
+    - [渲染引擎整个工作流程](#渲染引擎整个工作流程)
     - [websocket](#websocket)
       - [为什么需要pong响应机制？](#为什么需要pong响应机制)
       - [是否监听ping响应失败可以执行重连？](#是否监听ping响应失败可以执行重连)
@@ -923,7 +924,29 @@ JS引擎则：解析和执行javascript来实现网页的动态效果。
 + Trident 内核：IE, MaxThon, TT, The World, 360, 搜狗浏览器等。[又称 MSHTML]
 + Gecko 内核：Netscape6 及以上版本，FF, MozillaSuite / SeaMonkey 等
 + Presto 内核：Opera7 及以上。 [Opera内核原为：Presto，现为：Blink;]
-+ Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支）]
++ Webkit 内核：Safari, Chrome等。 [ Chrome的：Blink（WebKit 的分支），Edge浏览器也已经转向Blink]
+
+> 排版引擎（layout engine），也称为浏览器引擎（browser engine）、页面渲染引擎（rendering engine）或样版引擎
+
+### 渲染引擎整个工作流程
+
+![1](book_files/325.jpg)
+
+![2](book_files/326.jpg)
+
+![3](book_files/327.jpg)
+
+![4](book_files/328.jpg)
+
+1. 解析 HTML 文件，构建 DOM（文档对象模型）树。这个树代表了页面上所有元素的节点结构
+2. 解析 CSS 文件，构建 CSSOM 树。
+3. 将 DOM 树和 CSSOM 树合并成渲染树。
+4. 生成布局树，计算每个元素在页面上的位置和大小。
+5. 根据布局绘制渲染树，将渲染树上的元素绘制成屏幕上的像素。
+6. `合成层，将多个图层合并成一个图层，以便使用 GPU 进行加速。`
+7. `使用 GPU 加速，对图层进行合成，形成最终的图像。`
+8. 如果发生重绘或回流操作，重新执行步骤 4-7。
+9. 有些操作会触发重绘或回流，如改变元素的位置、大小、颜色等。这些操作会影响页面的性能和渲染速度，因此需要尽可能避免。
 
 
 ### websocket
@@ -3355,6 +3378,33 @@ export default {
 }
 ```
 
+4. 因为很多项目可能比较陈旧，某些样式可能因为框架被更改，要对着控制台去排查，比如级联菜单中，因为radio上移了0.5rem，然后发现是bootstrap中label的magin-bottom设置了默认值影响的，才可以更好的去处理
+
+```css
+.el-cascader__dropdown .el-cascader-menu__list .el-radio{
+  margin-bottom:0
+}
+```
+
+
+### 页面性能优化
+避免回流是提高页面性能的重要手段之一，因为它既是计算成本也是渲染成本的源头，以下是一些常用的优化方法：
+
+1. 尽量一次性修改样式 可以使用 cssText 属性、添加 class 等方式，一次性修改元素的样式，避免多次修改引起页面的回流。比如，可以将需要修改的样式保存在一个对象中，然后一次性设置给元素，避免多次触发回流。
+2. 避免频繁的操作 DOM 可以使用 DocumentFragment 或者父元素来操作 DOM，避免频繁地操作 DOM 元素，从而减少页面的回流次数。
+3. 避免使用 **getComputedStyle()** 获取元素信息 因为 getComputedStyle() 方法会强制浏览器进行回流操作，从而影响页面的性能。如果需要获取元素的信息，可以在修改样式之前先保存到变量中，避免多次触发回流。
+4. 使用 **position:absolute 或者 position:fixed** 属性 因为可以将元素从文档流中脱离出来，从而避免影响其他元素的位置和大小。虽然这也会引起回流，但是相对于修改文档流中的元素来说，开销较小，对页面的性能影响较小。
+5. 一些特殊的属性，会创建一个新的合成层（ CompositingLayer ），并且新的图层可以利用GPU来加速绘制
+
+有些属性可以触发合成层的创建，包括：
+（1）3D 变换（3D Transforms）：如 `rotateX、rotateY、translateZ` 等属性，可以创建一个新的合成层。
+（2）`video、canvas、iframe` 等标签：这些标签会创建一个新的合成层。
+（3）`opacity` 动画转换时：当元素透明度发生变化时，会创建一个新的合成层。
+（4）position: fixed：将元素定位为固定位置时，也会创建一个新的合成层。
+（5）`will-change 属性：可以通过这个实验性的属性，告诉浏览器元素可能会发生哪些变化，从而预先创建合成层。`
+（6）动画（`Animation`）或过渡（`Transition`）设置了 opacity、transform 属性时，也会创建一个新的合成层。
+
+> 过度使用合成层也会带来一些问题，如占用更多的内存、增加页面的复杂度等。
 
 
 
@@ -16644,7 +16694,7 @@ npx patch-package some-package
 ## http
 
 ### `从输入URL到渲染页面的整个过程`
-1. DNS解析：域名=>IP地址
+1. DNS解析：域名=>IP地址(如果直接输IP可跳过，意义不大)
 2. 建立TCP连接
 3. 浏览器根据IP地址向服务器发起http请求
 4. 服务器处理http请求，并将对应资源返回给浏览器
