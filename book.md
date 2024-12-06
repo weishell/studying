@@ -708,9 +708,9 @@
 
 
 ### `如何理解html语义化`
-1.	让人更容易读懂（增加代码可读性）
+1.	让人更容易读懂（增加代码***可读性***）
 2.	去掉或丢失样式的时候能够让页面呈现出清晰结构
-3.	让搜素引擎更容易理解（SEO优化）
+3.	让搜素引擎更容易理解（***SEO优化***）
 
 
 ### p标签里面不能嵌套ul、div等块级元素原因
@@ -815,7 +815,7 @@ Standard Generalized Markup language，标准通用标记语言
 	+ **增加http请求**
 	+ 会增加页面的加载时间和渲染复杂度
 	+ 嵌入的内容可能来自不受信任的第三方网站，这可能会导致一些安全风险
-	+ 响应性问题：iframe内容的大小通常是固定的，这可能导致响应性问题，特别是在移动设备上
+	+ `响应性问题`：iframe内容的大小通常是固定的，这可能导致响应性问题，特别是在移动设备上
 
 ```js
 // 比如动态添加一个广告弹窗
@@ -1116,9 +1116,10 @@ setInterval(checkPong, 1000); // 每秒检查一次
 
 
 ### h5新特性SharedWorker
-1. SharedWorker地址如果本地相对地址失效，可用http完整地址
+1. SharedWorker地址通常是相对路径，也可用http完整地址
 2. 在SharedWorker中，如果想要将发送者的信息传播给其他页面（即连接到SharedWorker的其他端口），不能直接通过port.postMessage发送消息给特定的其他端口，因为port对象只代表当前连接。但是，可以设置一个机制来存储和广播消息给所有连接的端口。
 
+index页面
 ```html
 <!DOCTYPE html>  
 <html lang="en">  
@@ -1155,6 +1156,8 @@ function sendMessage() {
 </body>  
 </html>
 ```
+
+html页面
 ```html
 <!DOCTYPE html>  
 <html lang="en">  
@@ -1170,11 +1173,11 @@ function sendMessage() {
 <!-- <button onclick="sendMessage()">Send Message to SharedWorker</button>  -->
   
 <script>  
-// 连接到SharedWorker  
-var worker = new SharedWorker('http://127.0.0.1:8848/code/sharedworker.js');  
+// 连接到SharedWorker  路径根据实际项目需求
+var worker = new SharedWorker('./sharedworker.js');  
   
 // 连接到SharedWorker的端口  
-var port = worker.port;  
+var port = worker.port; 
   
 // 监听从SharedWorker发送的消息  
 port.onmessage = function(e) {  
@@ -1191,6 +1194,8 @@ function sendMessage() {
 </body>  
 </html>
 ```
+
+sharedworkjs
 ```js
 var ports = [];  
   
@@ -7163,6 +7168,47 @@ jscodeshift -t remove-console.js path/to/your/directory --extensions js
 # 递归处理(注意，jscodeshift 的某些版本可能默认就是递归的)
 jscodeshift -t remove-console.js path/to/your/directory --extensions js --recursive
 ```
+
+
+### 同一个页面多个窗口打开数据同步更新方案
+
+1. sharedwork实现通知
+2. localstorange监听storage事件
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<div id='k'>kkk</div>
+		<div id='k1'>0</div>
+	</body>
+</html>
+<script type="text/javascript">
+	const k =document.getElementById('k')
+	const k1 = document.querySelector('#k1')
+	k.onclick = function(){
+		console.log(k1.innerHTML)
+		let num = parseInt(k1.innerHTML)
+		num++
+		localStorage.setItem('k1',num)
+		k1.innerHTML = num
+	}
+	// A 页面打开两个，当前A页面不会触发该事件，但是A页面的另外一个标签会触发，可以实现同步更新数据
+	window.onstorage = (e) => {
+		k1.innerHTML = e.newValue
+	}
+</script>
+```
+
+3. websocket
+4. 轮询长轮询等方案
+
+
+
 
 
 ## ES6
