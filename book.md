@@ -83,12 +83,12 @@
     - [offsetWidth](#offsetwidth)
     - [clientX、offsetX、screenX](#clientxoffsetxscreenx)
     - [clientX、offsetTop、offsetLeft、offsetWidth、offsetHeight](#clientxoffsettopoffsetleftoffsetwidthoffsetheight)
-    - [offset的理解](#offset的理解)
+    - [`offset的理解`](#offset的理解)
     - [a标签伪类顺序](#a标签伪类顺序)
     - [margin负值](#margin负值)
-    - [BFC](#bfc)
+    - [`BFC`](#bfc)
       - [margin重叠](#margin重叠)
-    - [两三栏布局](#两三栏布局)
+    - [`两三栏布局`](#两三栏布局)
     - [粘连布局](#粘连布局)
     - [`清除浮动`](#清除浮动)
     - [盒模型](#盒模型)
@@ -1314,6 +1314,10 @@ worker.terminate();
 self.close();
 ```
 
+```js
+navigator.hardwareConcurrency// 检测当前电脑cpu是多少核
+```
+
 
 
 
@@ -1382,15 +1386,21 @@ offsetWidth 属性是一个只读属性,返回一个元素的布局宽度.（各
 + offsetWidth/Height：元素占据的位置，直到边框为止
 + offsetLeft/offsetTop：和父级偏移的相对应位置
 + event.offsetX/event.offsetY: 和点击元素相对的偏移的x和y的值
++ HTMLElement.offsetParent：返回一个指向最近的（指包含层级上的最近）包含该元素的定位元素或者最近的 table, td, th, body 元素。当元素的 style.display 设置为 "none" 时，offsetParent 返回 null。
+
+```js
+// parentObj 是一个对象引用，当前元素相对于该对象偏移（offset）。
+parentObj = element.offsetParent;
+```
 
 
 ### a标签伪类顺序
-lvha(love-ha)
+lvha(LoVe HAte)
 ```css
 a:link{color:#f30;} 
 a:visited{color:#000;} 
 a:hover{color:#fff;} 
-a:active{color:#f99;}
+a:active{color:#f99;} /*链接被激活时，如鼠标按钮按下但还没有释放的时。用于强调链接交互状态。*/
 ```
 
 
@@ -1829,6 +1839,110 @@ div内容为3的位置，设置了margin-right负值，本来应该影响右侧�
 
 2. flex布局：footer的flex设为0，这样footer获得其固有的高度;content的flex设为1
 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox Sticky Footer with Scrollable Content</title>
+    <style>
+		* {
+		    box-sizing: border-box;
+		    margin: 0;
+		    padding: 0;
+		}
+		
+		html, body {
+		    height: 100%;
+		    margin: 0;
+		    font-family: Arial, sans-serif;
+		}
+		
+		body {
+		    display: flex;
+		    justify-content: center;
+		    align-items: flex-start; /* 让flex-container从顶部开始对齐 */
+		    padding: 10px;
+		    overflow-x: hidden; /* 防止水平滚动条 */
+		}
+		
+		.flex-container {
+		    display: flex;
+		    flex-direction: column;
+		    width: 100%;
+		    max-width: 1200px;
+		    min-height: 100vh; /* 确保容器至少占满视口高度 */
+		}
+		
+		.top-content {
+		    flex: 1; /* 顶部内容占据剩余空间 */
+		    overflow-y: auto; /* 启用垂直滚动 */
+		    padding: 20px;
+		    background-color: #f0f0f0; /* 可选背景色 */
+		}
+		/* 根据实际需求，也可以考虑省略 */
+		.spacer {
+		    flex: 1; /* 这是一个灵活的间隔，用于推到底部内容 */
+		    min-height: 0; /* 确保间隔不会占用不必要的空间 */
+		}
+		
+		.bottom-content {
+		    margin-top: auto; /* 使用auto margin将底部内容推到容器的底部 */
+		    padding: 20px;
+		    background-color: #ddd; /* 可选背景色 */
+		    /* 设置一个最小高度，确保即使内容很少时，底部内容也不会消失（可选） */
+		    min-height: 50px;
+		}
+	</style>
+</head>
+<body>
+    <div class="flex-container">
+        <div class="top-content">
+            <p>22这是顶部内容区域。您可以在这里添加更多的段落或内容来测试滚动效果。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p><p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p><p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p><p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p><p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+			<p>这是顶部内容区域。</p>
+            <!-- 添加更多内容以测试滚动 -->
+        </div>
+        <div class="spacer"></div>
+        <div class="bottom-content">
+            <p>这是底部内容区域，它始终位于页面底部。</p>
+        </div>
+    </div>
+</body>
+</html>
+```
+
 
 ### `清除浮动`
 1.	overflow:hidden
@@ -2104,6 +2218,51 @@ flex+margin:auto
 1.	写具体数值，如30px，则继承父级该值
 2.	写比例如1/2/3.5等,则继承该比例（**自己的**font-size*父级中的比例）
 3.	写百分比,如200%,则继承计算出来的结果(**父级**的font-size*200%)
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<style>
+			*{
+				margin:0;
+				padding:0
+			}
+			
+			#k1{
+				width:400px;
+				height: 400px;
+				border:1px solid red;
+				font-size:12px;
+				line-height: 40px
+			}
+			
+			#k2{
+				width:200px;
+				height:200px;
+				border: 1px solid blue;
+				font-size:20px
+			}
+		</style>
+	</head>
+	<body>
+		<div id='k1'>
+			<div id='k2'>222</div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	let k2 = document.getElementById("k2")
+	let obj = window.getComputedStyle(k2)
+	console.log(obj.lineHeight)
+</script>
+```
+
+![如图所示](book_files/337.jpg)
+
 
 
 ### css预处理语言
