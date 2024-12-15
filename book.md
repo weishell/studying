@@ -2506,6 +2506,8 @@ body {
  border-width: 3px;}
 ```
 
+less中有类似的实现方案，stylus虽然没有，但是可以嵌套的方式实现对应的功能
+
 
 ### sass 插值语句 #{}
 通过 #{} 插值语句可以在选择器或属性名中使用变量
@@ -2537,6 +2539,8 @@ body {
   /*实际编写时，可能需要使用Sass的@at-root或自定义函数来处理!important*/  
 }
 ```
+
+stylus和less都有对应的实现方案
 
 
 ### flex布局
@@ -2588,6 +2592,48 @@ body {
 
 ### 元素竖向的百分比设定是相对于容器的高度吗？
 当按百分比设定一个元素的宽度时，它是相对于**父容器的宽度**计算的，但是，对于一些表示竖向距离的属性，例如 `padding-top , padding-bottom , margin-top , margin-bottom` 等，当按百分比设定它们时，依据的也是父容器的`宽度`，而不是高度。
+
+当然， ***元素的高度*** 这样的属性如果是百分比，则依然按照父元素的高度得到的。
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<style>
+			*{margin:0;padding:0}
+			.k1{
+				width:400px;
+				height:100px;
+				/* border:1px solid red; */
+				background: rgba(200,100,50,.3);
+				overflow: hidden;
+			}
+			.k2{
+				width:20%;
+				height:20%;
+				margin-top:5%;
+				background: blue;
+			}
+		</style>
+	</head>
+	<body>
+		<div class='k1'>
+			<div class='k2'></div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	let k2 = document.getElementsByClassName('k2')[0]
+	let obj = window.getComputedStyle(k2)
+	console.log(obj.height,obj.marginTop)
+</script>
+```
+
+
+![案例](book_files/338.jpg)
 
 
 ### css选择器
