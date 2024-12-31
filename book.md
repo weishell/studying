@@ -3204,7 +3204,6 @@ transform-style 属性指定嵌套元素是怎样在三维空间中呈现。
 	background-color: yellow;
 	transform: rotateY(-60deg);
 	-webkit-transform: rotateY(-60deg); 
-
 }
 
 </style>
@@ -3228,6 +3227,7 @@ transform-style 属性指定嵌套元素是怎样在三维空间中呈现。
 ### `css性能优化`
 1. 内联首屏`关键css`，可下载完html立刻渲染，不需要外链下载再渲染，但是不能缓存且代码不能过多(阻塞)
 2. **异步加载css**
+
 ```js
 //方案1
 const myCSS = document.createElement( "link" );
